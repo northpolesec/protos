@@ -8,15 +8,22 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     permissions:
-      # required to push a commit
       contents: write
-      # required to create a pull request
       pull-requests: write
     steps:
-      - uses: actions/checkout@v3
+      # Checkout the code
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # ratchet:actions/checkout@v4
 
-      # something to generate files
+      # Setup bazel and any caches
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@90b352333885f9fb6bf262d8e659f01b6219cc25 # ratchet:bazel-contrib/s#
+        with:
+          bazelisk-cache: true
+          disk-cache: true
+          repository-cache: true
+
+      # Build the generated go files and copy to the root of the repo
       - run: bazel build :sync_v1_go_proto && cp bazel-bin/sync_v1_go_proto_/github.com/northpolesec/protos/sync_v1_proto/syncv1.pb.go .
 
-      # push the change if exists
-      - uses: int128/update-generated-files-action@v2
+      # Push any changes
+      - uses: int128/update-generated-files-action@757376506709ed3d87f14a80ca28a98736d52236 # ratchet:int128/update-generated-files-action@v2
