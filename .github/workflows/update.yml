@@ -1,0 +1,22 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      # required to push a commit
+      contents: write
+      # required to create a pull request
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+
+      # something to generate files
+      - run: bazel build :sync_v1_go_proto && cp bazel-bin/sync_v1_go_proto_/github.com/northpolesec/protos/sync_v1_proto/syncv1.pb.go .
+
+      # push the change if exists
+      - uses: int128/update-generated-files-action@v2
