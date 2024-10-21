@@ -22,8 +22,8 @@ jobs:
           disk-cache: true
           repository-cache: true
 
-      # Build the generated go files and copy to the root of the repo
-      - run: bazel build :sync_v1_go_proto && cp bazel-bin/sync_v1_go_proto_/github.com/northpolesec/protos/sync_v1_proto/syncv1.pb.go .
+      # Build the generated sync Go files and copy to the root of the repo
+      - run: bazel build //sync:v1_go_proto && cp bazel-bin/sync/v1_go_proto_/github.com/northpolesec/protos/sync/v1_proto/v1.pb.go sync
 
       # Push any changes
       - uses: int128/update-generated-files-action@757376506709ed3d87f14a80ca28a98736d52236 # ratchet:int128/update-generated-files-action@v2
