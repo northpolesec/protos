@@ -1,6 +1,6 @@
 # North Pole Security Protos
 
-This repository contains protobuf definitions used by Santa.
+This repository contains protobuf definitions used by [Santa](https://github.com/northpolesec/santa).
 
 It also contains generated Go code for these protos, so that the protos can be
 imported by projects that don't use Bazel as their build system. There is a
