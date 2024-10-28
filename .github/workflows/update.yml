@@ -27,5 +27,5 @@ jobs:
             fi
           done
 
-          exit $(test ${FOUND_CHANGES} == 1)
+          exit $(test ${FOUND_CHANGES:-0} == 0)
 
