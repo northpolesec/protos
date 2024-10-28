@@ -1,4 +1,5 @@
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -6,24 +7,25 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       # Checkout the code
       - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # ratchet:actions/checkout@v4
 
-      # Build the generated sync Go files and copy into the sync folder
-      - name: Build & Copy sync v1.pb.go
+      # Check if there are changes
+      - name: Check for changes
         run: |
-          bazel build //sync:v1_go_proto
+          bazel build //sync:v1_go_proto //telemetry:v1_go_proto
           cp $(find bazel-bin/sync/ -name 'v1.pb.go') sync
-
-      # Build the generated telemetry Go files and copy into the telemetry folder
-      - name: Build & Copy telemetry v1.pb.go
-        run: |
-          bazel build //telemetry:v1_go_proto
           cp $(find bazel-bin/telemetry/ -name 'v1.pb.go') telemetry
 
-      # Push any changes
-      - uses: int128/update-generated-files-action@757376506709ed3d87f14a80ca28a98736d52236 # ratchet:int128/update-generated-files-action@v2
+          for f in sync telemetry; do
+            if [[ -n "$(git diff ${f}/v1.pb.go)" ]]; then
+              echo "Changes to ${f}.proto require re-generation of ${f}/v1.pb.go"
+              echo "Please run 'bazel build //${f}:v1_go_proto && cp \$(find bazel-bin/${f}/ -name 'v1.pb.go') ${f}/'"
+              echo ""
+              FOUND_CHANGES=1
+            fi
+          done
+
+          exit $(test ${FOUND_CHANGES} == 1)
+
