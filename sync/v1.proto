@@ -284,10 +284,25 @@ message Event {
   repeated Certificate signing_chain = 28 [json_name = "signing_chain"];
 }
 
+// AuditE
+message NewStandaloneModeRuleCreation {
+  Decision decision = 1; // Indicates new rule type
+  string identifier = 2; // Indicates new rule identifier
+  uint32 timestamp  = 3; // Timestamp of rule creation
+}
+
+// AuditEvents are events sent by Santa such as standalone mode rule creation.
+message AuditEvents {
+   oneof event {
+      NewStandaloneModeRule new_standalonemode_rule = 1;
+   }
+}
+
 message EventUploadRequest {
-  repeated Event events = 1 [json_name = "events"];
+  repeated Event events = 1             [json_name = "events"];
+  repeated AuditEvent audit_events = 3; [json_name="audit_events"];
   // The UUID of the machine where the event(s) occurred
-  string machine_id = 2 [json_name = "machine_id"];
+  string machine_id = 2                 [json_name = "machine_id"];
 }
 
 message EventUploadResponse {
