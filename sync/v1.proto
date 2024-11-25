@@ -98,7 +98,11 @@ enum SyncType {
 
   // Delete all previously received rules before applying the newly received rules.
   CLEAN_ALL = 3;
-  clean_all = 3 [deprecated = true];
+  clean_all = 3 [deprecated=true];
+
+  // Delete all rules created in Standalone mode before applying the newly
+  // received rules.
+  CLEAN_STANDALONE = 4;
 }
 
 enum FileAccessAction {
@@ -178,6 +182,11 @@ message PreflightResponse {
   //   `auditonly`: Actions that would be denied are logged but allowed
   //   `none`: The policy will be applied as written
   optional FileAccessAction override_file_access_action = 15;
+
+  // If set, this will put Santa into standalone mode, where a user can approve
+  // binaries from unknown blocks with TouchID. If set to false, Santa will
+  // revert back to normal operation.
+  optional bool standalone_mode = 16;
 
   // These fields are deprecated forms of other fields and exist here solely for backwards compatibility
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -284,17 +293,18 @@ message Event {
   repeated Certificate signing_chain = 28 [json_name = "signing_chain"];
 }
 
-// AuditE
-message NewStandaloneModeRuleCreation {
-  Decision decision = 1; // Indicates new rule type
-  string identifier = 2; // Indicates new rule identifier
-  uint32 timestamp  = 3; // Timestamp of rule creation
+// Audit Event for when Santa makes a new rule in standalone mode.
+message StandaloneModeRuleCreation {
+  Decision decision = 1 [json_name="decision"];   // Indicates new rule type
+  string identifier = 2 [json_name="identifier"]; // Indicates new rule identifier
+  uint32 timestamp  = 3 [json_name="timestamp"];  // Timestamp of rule creation
 }
 
-// AuditEvents are events sent by Santa such as standalone mode rule creation.
+// AuditEvents are events sent by Santa to communicate context to the sync
+// service.
 message AuditEvents {
    oneof event {
-      NewStandaloneModeRule new_standalonemode_rule = 1;
+      StandaloneModeRuleCreation standalone_mode_rule_creation = 1 [json_name="standalone_mode_rule_creation"];
    }
 }
 
