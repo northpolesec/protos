@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package santa.sync.v1;
 
-option go_package = "github.com/northpolesec/protos/sync/v1_proto";
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync";
 
 // Note: Many of the enums in this proto file do not conform to protocol buffer
 // best practices. The reason for this is that this proto was developed to be

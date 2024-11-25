@@ -5,7 +5,7 @@ package santa.telemetry.v1;
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/northpolesec/protos/telemetry/v1_proto";
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
 option objc_class_prefix = "SNTPB";
 
 // User ID and associated username
