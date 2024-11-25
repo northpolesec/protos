@@ -2,6 +2,8 @@
 
 syntax = "proto3";
 
+option go_package = "github.com/northpolesec/protos/sync";
+
 package santa.sync.v1;
 
 // Note: Many of the enums in this proto file do not conform to protocol buffer

@@ -4,6 +4,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -11,21 +15,7 @@ jobs:
       # Checkout the code
       - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # ratchet:actions/checkout@v4
 
-      # Check if there are changes
-      - name: Check for changes
-        run: |
-          bazel build //sync:v1_go_proto //telemetry:v1_go_proto
-          cp $(find bazel-bin/sync/ -name 'v1.pb.go') sync
-          cp $(find bazel-bin/telemetry/ -name 'v1.pb.go') telemetry
-
-          for f in sync telemetry; do
-            if [[ -n "$(git diff ${f}/v1.pb.go)" ]]; then
-              echo "Changes to ${f}.proto require re-generation of ${f}/v1.pb.go"
-              echo "Please run 'bazel build //${f}:v1_go_proto && cp \$(find bazel-bin/${f}/ -name 'v1.pb.go') ${f}/'"
-              echo ""
-              FOUND_CHANGES=1
-            fi
-          done
-
-          exit $(test ${FOUND_CHANGES:-0} == 0)
-
+      # Publish to buf.build BSR
+      - uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
