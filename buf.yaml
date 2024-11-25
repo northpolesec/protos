@@ -2,3 +2,5 @@ version: v2
 modules:
   - path: .
     name: buf.build/northpolesec/protos
+deps:
+  - buf.build/googleapis/googleapis

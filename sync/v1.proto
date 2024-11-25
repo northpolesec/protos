@@ -6,6 +6,8 @@ package santa.sync.v1;
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync";
 
+import "google/api/annotations.proto";
+
 // Note: Many of the enums in this proto file do not conform to protocol buffer
 // best practices. The reason for this is that this proto was developed to be
 // backward-compatible with an existing JSON API and unlike field names, enum
@@ -15,18 +17,38 @@ option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/syn
 service SantaSync {
   // Preflight is used to send current configuration data to the server and to
   // retrieve new configuration values from the server.
-  rpc Preflight(PreflightRequest) returns (PreflightResponse) {}
+  rpc Preflight(PreflightRequest) returns (PreflightResponse) {
+    option (google.api.http) = {
+      post: "/preflight/{machine_id}"
+      body: "*"
+    };
+  }
 
   // EventUpload sends details about blocked (or would-be-blocked) executions to
   // the server.
-  rpc EventUpload(EventUploadRequest) returns (EventUploadResponse) {}
+  rpc EventUpload(EventUploadRequest) returns (EventUploadResponse) {
+    option (google.api.http) = {
+      post: "/eventupload/{machine_id}"
+      body: "*"
+    };
+  }
 
   // RuleDownload retrieves new rules from the server.
-  rpc RuleDownload(RuleDownloadRequest) returns (RuleDownloadResponse) {}
+  rpc RuleDownload(RuleDownloadRequest) returns (RuleDownloadResponse) {
+    option (google.api.http) = {
+      post: "/ruledownload/{machine_id}"
+      body: "*"
+    };
+  }
 
   // Postflight sends status data back to the server after applying any new
   // configuration received in the previous stages.
-  rpc Postflight(PostflightRequest) returns (PostflightResponse) {}
+  rpc Postflight(PostflightRequest) returns (PostflightResponse) {
+    option (google.api.http) = {
+      post: "/postflight/{machine_id}"
+      body: "*"
+    };
+  }
 }
 
 // ClientMode represents the operating mode for an agent.
