@@ -310,7 +310,7 @@ message AuditEvent {
 
 message EventUploadRequest {
   repeated Event events = 1             [json_name = "events"];
-  repeated AuditEvent audit_events = 3; [json_name="audit_events"];
+  repeated AuditEvent audit_events = 3  [json_name="audit_events"];
   // The UUID of the machine where the event(s) occurred
   string machine_id = 2                 [json_name = "machine_id"];
 }
