@@ -302,7 +302,7 @@ message StandaloneModeRuleCreation {
 
 // AuditEvents are events sent by Santa to communicate context to the sync
 // service.
-message AuditEvents {
+message AuditEvent {
    oneof event {
       StandaloneModeRuleCreation standalone_mode_rule_creation = 1 [json_name="standalone_mode_rule_creation"];
    }
