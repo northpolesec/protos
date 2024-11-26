@@ -1,11 +1,12 @@
 syntax = "proto3";
 
+package santa.telemetry.v1;
+
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
 option objc_class_prefix = "SNTPB";
-
-package santa.telemetry.v1;
 
 // User ID and associated username
 message UserInfo {
@@ -916,7 +917,7 @@ message SantaMessage {
     ScreenSharing screen_sharing = 25;
     OpenSSH open_ssh = 26;
     Authentication authentication = 27;
-  };
+  }
 }
 
 message SantaMessageBatch {

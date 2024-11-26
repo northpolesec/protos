@@ -4,6 +4,10 @@ syntax = "proto3";
 
 package santa.sync.v1;
 
+import "google/api/annotations.proto";
+
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync";
+
 // Note: Many of the enums in this proto file do not conform to protocol buffer
 // best practices. The reason for this is that this proto was developed to be
 // backward-compatible with an existing JSON API and unlike field names, enum
@@ -13,18 +17,38 @@ package santa.sync.v1;
 service SantaSync {
   // Preflight is used to send current configuration data to the server and to
   // retrieve new configuration values from the server.
-  rpc Preflight(PreflightRequest) returns (PreflightResponse) {}
+  rpc Preflight(PreflightRequest) returns (PreflightResponse) {
+    option (google.api.http) = {
+      post: "/preflight/{machine_id}"
+      body: "*"
+    };
+  }
 
   // EventUpload sends details about blocked (or would-be-blocked) executions to
   // the server.
-  rpc EventUpload(EventUploadRequest) returns (EventUploadResponse) {}
+  rpc EventUpload(EventUploadRequest) returns (EventUploadResponse) {
+    option (google.api.http) = {
+      post: "/eventupload/{machine_id}"
+      body: "*"
+    };
+  }
 
   // RuleDownload retrieves new rules from the server.
-  rpc RuleDownload(RuleDownloadRequest) returns (RuleDownloadResponse) {}
+  rpc RuleDownload(RuleDownloadRequest) returns (RuleDownloadResponse) {
+    option (google.api.http) = {
+      post: "/ruledownload/{machine_id}"
+      body: "*"
+    };
+  }
 
   // Postflight sends status data back to the server after applying any new
   // configuration received in the previous stages.
-  rpc Postflight(PostflightRequest) returns (PostflightResponse) {}
+  rpc Postflight(PostflightRequest) returns (PostflightResponse) {
+    option (google.api.http) = {
+      post: "/postflight/{machine_id}"
+      body: "*"
+    };
+  }
 }
 
 // ClientMode represents the operating mode for an agent.
@@ -35,27 +59,27 @@ enum ClientMode {
 }
 
 message PreflightRequest {
-  string serial_number = 1           [json_name="serial_num"];
-  string hostname = 2                [json_name="hostname"];
-  string os_version = 3              [json_name="os_version"];
-  string os_build = 4                [json_name="os_build"];
-  string model_identifier = 5        [json_name="model_identifier"];
-  string santa_version = 6           [json_name="santa_version"];
-  string primary_user = 7            [json_name="primary_user"];
-  string push_notification_token = 8 [json_name="push_notification_token"];
+  string serial_number = 1 [json_name = "serial_num"];
+  string hostname = 2 [json_name = "hostname"];
+  string os_version = 3 [json_name = "os_version"];
+  string os_build = 4 [json_name = "os_build"];
+  string model_identifier = 5 [json_name = "model_identifier"];
+  string santa_version = 6 [json_name = "santa_version"];
+  string primary_user = 7 [json_name = "primary_user"];
+  string push_notification_token = 8 [json_name = "push_notification_token"];
 
-  ClientMode client_mode = 9         [json_name="client_mode"];
-  bool request_clean_sync = 10       [json_name="request_clean_sync"];
+  ClientMode client_mode = 9 [json_name = "client_mode"];
+  bool request_clean_sync = 10 [json_name = "request_clean_sync"];
 
-  uint32 binary_rule_count = 11      [json_name="binary_rule_count"];
-  uint32 certificate_rule_count = 12 [json_name="certificate_rule_count"];
-  uint32 compiler_rule_count = 13    [json_name="compiler_rule_count"];
-  uint32 transitive_rule_count = 14  [json_name="transitive_rule_count"];
-  uint32 teamid_rule_count = 15      [json_name="teamid_rule_count"];
-  uint32 signingid_rule_count = 16   [json_name="signingid_rule_count"];
-  uint32 cdhash_rule_count = 17      [json_name="cdhash_rule_count"];
+  uint32 binary_rule_count = 11 [json_name = "binary_rule_count"];
+  uint32 certificate_rule_count = 12 [json_name = "certificate_rule_count"];
+  uint32 compiler_rule_count = 13 [json_name = "compiler_rule_count"];
+  uint32 transitive_rule_count = 14 [json_name = "transitive_rule_count"];
+  uint32 teamid_rule_count = 15 [json_name = "teamid_rule_count"];
+  uint32 signingid_rule_count = 16 [json_name = "signingid_rule_count"];
+  uint32 cdhash_rule_count = 17 [json_name = "cdhash_rule_count"];
   // The UUID of the machine that is sending this preflight.
-  string machine_id = 18             [json_name="machine_id"];
+  string machine_id = 18 [json_name = "machine_id"];
 }
 
 enum SyncType {
@@ -66,15 +90,15 @@ enum SyncType {
 
   // Standard, progressive sync
   NORMAL = 1;
-  normal = 1 [deprecated=true];
+  normal = 1 [deprecated = true];
 
   // Delete all non-transitive, previously received rules before applying the newly received rules.
   CLEAN = 2;
-  clean = 2 [deprecated=true];
+  clean = 2 [deprecated = true];
 
   // Delete all previously received rules before applying the newly received rules.
   CLEAN_ALL = 3;
-  clean_all = 3 [deprecated=true];
+  clean_all = 3 [deprecated = true];
 }
 
 enum FileAccessAction {
@@ -85,15 +109,15 @@ enum FileAccessAction {
 
   // The policy will be applied as written
   NONE = 1;
-  None = 1 [deprecated=true];
+  None = 1 [deprecated = true];
 
   // Actions that would be denied are logged but allowed
   AUDIT_ONLY = 2;
-  AuditOnly = 2 [deprecated=true];
+  AuditOnly = 2 [deprecated = true];
 
   // No action will be taken
   DISABLE = 3;
-  Disable = 3 [deprecated=true];
+  Disable = 3 [deprecated = true];
 }
 
 message PreflightResponse {
@@ -125,16 +149,16 @@ message PreflightResponse {
   optional bool disable_unknown_event_upload = 7;
 
   // Specifies the time interval in seconds between full syncs. Defaults to 600 (10 minutes). Cannot be set lower than 60.
-  uint32 full_sync_interval_seconds = 8 [json_name="full_sync_interval"];
+  uint32 full_sync_interval_seconds = 8 [json_name = "full_sync_interval"];
 
   // When push notifications are enabled, this overrides the full_sync_interval above. It is expected that Santa will not
   // need to perform a full sync as frequently when push notifications are working. Defaults to 14400 (6 hours).
-  uint32 push_notification_full_sync_interval_seconds = 9 [json_name="push_notification_full_sync_interval"];
+  uint32 push_notification_full_sync_interval_seconds = 9 [json_name = "push_notification_full_sync_interval"];
 
   // The maximum number of seconds Santa can wait before triggering a rule sync after receiving a "global rule sync" notification.
   // As these notifications cause every Santa client to try and sync, we add a random delay to each client to try and spread the
   // load out on the sync server. This defaults to 600 (10 minutes).
-  uint32 push_notification_global_rule_sync_deadline_seconds = 10 [json_name="push_notification_global_rule_sync_deadline"];
+  uint32 push_notification_global_rule_sync_deadline_seconds = 10 [json_name = "push_notification_global_rule_sync_deadline"];
 
   // These two regexes are used to allow/block executions whose path matches. The provided regex must conform to ICU format.
   // While this feature can be useful, its use should be very carefully considered as it is much riskier than real rules.
@@ -156,17 +180,41 @@ message PreflightResponse {
   optional FileAccessAction override_file_access_action = 15;
 
   // These fields are deprecated forms of other fields and exist here solely for backwards compatibility
-  optional bool deprecated_enabled_transitive_whitelisting = 1000 [json_name="enabled_transitive_whitelisting", deprecated=true];
-  optional bool deprecated_transitive_whitelisting_enabled = 1001 [json_name="transitive_whitelisting_enabled", deprecated=true];
-  optional bool deprecated_bundles_enabled = 1002 [json_name="bundles_enabled", deprecated=true];
-  optional uint32 deprecated_fcm_full_sync_interval_seconds = 1003 [json_name="fcm_full_sync_interval", deprecated=true];
-  optional uint32 deprecated_fcm_global_rule_sync_deadline_seconds = 1004 [json_name="fcm_global_rule_sync_deadline", deprecated=true];
-  optional string deprecated_whitelist_regex = 1005 [json_name="whitelist_regex", deprecated=true];
-  optional string deprecated_blacklist_regex = 1006 [json_name="blacklist_regex", deprecated=true];
+  optional bool deprecated_enabled_transitive_whitelisting = 1000 [
+    json_name = "enabled_transitive_whitelisting",
+    deprecated = true
+  ];
+  optional bool deprecated_transitive_whitelisting_enabled = 1001 [
+    json_name = "transitive_whitelisting_enabled",
+    deprecated = true
+  ];
+  optional bool deprecated_bundles_enabled = 1002 [
+    json_name = "bundles_enabled",
+    deprecated = true
+  ];
+  optional uint32 deprecated_fcm_full_sync_interval_seconds = 1003 [
+    json_name = "fcm_full_sync_interval",
+    deprecated = true
+  ];
+  optional uint32 deprecated_fcm_global_rule_sync_deadline_seconds = 1004 [
+    json_name = "fcm_global_rule_sync_deadline",
+    deprecated = true
+  ];
+  optional string deprecated_whitelist_regex = 1005 [
+    json_name = "whitelist_regex",
+    deprecated = true
+  ];
+  optional string deprecated_blacklist_regex = 1006 [
+    json_name = "blacklist_regex",
+    deprecated = true
+  ];
 
   // Deprecated but still supported key that acts like sync_type was set to "CLEAN" unless
   // the client had requested a clean sync, in which case it acts like "CLEAN_ALL"
-  optional bool deprecated_clean_sync = 1007 [json_name="clean_sync", deprecated=true];
+  optional bool deprecated_clean_sync = 1007 [
+    json_name = "clean_sync",
+    deprecated = true
+  ];
 }
 
 enum Decision {
@@ -193,53 +241,53 @@ message Certificate {
   string cn = 2;
   string org = 3;
   string ou = 4;
-  uint32 valid_from = 5   [json_name="valid_from"];
-  uint32 valid_until = 6  [json_name="valid_until"];
+  uint32 valid_from = 5 [json_name = "valid_from"];
+  uint32 valid_until = 6 [json_name = "valid_until"];
 }
 
 message Event {
-  string file_sha256 = 1                        [json_name="file_sha256"];
-  string file_path = 2                          [json_name="file_path"];
-  string file_name = 3                          [json_name="file_name"];
-  string executing_user = 4                     [json_name="executing_user"];
-  double execution_time = 5                     [json_name="execution_time"];
-  repeated string logged_in_users = 6           [json_name="logged_in_users"];
-  repeated string current_sessions = 7          [json_name="current_sessions"];
-  Decision decision = 8                         [json_name="decision"];
+  string file_sha256 = 1 [json_name = "file_sha256"];
+  string file_path = 2 [json_name = "file_path"];
+  string file_name = 3 [json_name = "file_name"];
+  string executing_user = 4 [json_name = "executing_user"];
+  double execution_time = 5 [json_name = "execution_time"];
+  repeated string logged_in_users = 6 [json_name = "logged_in_users"];
+  repeated string current_sessions = 7 [json_name = "current_sessions"];
+  Decision decision = 8 [json_name = "decision"];
 
-  string file_bundle_id = 9                     [json_name="file_bundle_id"];
-  string file_bundle_path = 10                  [json_name="file_bundle_path"];
-  string file_bundle_executable_rel_path = 11   [json_name="file_bundle_executable_rel_path"];
-  string file_bundle_name = 12                  [json_name="file_bundle_name"];
-  string file_bundle_version = 13               [json_name="file_bundle_version"];
-  string file_bundle_version_string = 14        [json_name="file_bundle_version_string"];
-  string file_bundle_hash = 15                  [json_name="file_bundle_hash"];
-  uint32 file_bundle_hash_millis = 16           [json_name="file_bundle_hash_millis"];
-  uint32 file_bundle_binary_count = 17          [json_name="file_bundle_binary_count"];
+  string file_bundle_id = 9 [json_name = "file_bundle_id"];
+  string file_bundle_path = 10 [json_name = "file_bundle_path"];
+  string file_bundle_executable_rel_path = 11 [json_name = "file_bundle_executable_rel_path"];
+  string file_bundle_name = 12 [json_name = "file_bundle_name"];
+  string file_bundle_version = 13 [json_name = "file_bundle_version"];
+  string file_bundle_version_string = 14 [json_name = "file_bundle_version_string"];
+  string file_bundle_hash = 15 [json_name = "file_bundle_hash"];
+  uint32 file_bundle_hash_millis = 16 [json_name = "file_bundle_hash_millis"];
+  uint32 file_bundle_binary_count = 17 [json_name = "file_bundle_binary_count"];
 
   // pid_t is an int32
-  int32 pid = 18                                [json_name="pid"];
-  int32 ppid = 19                               [json_name="ppid"];
-  string parent_name = 20                       [json_name="parent_name"];
+  int32 pid = 18 [json_name = "pid"];
+  int32 ppid = 19 [json_name = "ppid"];
+  string parent_name = 20 [json_name = "parent_name"];
 
-  string team_id = 21                           [json_name="team_id"];
-  string signing_id = 22                        [json_name="signing_id"];
-  string cdhash = 23                            [json_name="cdhash"];
+  string team_id = 21 [json_name = "team_id"];
+  string signing_id = 22 [json_name = "signing_id"];
+  string cdhash = 23 [json_name = "cdhash"];
 
-  string quarantine_data_url = 24               [json_name="quarantine_data_url"];
-  string quarantine_referer_url = 25            [json_name="quarantine_referer_url"];
+  string quarantine_data_url = 24 [json_name = "quarantine_data_url"];
+  string quarantine_referer_url = 25 [json_name = "quarantine_referer_url"];
   // Seconds since UNIX epoch. This field would ideally be an int64 but the protobuf library
   // encodes that as a string, unlike NSJSONSerialization
-  uint32 quarantine_timestamp = 26              [json_name="quarantine_timestamp"];
-  string quarantine_agent_bundle_id = 27        [json_name="quarantine_agent_bundle_id"];
+  uint32 quarantine_timestamp = 26 [json_name = "quarantine_timestamp"];
+  string quarantine_agent_bundle_id = 27 [json_name = "quarantine_agent_bundle_id"];
 
-  repeated Certificate signing_chain = 28       [json_name="signing_chain"];
+  repeated Certificate signing_chain = 28 [json_name = "signing_chain"];
 }
 
 message EventUploadRequest {
-  repeated Event events = 1                     [json_name="events"];
+  repeated Event events = 1 [json_name = "events"];
   // The UUID of the machine where the event(s) occurred
-  string machine_id = 2                         [json_name="machine_id"];
+  string machine_id = 2 [json_name = "machine_id"];
 }
 
 message EventUploadResponse {
@@ -290,13 +338,16 @@ message Rule {
   string file_bundle_hash = 6;
   uint32 file_bundle_binary_count = 7;
 
-  string deprecated_sha256 = 1000 [json_name="sha256", deprecated=true];  // Use identifier instead
+  string deprecated_sha256 = 1000 [
+    json_name = "sha256",
+    deprecated = true
+  ]; // Use identifier instead
 }
 
 message RuleDownloadRequest {
-  string cursor = 1       [json_name="cursor"];
+  string cursor = 1 [json_name = "cursor"];
   // The UUID of the machine that is requesting the rules.
-  string machine_id = 2   [json_name="machine_id"];
+  string machine_id = 2 [json_name = "machine_id"];
 }
 
 message RuleDownloadResponse {
@@ -305,11 +356,10 @@ message RuleDownloadResponse {
 }
 
 message PostflightRequest {
-  uint32 rules_received = 1   [json_name="rules_received"];
-  uint32 rules_processed = 2  [json_name="rules_processed"];
+  uint32 rules_received = 1 [json_name = "rules_received"];
+  uint32 rules_processed = 2 [json_name = "rules_processed"];
   // The UUID of the machine that is sending this postflight.
-  string machine_id = 3       [json_name="machine_id"];
+  string machine_id = 3 [json_name = "machine_id"];
 }
 
-message PostflightResponse { }
-
+message PostflightResponse {}
