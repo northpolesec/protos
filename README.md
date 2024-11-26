@@ -2,10 +2,20 @@
 
 This repository contains protobuf definitions used by [Santa](https://github.com/northpolesec/santa).
 
-It also contains generated Go code for these protos, so that the protos can be
-imported by projects that don't use Bazel as their build system. There is a
-GitHub actions workflow that will automatically re-generate the Go code upon
-push/pull request.
+### Buf
 
-If it would be helpful to have BUILD rules or pre-generated files for other
-languages, please open an Issue.
+The protos are also available at https://buf.build/northpolesec/protos and can
+be imported as a dependency into a project using `buf` by adding the following
+to the `deps` section of your `buf.yaml`:
+
+```
+buf.build/northpolesec/protos
+```
+
+You can also import generated proto code directly from buf. For example, to
+import the sync proto in Go code add the following to your imports:
+
+```
+buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync
+```
+
