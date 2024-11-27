@@ -1,5 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_proto_library")
-load("@rules_go//proto:def.bzl", "go_proto_library")
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
 
 proto_library(
     name = "v1_proto",
@@ -25,13 +24,6 @@ cc_library(
     deps = [
         ":v1_cc_proto",
     ],
-    visibility = ["//visibility:public"],
-)
-
-go_proto_library(
-    name = "v1_go_proto",
-    importpath = "github.com/northpolesec/protos/telemetry/v1_proto",
-    protos = [":v1_proto"],
     visibility = ["//visibility:public"],
 )
 
