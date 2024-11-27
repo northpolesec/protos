@@ -56,6 +56,7 @@ enum ClientMode {
   UNKNOWN_CLIENT_MODE = 0;
   MONITOR = 1;
   LOCKDOWN = 2;
+  STANDALONE = 3;
 }
 
 message PreflightRequest {
@@ -99,6 +100,10 @@ enum SyncType {
   // Delete all previously received rules before applying the newly received rules.
   CLEAN_ALL = 3;
   clean_all = 3 [deprecated = true];
+
+  // Delete all rules created in Standalone mode before applying the newly
+  // received rules.
+  CLEAN_STANDALONE = 4;
 }
 
 enum FileAccessAction {
@@ -284,8 +289,24 @@ message Event {
   repeated Certificate signing_chain = 28 [json_name = "signing_chain"];
 }
 
+// Audit Event for when Santa makes a new rule in standalone mode.
+message StandaloneModeRuleCreation {
+  Decision decision = 1 [json_name = "decision"]; // Indicates new rule type
+  string identifier = 2 [json_name = "identifier"]; // Indicates new rule identifier
+  uint32 timestamp = 3 [json_name = "timestamp"]; // Timestamp of rule creation
+}
+
+// AuditEvents are events sent by Santa to communicate context to the sync
+// service.
+message AuditEvent {
+  oneof event {
+    StandaloneModeRuleCreation standalone_mode_rule_creation = 1 [json_name = "standalone_mode_rule_creation"];
+  }
+}
+
 message EventUploadRequest {
   repeated Event events = 1 [json_name = "events"];
+  repeated AuditEvent audit_events = 3 [json_name = "audit_events"];
   // The UUID of the machine where the event(s) occurred
   string machine_id = 2 [json_name = "machine_id"];
 }
