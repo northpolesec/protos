@@ -56,6 +56,7 @@ enum ClientMode {
   UNKNOWN_CLIENT_MODE = 0;
   MONITOR = 1;
   LOCKDOWN = 2;
+  STANDALONE = 3;
 }
 
 message PreflightRequest {
@@ -182,11 +183,6 @@ message PreflightResponse {
   //   `auditonly`: Actions that would be denied are logged but allowed
   //   `none`: The policy will be applied as written
   optional FileAccessAction override_file_access_action = 15;
-
-  // If set, this will put Santa into standalone mode, where a user can approve
-  // binaries from unknown blocks with TouchID. If set to false, Santa will
-  // revert back to normal operation.
-  optional bool standalone_mode = 16;
 
   // These fields are deprecated forms of other fields and exist here solely for backwards compatibility
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
