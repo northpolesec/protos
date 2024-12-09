@@ -254,6 +254,27 @@ message Certificate {
   uint32 valid_until = 6 [json_name = "valid_until"];
 }
 
+// Information about a single entitlement key/value pair
+message Entitlement {
+  // The name of an entitlement
+  optional string key = 1;
+
+  // The value of an entitlement
+  optional string value = 2;
+}
+
+// Information about entitlements
+message EntitlementInfo {
+  // Whether or not the set of reported entilements is complete or has been
+  // filtered (e.g. by configuration or clipped because too many to log).
+  optional bool entitlements_filtered = 1;
+
+  // The set of entitlements associated with the target executable
+  // Only top level keys are represented
+  // Values (including nested keys) are JSON serialized
+  repeated Entitlement entitlements = 2;
+}
+
 message Event {
   string file_sha256 = 1 [json_name = "file_sha256"];
   string file_path = 2 [json_name = "file_path"];
@@ -291,6 +312,9 @@ message Event {
   string quarantine_agent_bundle_id = 27 [json_name = "quarantine_agent_bundle_id"];
 
   repeated Certificate signing_chain = 28 [json_name = "signing_chain"];
+
+  // Entitlement information about the target executbale
+  EntitlementInfo entitlement_info = 29;
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
