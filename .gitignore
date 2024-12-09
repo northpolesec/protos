@@ -2,3 +2,4 @@
 bazel-*
 MODULE.bazel.lock
 .vscode/*
+.zed/**
