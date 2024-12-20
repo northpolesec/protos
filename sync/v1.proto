@@ -315,6 +315,9 @@ message Event {
 
   // Entitlement information about the target executbale
   EntitlementInfo entitlement_info = 29;
+
+  // If the executable was signed using a production cert
+  optional bool prod_signed = 30;
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
