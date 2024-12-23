@@ -279,10 +279,11 @@ message EntitlementInfo {
 enum SigningStatus {
   SIGNING_STATUS_UNSPECIFIED = 0;
 
-  // The executing binary wasn't signed'
+  // The executing binary wasn't signed
   SIGNING_STATUS_UNSIGNED = 1;
 
-  // There was a problem checking the validity of the code signature of the executing binary
+  // There was a problem checking the validity of the code signature of the
+  // executing binary or its code signature was invalid.
   SIGNING_STATUS_INVALID = 2;
 
   // The exxecuting binary was ad hoc signed
