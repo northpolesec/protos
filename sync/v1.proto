@@ -275,6 +275,27 @@ message EntitlementInfo {
   repeated Entitlement entitlements = 2;
 }
 
+// Status of the analysis of the leaf signing certificate
+enum SigningStatus {
+  SIGNING_STATUS_UNSPECIFIED = 0;
+
+  // The executing binary wasn't signed
+  SIGNING_STATUS_UNSIGNED = 1;
+
+  // There was a problem checking the validity of the code signature of the
+  // executing binary or its code signature was invalid.
+  SIGNING_STATUS_INVALID = 2;
+
+  // The exxecuting binary was ad hoc signed
+  SIGNING_STATUS_ADHOC = 3;
+
+  // The executing binary was validly signed with a development certificate
+  SIGNING_STATUS_DEVELOPMENT = 4;
+
+  // The executing binary was validly signed with a production certificate
+  SIGNING_STATUS_PRODUCTION = 5;
+}
+
 message Event {
   string file_sha256 = 1 [json_name = "file_sha256"];
   string file_path = 2 [json_name = "file_path"];
@@ -315,6 +336,12 @@ message Event {
 
   // Entitlement information about the target executbale
   EntitlementInfo entitlement_info = 29;
+
+  // The raw codesigning flags set for the execution
+  uint32 cs_flags = 30;
+
+  // The signing status of the executing binary
+  SigningStatus signing_status = 31;
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
