@@ -436,6 +436,8 @@ message PostflightRequest {
   uint32 rules_processed = 2 [json_name = "rules_processed"];
   // The UUID of the machine that is sending this postflight.
   string machine_id = 3 [json_name = "machine_id"];
+  // The type of sync that the client just completed.
+  SyncType sync_type = 4;
 }
 
 message PostflightResponse {}
