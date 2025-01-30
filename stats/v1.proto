@@ -26,6 +26,7 @@ message SubmitStatsRequest {
 
   // The macOS version (e.g. 15.2).
   string macos_version = 4;
+
   // The macOS build (e.g. 24C101).
   string macos_build = 5;
 
