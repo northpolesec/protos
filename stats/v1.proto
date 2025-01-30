@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package santa.stats.v1;
+
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/stats";
+
+// StatsService is a gRPC service hosted at stats.northpole.security to which
+// the Santa agent will send anonymous usage statistics, IF OPTED IN.
+// These statistics help development by providing data about what versions are
+// being used and on what macOS versions, particularly when it comes to using
+// new library/SDK features and deprecating older features.
+service StatsService {
+  rpc SubmitStats(SubmitStatsRequest) returns (SubmitStatsResponse) {}
+}
+
+// The data sent in a SubmitStats request.
+message SubmitStatsRequest {
+  // A SHA-256 of the Hardware UUID of the submitting host.
+  string machine_id_hash = 1;
+
+  // The value of ORGANIZATION_ID from the Santa configuration profile.
+  string org_id = 2;
+
+  // The full Santa version (e.g. 2025.1.80).
+  string santa_version = 3;
+
+  // The macOS version (e.g. 15.2).
+  string macos_version = 4;
+
+  // The macOS build (e.g. 24C101).
+  string macos_build = 5;
+
+  // The Mac hardware model identifier (e.g. Mac15,7).
+  string mac_model = 6;
+}
+
+// No response is expected.
+message SubmitStatsResponse {}
