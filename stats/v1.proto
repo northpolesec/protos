@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package santa.stats.v1;
 
-import "google/protobuf/timestamp.proto";
-
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/stats";
 
 // StatsService is a gRPC service hosted at stats.northpole.security to which
@@ -17,26 +15,23 @@ service StatsService {
 
 // The data sent in a SubmitStats request.
 message SubmitStatsRequest {
-  // The timestamp of this submission.
-  google.protobuf.Timestamp submit_time = 1;
-
   // A SHA-256 of the Hardware UUID of the submitting host.
-  string machine_id_hash = 2;
+  string machine_id_hash = 1;
 
   // The value of ORGANIZATION_ID from the Santa configuration profile.
-  string org_id = 3;
+  string org_id = 2;
 
   // The full Santa version (e.g. 2025.1.80).
-  string santa_version = 4;
+  string santa_version = 3;
 
   // The macOS version (e.g. 15.2).
-  string macos_version = 5;
+  string macos_version = 4;
 
   // The macOS build (e.g. 24C101).
-  string macos_build = 6;
+  string macos_build = 5;
 
   // The Mac hardware model identifier (e.g. Mac15,7).
-  string mac_model = 7;
+  string mac_model = 6;
 }
 
 // No response is expected.
