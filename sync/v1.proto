@@ -535,7 +535,7 @@ message Event {
   // not be popoulated, so it has been marked deprecated.
   string quarantine_data_url = 24 [
     json_name = "quarantine_data_url",
-    deprecated = true,
+    deprecated = true
   ];
 
   // The referring URL that led to the URL the binary was downloaded from, if
@@ -544,21 +544,21 @@ message Event {
   // not be popoulated.
   string quarantine_referer_url = 25 [
     json_name = "quarantine_referer_url",
-    deprecated = true,
+    deprecated = true
   ];
 
   // Seconds since UNIX epoch. This field would ideally be an int64 but the
   // protobuf library encodes that as a string, unlike NSJSONSerialization.
   uint32 quarantine_timestamp = 26 [
     json_name = "quarantine_timestamp",
-    deprecated = true,
+    deprecated = true
   ];
 
   // If the binary was quarantined, this field contains the bundle ID of the
   // agent that downloaded the binary, e.g. com.google.Chrome.
   string quarantine_agent_bundle_id = 27 [
     json_name = "quarantine_agent_bundle_id",
-    deprecated = true,
+    deprecated = true
   ];
 
   // If the binary is properly signed, this field contains details of all of
@@ -710,7 +710,7 @@ message Rule {
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
     json_name = "sha256",
-    deprecated = true,
+    deprecated = true
   ];
 }
 
