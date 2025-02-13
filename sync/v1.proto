@@ -54,33 +54,82 @@ service SantaSync {
 // ClientMode represents the operating mode for an agent.
 enum ClientMode {
   UNKNOWN_CLIENT_MODE = 0;
+
+  // In MONITOR mode, any execution that doesn't match a rule or configuration
+  // will be allowed.
   MONITOR = 1;
+
+  // In LOCKDOWN mode, any execution that doesn't match a rule or configuration
+  // will be blocked.
   LOCKDOWN = 2;
+
+  // In STANDALONE mode, any execution that doesn't match a rule or
+  // configuration will be blocked but the user will be able to approve the
+  // execution by authenticating.
   STANDALONE = 3;
 }
 
 message PreflightRequest {
+  // The host's serial number.
   string serial_number = 1 [json_name = "serial_num"];
+
+  // The fully-qualified domain name, as returned by
+  // the gethostname() call.
   string hostname = 2 [json_name = "hostname"];
+
+  // The macOS version as reported in
+  // `/System/Library/CoreServices/SystemVersion.plist`
   string os_version = 3 [json_name = "os_version"];
+
+  // The macOS build number as reported in
+  // `/System/Library/CoreServices/SystemVersion.plist`
   string os_build = 4 [json_name = "os_build"];
+
+  // The host's model identifier, such as MacPro4,1 or Mac15,7, as reported
+  // by `sysctl hw.model`
   string model_identifier = 5 [json_name = "model_identifier"];
+
+  // The version of Santa making this request, e.g. 2025.1.80
   string santa_version = 6 [json_name = "santa_version"];
+
+  // The primary user of this machine, as configured by either the `MachineOwner`
+  // or (`MachineOwnerPlist` and `MachineOwnerKey`) configuration options.
   string primary_user = 7 [json_name = "primary_user"];
+
+  // If FCM or APNS push notifications are enabled, this will contain the
+  // notification token required to send push notifications back to this host.
   string push_notification_token = 8 [json_name = "push_notification_token"];
 
+  // The client mode that the machine is running in at the time of this sync.
   ClientMode client_mode = 9 [json_name = "client_mode"];
+
+  // True, if the user (or Santa itself) requested a clean sync.
+  // The user can request this by running `santactl sync --clean`. Santa itself
+  // can also request a clean sync, if the database is re-initialized or the
+  // SyncBaseURL changes.
   bool request_clean_sync = 10 [json_name = "request_clean_sync"];
 
+  // The number of BINARY rules in the database.
   uint32 binary_rule_count = 11 [json_name = "binary_rule_count"];
+  // The number of CERTIFICATE rules in the database.
   uint32 certificate_rule_count = 12 [json_name = "certificate_rule_count"];
+  // The number of ALLOW_COMPILER rules in the database.
   uint32 compiler_rule_count = 13 [json_name = "compiler_rule_count"];
+  // The number of rules that have been created by an allowed compiler.
   uint32 transitive_rule_count = 14 [json_name = "transitive_rule_count"];
+  // The number of TEAMID rules in the database.
   uint32 teamid_rule_count = 15 [json_name = "teamid_rule_count"];
+  // The number of SIGNINGID rules in the database.
   uint32 signingid_rule_count = 16 [json_name = "signingid_rule_count"];
+  // The number of CDHASH rules in the database.
   uint32 cdhash_rule_count = 17 [json_name = "cdhash_rule_count"];
 
   // The UUID of the machine that is sending this preflight.
+  // This will always match the UUID included in the request URL.
+  // This ID will be the first non-empty value of:
+  //    1) The value configured in the `MachineID` key in the config profile.
+  //    2) The value read from the `MachineIDKey` key from the `MachineIDPlist` plist.
+  //    3) The machine's hardware UUID.
   string machine_id = 18 [json_name = "machine_id"];
 
   // True, if the sync is a result of a push notification.
@@ -93,7 +142,11 @@ enum SyncType {
   // An unspecified SyncType will fallback to default "NORMAL" handling
   SYNC_TYPE_UNSPECIFIED = 0;
 
-  // Standard, progressive sync
+  // Standard, progressive sync.
+  // Santa will apply newly received rules on top of any existing rules. If a
+  // an existing rule with a matching `identifier` and `rule_type`, the rule
+  // will be replaced. If a received rule has the policy `REMOVE` then the rule
+  // will be removed.
   NORMAL = 1;
   normal = 1 [deprecated = true];
 
@@ -105,8 +158,7 @@ enum SyncType {
   CLEAN_ALL = 3;
   clean_all = 3 [deprecated = true];
 
-  // Delete all rules created in Standalone mode before applying the newly
-  // received rules.
+  // Delete rules created in Standalone mode before applying the newly received rules.
   CLEAN_STANDALONE = 4;
 }
 
@@ -132,53 +184,79 @@ enum FileAccessAction {
 message PreflightResponse {
   // The client mode that the client should move into at the end of this sync.
   // The mode does not change until the Postflight request has been made, to
-  // ensure the client has received all the needed rules before potentially going
-  // into Lockdown.
+  // ensure the client has received all the needed rules before potentially
+  // going into Lockdown.
   ClientMode client_mode = 1;
 
+  // The SyncType of this sync, which impacts how rules are applied. See the
+  // comments on the `SyncType` enum to learn how Santa interprets this value.
   optional SyncType sync_type = 2;
 
   // Controls how many events Santa should upload in a single EventUpload request.
   // If the server doesn't specify, the default is 50.
   uint32 batch_size = 3;
 
-  // Enable bundle hashing and bundle rules.
+  // Enable bundle hashing and bundle rules. If this is enabled when a binary
+  // is blocked Santa will try to determine the outermost bundle that it is a
+  // part of and create a "bundle hash" for the whole bundle. When the sync
+  // server receives this bundle hash it can decide whether to request that
+  // Santa uploads more details about all of the binaries contained within the
+  // bundle.
   optional bool enable_bundles = 4;
 
   // Enable transitive (ALLOWLIST_COMPILER) rules.
-  // Without this enabled, any received ALLOWLIST_COMPILER rules will be treated as ALLOWLIST.
+  // Without this enabled, any received ALLOWLIST_COMPILER rules will be treated
+  // as ALLOWLIST.
   optional bool enable_transitive_rules = 5;
 
-  // Ordinarily, Santa will only upload events about executions that are denied or would be denied if the machine
-  // were in LOCKDOWN mode. With this enabled, Santa will upload details about all events.
+  // Ordinarily, Santa will only upload events about executions that are denied
+  // or would be denied if the machine were in LOCKDOWN mode. With this enabled,
+  // Santa will upload details about all events.
   optional bool enable_all_event_upload = 6;
 
-  // Ordinarily, Santa will only upload events about executions that are denied or would be denied if the machine
-  // were in LOCKDOWN mode. With this enabled, Santa will NOT upload events for binaries that would have been blocked in LOCKDOWN.
+  // Ordinarily, Santa will only upload events about executions that are denied
+  // or would be denied if the machine were in LOCKDOWN mode. With this enabled,
+  // Santa will NOT upload events for binaries that would have been blocked in LOCKDOWN.
   optional bool disable_unknown_event_upload = 7;
 
-  // Specifies the time interval in seconds between full syncs. Defaults to 600 (10 minutes). Cannot be set lower than 60.
+  // Specifies the time interval in seconds between full syncs.
+  // Defaults to 600 (10 minutes). Cannot be set lower than 60.
   uint32 full_sync_interval_seconds = 8 [json_name = "full_sync_interval"];
 
-  // When push notifications are enabled, this overrides the full_sync_interval above. It is expected that Santa will not
-  // need to perform a full sync as frequently when push notifications are working. Defaults to 14400 (6 hours).
+  // When push notifications are enabled, this overrides the full_sync_interval
+  // above. It is expected that Santa will not need to perform a full sync as
+  // frequently when push notifications are working.
+  // Defaults to 14400 (6 hours).
   uint32 push_notification_full_sync_interval_seconds = 9 [json_name = "push_notification_full_sync_interval"];
 
-  // The maximum number of seconds Santa can wait before triggering a rule sync after receiving a "global rule sync" notification.
-  // As these notifications cause every Santa client to try and sync, we add a random delay to each client to try and spread the
-  // load out on the sync server. This defaults to 600 (10 minutes).
+  // The maximum number of seconds Santa can wait before triggering a rule sync
+  // after receiving a "global rule sync" notification. As these notifications
+  // cause every Santa client to try and sync, we add a random delay to each
+  // client to try and spread the load out on the sync server.
+  // Defaults to 600 (10 minutes).
   uint32 push_notification_global_rule_sync_deadline_seconds = 10 [json_name = "push_notification_global_rule_sync_deadline"];
 
-  // These two regexes are used to allow/block executions whose path matches. The provided regex must conform to ICU format.
-  // While this feature can be useful, its use should be very carefully considered as it is much riskier than real rules.
+  // A regex, in ICU format, that if an execution from a path matches the regex
+  // and the execution has not already matched any other rules, will cause the
+  // execution to be allowed. While this feature can be useful, its use should
+  // be very carefully considered as it is much riskier than real rules.
+  // N.b: `blocked_path_regex` is applied before `allowed_path_regex`, if both
+  // are configured.
   optional string allowed_path_regex = 11;
+
+  // A regex, in ICU format, that if an execution from a path matches the regex
+  // and the execution has not already matched any other rules, will cause the
+  // execution to be blocked. While this feature can be useful, its use should
+  // be very carefully considered as it is much riskier than real rules.
   optional string blocked_path_regex = 12;
 
-  // Enable USB mount blocking
+  // If True, mounting of filesystem from external USB devices will be blocked
+  // (modulo the `remount_usb_mode` setting below) and the user will be notified.
   optional bool block_usb_mount = 13;
 
-  // If set, if a mount of a USB device happens and the mount flags match, the mount will be allowed.
-  // If the flags do not match, Santa will deny the mount but then remount with the provided flags.
+  // If set, if a mount of a USB device happens and the mount flags match, the
+  // mount will be allowed. If the flags do not match, Santa will deny the mount
+  // but then remount with the provided flags.
   repeated string remount_usb_mode = 14;
 
   // Overrides the File Access Authorization (FAA) policy to change the performed action.
@@ -188,7 +266,8 @@ message PreflightResponse {
   //   `none`: The policy will be applied as written
   optional FileAccessAction override_file_access_action = 15;
 
-  // These fields are deprecated forms of other fields and exist here solely for backwards compatibility
+  // These fields are deprecated forms of other fields and exist here solely for
+  // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
     json_name = "enabled_transitive_whitelisting",
     deprecated = true
@@ -218,48 +297,107 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // Deprecated but still supported key that acts like sync_type was set to "CLEAN" unless
-  // the client had requested a clean sync, in which case it acts like "CLEAN_ALL"
+  // Deprecated but still supported key that acts like sync_type was set to
+  // "CLEAN" unless the client had requested a clean sync, in which case it acts
+  // like "CLEAN_ALL"
   optional bool deprecated_clean_sync = 1007 [
     json_name = "clean_sync",
     deprecated = true
   ];
 }
 
+// The Decision enum records what decision Santa made about an execution.
 enum Decision {
   DECISION_UNKNOWN = 0;
+
+  // The execution was allowed because no specific rule matched and the host is
+  // in MONITOR mode.
   ALLOW_UNKNOWN = 1;
+
+  // The exeuction was allowed because of a BINARY rule.
   ALLOW_BINARY = 2;
+
+  // The execution was allowed because the binary was signed by a certificate
+  // matching a CERTIFICATE rule.
   ALLOW_CERTIFICATE = 3;
+
+  // The execution was allowed because the executable matched an allowed scope.
+  // At present this includes paths matching a configured AllowedPathRegex or
+  // scripts.
   ALLOW_SCOPE = 4;
+
+  // The exeuction was allowed because the binary was signed by a certificate
+  // matching a TEAMID rule.
   ALLOW_TEAMID = 5;
+
+  // The execution was allowed because the binary matched a SIGNINGID rule,
   ALLOW_SIGNINGID = 6;
+
+  // The execution was allowed because the binary matched a CDHASH rule.
   ALLOW_CDHASH = 7;
+
+  // The execution was blocked because no specific rule matched and the host is
+  // in LOCKDOWN mode.
   BLOCK_UNKNOWN = 8;
+
+  // The execution was blocked becasue of a BINARY rule.
   BLOCK_BINARY = 9;
+
+  // The execution was blocked because the binary was signed by a certificate
+  // matching a CERTIFICATE rule.
   BLOCK_CERTIFICATE = 10;
+
+  // The execution was blocked because the executable matched a blocked scope.
+  // At present this includes paths matching a configured BlockedPathRegex or
+  // because EnablePageZeroProtection is turned on and the binary is missing
+  // a __PAGEZERO segment (very rare).
   BLOCK_SCOPE = 11;
+
+  // The exeuction was blocked because the binary was signed by a certificate
+  // matching a TEAMID rule.
   BLOCK_TEAMID = 12;
+
+  // The execution was blocked because the binary matched a SIGNINGID rule,
   BLOCK_SIGNINGID = 13;
+
+  // The execution was blocked because the binary matched a CDHASH rule.
   BLOCK_CDHASH = 14;
+
+  // BUNDLE_BINARY events don't represent an execution but are sent to a server
+  // that requested details about all of the binaries contained within a bundle.
   BUNDLE_BINARY = 15;
 }
 
 message Certificate {
+  // The SHA-256 of the certificate contents.
   string sha256 = 1;
+
+  // The Common Name field of the certificate.
   string cn = 2;
+
+  // The Organization field of the certificate.
   string org = 3;
+
+  // The Organizational Unit field of the certificate.
   string ou = 4;
+
+  // The Valid From field of the certificate, represented as the number of
+  // seconds since the UNIX epoch.
   uint32 valid_from = 5 [json_name = "valid_from"];
+
+  // The Valid Until field of the certificate, represented as the number of
+  // seconds since the UNIX epoch.
   uint32 valid_until = 6 [json_name = "valid_until"];
 }
 
 // Information about a single entitlement key/value pair
 message Entitlement {
-  // The name of an entitlement
+  // The name of an entitlement.
   optional string key = 1;
 
-  // The value of an entitlement
+  // The value of an entitlement. This will generally be either true, false, or
+  // a JSON object. A value of false means that the entitlement is not really
+  // claimed and can be ignored (but is reported for informational purposes).
   optional string value = 2;
 }
 
@@ -275,7 +413,7 @@ message EntitlementInfo {
   repeated Entitlement entitlements = 2;
 }
 
-// Status of the analysis of the leaf signing certificate
+// Status of the analysis of the leaf signing certificate.
 enum SigningStatus {
   SIGNING_STATUS_UNSPECIFIED = 0;
 
@@ -297,50 +435,145 @@ enum SigningStatus {
 }
 
 message Event {
+  // The SHA-256 of the binary file being executed.
   string file_sha256 = 1 [json_name = "file_sha256"];
+
+  // The path containing this binary, e.g. /usr/bin
   string file_path = 2 [json_name = "file_path"];
+
+  // The name of the binary file, e.g. yes
   string file_name = 3 [json_name = "file_name"];
+
+  // The user that executed the binary.
   string executing_user = 4 [json_name = "executing_user"];
+
+  // The time of the execution, represented as the number of seconds since the
+  // UNIX epoch. As a double-precision floating point number it can represent
+  // submultiples in its fraction.
   double execution_time = 5 [json_name = "execution_time"];
+
+  // The set of users logged in at the time of the execution.
   repeated string logged_in_users = 6 [json_name = "logged_in_users"];
+
+  // The set of sessions at the time of execution.
+  //
+  //  * A user logged into the GUI will be shown as user@console
+  //  * A user logged into a local terminal will be shown as user@ttyS000
+  //  * A user logged in over SSH wil be shown as user@IP
   repeated string current_sessions = 7 [json_name = "current_sessions"];
+
+  // The decision that was made. See the comments on the Decision enum for
+  // interpreting this value.
   Decision decision = 8 [json_name = "decision"];
 
+  // If the executed file is part of a bundle, this field is the
+  // CFBundleIdentifier, e.g. com.northpolesec.santa.
   string file_bundle_id = 9 [json_name = "file_bundle_id"];
+
+  // If the executed file is part of a bundle, this field is the path of the
+  // bundle. E.g. if the binary is at /Applications/Acme.app/Contents/MacOS/Acme
+  // then the bundle path will be /Applications/Acme.app.
   string file_bundle_path = 10 [json_name = "file_bundle_path"];
+
+  // If the executed file is part of a bundle, this field is the path of the
+  // executing binary relative to the root of the bundle. E.g. if the binary is
+  // at /Applications/Acme.app/Contents/MacOS/Acme then this field will be
+  // Contents/MacOS/Acme.
   string file_bundle_executable_rel_path = 11 [json_name = "file_bundle_executable_rel_path"];
+
+  // If the executed file is part of a bundle, this field will be the
+  // CFBundleName of the bundle.
   string file_bundle_name = 12 [json_name = "file_bundle_name"];
+
+  // If the executed file is part of a bundle, this field will be set to the
+  // CFBundleVersion of the bundle.
   string file_bundle_version = 13 [json_name = "file_bundle_version"];
+
+  // If the executed file is part of a bundle, this field will be set to the
+  // CFBundleShortVersionString of the bundle.
   string file_bundle_version_string = 14 [json_name = "file_bundle_version_string"];
+
+  // If the executed file is part of a bundle and bundle scanning is enabled,
+  // this field will be set to the calculated hash of the bundle.
   string file_bundle_hash = 15 [json_name = "file_bundle_hash"];
+
+  // If the executed file is part of a bundle and bundle scanning is enabled,
+  // this field will be set to the number of milliseconds that
+  // santabundleservice spend discovering all of the binaries inside the bundle
+  // and hashing them to create the bundle hash.
   uint32 file_bundle_hash_millis = 16 [json_name = "file_bundle_hash_millis"];
+
+  // If the executed file is part of a bundle and bundle scanning is enabled,
+  // this field will be set to the number of binaries that were discovered in
+  // the bundle.
   uint32 file_bundle_binary_count = 17 [json_name = "file_bundle_binary_count"];
 
-  // pid_t is an int32
+  // The pid of the execution (regardless of whether it was allowed or denied).
   int32 pid = 18 [json_name = "pid"];
+
+  // The parent pid of the execution.
   int32 ppid = 19 [json_name = "ppid"];
+
+  // The name of the parent process.
   string parent_name = 20 [json_name = "parent_name"];
 
+  // The team ID of the binary being executed.
   string team_id = 21 [json_name = "team_id"];
+
+  // The signing ID of the binary being executed.
+  // For binaries that are part of macOS this will be prefixed with platform:
+  // For binaries that are signed by a valid developer certificate this will
+  //   be prefixed with the signer's team ID.
   string signing_id = 22 [json_name = "signing_id"];
+
+  // The CDHash of the binary, if it is validly signed.
   string cdhash = 23 [json_name = "cdhash"];
 
-  string quarantine_data_url = 24 [json_name = "quarantine_data_url"];
-  string quarantine_referer_url = 25 [json_name = "quarantine_referer_url"];
-  // Seconds since UNIX epoch. This field would ideally be an int64 but the protobuf library
-  // encodes that as a string, unlike NSJSONSerialization
-  uint32 quarantine_timestamp = 26 [json_name = "quarantine_timestamp"];
-  string quarantine_agent_bundle_id = 27 [json_name = "quarantine_agent_bundle_id"];
+  // The URL that the executing binary was downloaded from, if the binary had
+  // been quarantined at the time of download.
+  // As of macOS 12, this data is usually not retrievable and this field will
+  // not be popoulated, so it has been marked deprecated.
+  string quarantine_data_url = 24 [
+    json_name = "quarantine_data_url",
+    deprecated = true,
+  ];
 
+  // The referring URL that led to the URL the binary was downloaded from, if
+  // the binary had been quarantined at the time of download.
+  // As of macOS 12, this data is usually not retrievable and this field will
+  // not be popoulated.
+  string quarantine_referer_url = 25 [
+    json_name = "quarantine_referer_url",
+    deprecated = true,
+  ];
+
+  // Seconds since UNIX epoch. This field would ideally be an int64 but the
+  // protobuf library encodes that as a string, unlike NSJSONSerialization.
+  uint32 quarantine_timestamp = 26 [
+    json_name = "quarantine_timestamp",
+    deprecated = true,
+  ];
+
+  // If the binary was quarantined, this field contains the bundle ID of the
+  // agent that downloaded the binary, e.g. com.google.Chrome.
+  string quarantine_agent_bundle_id = 27 [
+    json_name = "quarantine_agent_bundle_id",
+    deprecated = true,
+  ];
+
+  // If the binary is properly signed, this field contains details of all of
+  // the certificates in the signing chain, starting at the leaf certificate
+  // (the one that directly signed the binary) leading up to a root.
   repeated Certificate signing_chain = 28 [json_name = "signing_chain"];
 
-  // Entitlement information about the target executbale
+  // Entitlement information about the target executable.
   EntitlementInfo entitlement_info = 29;
 
-  // The raw codesigning flags set for the execution
+  // The raw codesigning flags set for the execution.
   uint32 cs_flags = 30;
 
-  // The signing status of the executing binary
+  // The signing status of the executing binary. This is calculated from the
+  // cs_flags field but is generally easier to utilize.
   SigningStatus signing_status = 31;
 }
 
@@ -360,25 +593,52 @@ message AuditEvent {
 }
 
 message EventUploadRequest {
+  // The set of execution events being uploaded.
   repeated Event events = 1 [json_name = "events"];
+
+  // A possible set of AuditEvents.
   repeated AuditEvent audit_events = 3 [json_name = "audit_events"];
-  // The UUID of the machine where the event(s) occurred
+
+  // The UUID of the machine where the event(s) occurred. See the comment
+  // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
 }
 
 message EventUploadResponse {
   // A list of SHA-256's of bundle binaries that need to be uploaded.
+
+  // If the EventUploadRequest contained any binaries in bundles that were
+  // scanned and the server has not previously seen any of those bundles, this
+  // field will contain the generated bundle hashes of those bundles. This will
+  // trigger santasyncservice to uploaded BUNDLE_BINARY events for the binaries
+  // that were discovered inside those bundles.
   repeated string event_upload_bundle_binaries = 1;
 }
 
+// A policy for a given rule.
 enum Policy {
   option allow_alias = true;
 
+  // Should never be set, will be ignored.
   POLICY_UNKNOWN = 0;
+
+  // The target should be allowed.
   ALLOWLIST = 1;
+
+  // The target should be allowed and if the client has transitive allowlisting
+  // enabled, any files created by this binary will be locally allowlisted.
   ALLOWLIST_COMPILER = 2;
+
+  // The target should be blocked.
   BLOCKLIST = 3;
+
+  // The target should be blocked and GUI notifications should not be shown to
+  // the user. This should be used sparingly as the behavior of applications
+  // being silently blocked can be very confusing for users.
   SILENT_BLOCKLIST = 4;
+
+  // An existing rule for this target should be removed, allowing Santa to
+  // fallback to rules with lower precedence or ultimately the client mode.
   REMOVE = 5;
 
   // These enum values are deprecated and remain here for backward compatibility.
@@ -388,55 +648,109 @@ enum Policy {
   SILENT_BLACKLIST = 4;
 }
 
+// The type of a rule, determining how the identifier should be interpreted.
 enum RuleType {
+  // Should never be set, will be ignored.
   RULETYPE_UNKNOWN = 0;
+
+  // A binary rule identifies a binary by its SHA-256 hash.
   BINARY = 1;
+
+  // A certificate rule identifies the leaf certificate that signed a binary
+  // by its SHA-256 hash.
   CERTIFICATE = 2;
+
+  // A team ID rule identifies a publisher by the 10 character ID issued by
+  // Apple and contained within the signing certificate, e.g. EQHXZ8M8AV.
+  // This allows creating rules for a publisher that will continue to work as
+  // the publisher rotates their signing certificates.
   TEAMID = 3;
+
+  // A signing ID rule identifies a binary by the signing ID
+  // (kSecCodeInfoIdentifier) sealed into the signature, prefixed with the team
+  // ID of the publisher (or platform, if the binary is part of macOS).
+  // E.g. UBF8T346G9:com.microsoft.VSCode or platform:com.apple.yes.
   SIGNINGID = 4;
+
+  // A CDHash rule identifies a binary by its CDHash, if it is properly signed.
   CDHASH = 5;
 }
 
 message Rule {
+  // The identifier for this rule. How this field is interpreted depends on the
+  // `rule_type` field.
   string identifier = 1;
+
+  // The policy for this rule, e.g. ALLOWLIST, BLOCKLIST.
   Policy policy = 2;
+
+  // The type for this rule, see the RuleType enum for details on the values.
   RuleType rule_type = 3;
 
-  // For BLOCK_* rules, this will override the default block message shown to users.
+  // For BLOCK_* rules, this will override the default block message shown to
+  // users.
   string custom_msg = 4;
 
-  // For BLOCK_* rules, this will override the URL used by the "Open" button in the UI.
-  // The same format values used by the EventDetailURL configuration value can be used here.
+  // For BLOCK_* rules, this will override the URL used by the "Open" button in
+  // the UI. The same format values used by the EventDetailURL configuration
+  // value can be used here.
   // See: https://santa.dev/deployment/configuration#eventdetailurl
   string custom_url = 5;
 
-  // These two fields are used for bundle binaries.
+  // If the `file_bundle_hash` is populated, the client can use this as a signal
+  // that an application that previously has been blocked is now allowed and to
+  // show a popup notification that this is the case.
   string file_bundle_hash = 6;
+
+  // If the `file_bundle_binary_count` is populated, the notification shown that
+  // an application is allowed will not be presented until rules for all the
+  // binaries have been received.
   uint32 file_bundle_binary_count = 7;
 
+  // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
     json_name = "sha256",
-    deprecated = true
-  ]; // Use identifier instead
+    deprecated = true,
+  ];
 }
 
 message RuleDownloadRequest {
+  // When Santa downloads rules from the server, the server can return a
+  // "cursor" that is sent back in the next request. This can be used to
+  // paginate, or split up, responses, and avoid sending a very large number of
+  // rules in a single response. The value of this field is not interpreted in
+  // any way by the client, but if it is populated with anything, it is a signal
+  // to the client that more rules are remaining and that it should make another
+  // request, sending the cursor back.
   string cursor = 1 [json_name = "cursor"];
-  // The UUID of the machine that is requesting the rules.
+
+  // The UUID of the machine requesting rules. See the comment
+  // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
 }
 
 message RuleDownloadResponse {
+  // The set of rules returned in this response.
   repeated Rule rules = 1;
+
+  // The aforementioned cursor (see the comment on `RuleDownloadRequest`).
   string cursor = 2;
 }
 
 message PostflightRequest {
+  // The total number of rules that were received by the client across all
+  // RuleDownload requests.
   uint32 rules_received = 1 [json_name = "rules_received"];
+
+  // The number of valid rules that were successfully imported.
   uint32 rules_processed = 2 [json_name = "rules_processed"];
-  // The UUID of the machine that is sending this postflight.
+
+  // The UUID of the machine requesting rules. See the comment
+  // above the same field in `PreflightRequest` for more details.
   string machine_id = 3 [json_name = "machine_id"];
-  // The type of sync that the client just completed.
+
+  // The type of sync that the client just completed. This is used to inform
+  // the server whether a pending non-standard sync is still required.
   SyncType sync_type = 4;
 }
 
