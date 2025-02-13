@@ -105,7 +105,7 @@ message PreflightRequest {
 
   // True, if the user (or Santa itself) requested a clean sync.
   // The user can request this by running `santactl sync --clean`. Santa itself
-  // can also request a clean sync, if the database is re-initialized or the
+  // can also request a clean sync if the database is re-initialized or the
   // SyncBaseURL changes.
   bool request_clean_sync = 10 [json_name = "request_clean_sync"];
 
@@ -211,7 +211,12 @@ message PreflightResponse {
 
   // Ordinarily, Santa will only upload events about executions that are denied
   // or would be denied if the machine were in LOCKDOWN mode. With this enabled,
-  // Santa will upload details about all events.
+  // Santa will upload details about all events. It is important to note that
+  // due to caching, not every execution will be logged, only those that require
+  // Santa to make a decision. If you want information about every single
+  // execution, with much more fidelity than is available from Events,
+  // Santa can record telemetry by configuring the Telemetry, EventLogType, and
+  // EventLogPath keys in the configuration profile.
   optional bool enable_all_event_upload = 6;
 
   // Ordinarily, Santa will only upload events about executions that are denied
@@ -314,7 +319,7 @@ enum Decision {
   // in MONITOR mode.
   ALLOW_UNKNOWN = 1;
 
-  // The exeuction was allowed because of a BINARY rule.
+  // The execution was allowed because of a BINARY rule.
   ALLOW_BINARY = 2;
 
   // The execution was allowed because the binary was signed by a certificate
@@ -326,7 +331,7 @@ enum Decision {
   // scripts.
   ALLOW_SCOPE = 4;
 
-  // The exeuction was allowed because the binary was signed by a certificate
+  // The execution was allowed because the binary was signed by a certificate
   // matching a TEAMID rule.
   ALLOW_TEAMID = 5;
 
@@ -340,7 +345,7 @@ enum Decision {
   // in LOCKDOWN mode.
   BLOCK_UNKNOWN = 8;
 
-  // The execution was blocked becasue of a BINARY rule.
+  // The execution was blocked because of a BINARY rule.
   BLOCK_BINARY = 9;
 
   // The execution was blocked because the binary was signed by a certificate
@@ -353,7 +358,7 @@ enum Decision {
   // a __PAGEZERO segment (very rare).
   BLOCK_SCOPE = 11;
 
-  // The exeuction was blocked because the binary was signed by a certificate
+  // The execution was blocked because the binary was signed by a certificate
   // matching a TEAMID rule.
   BLOCK_TEAMID = 12;
 
@@ -403,7 +408,7 @@ message Entitlement {
 
 // Information about entitlements
 message EntitlementInfo {
-  // Whether or not the set of reported entilements is complete or has been
+  // Whether or not the set of reported entitlements is complete or has been
   // filtered (e.g. by configuration or clipped because too many to log).
   optional bool entitlements_filtered = 1;
 
@@ -424,7 +429,7 @@ enum SigningStatus {
   // executing binary or its code signature was invalid.
   SIGNING_STATUS_INVALID = 2;
 
-  // The exxecuting binary was ad hoc signed
+  // The executing binary was ad-hoc signed
   SIGNING_STATUS_ADHOC = 3;
 
   // The executing binary was validly signed with a development certificate
@@ -459,7 +464,7 @@ message Event {
   //
   //  * A user logged into the GUI will be shown as user@console
   //  * A user logged into a local terminal will be shown as user@ttyS000
-  //  * A user logged in over SSH wil be shown as user@IP
+  //  * A user logged in over SSH will be shown as user@IP
   repeated string current_sessions = 7 [json_name = "current_sessions"];
 
   // The decision that was made. See the comments on the Decision enum for
@@ -532,7 +537,7 @@ message Event {
   // The URL that the executing binary was downloaded from, if the binary had
   // been quarantined at the time of download.
   // As of macOS 12, this data is usually not retrievable and this field will
-  // not be popoulated, so it has been marked deprecated.
+  // not be populated, so it has been marked deprecated.
   string quarantine_data_url = 24 [
     json_name = "quarantine_data_url",
     deprecated = true
@@ -541,7 +546,7 @@ message Event {
   // The referring URL that led to the URL the binary was downloaded from, if
   // the binary had been quarantined at the time of download.
   // As of macOS 12, this data is usually not retrievable and this field will
-  // not be popoulated.
+  // not be populated.
   string quarantine_referer_url = 25 [
     json_name = "quarantine_referer_url",
     deprecated = true
