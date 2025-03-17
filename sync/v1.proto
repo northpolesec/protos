@@ -580,6 +580,10 @@ message Event {
   // The signing status of the executing binary. This is calculated from the
   // cs_flags field but is generally easier to utilize.
   SigningStatus signing_status = 31;
+
+  // If this event was caused by an explicit BLOCK rule, this field may indicate
+  // the reason that the software has been blocked.
+  BlockRuleReason block_rule_reason = 32;
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
@@ -681,6 +685,17 @@ enum RuleType {
   CDHASH = 5;
 }
 
+enum BlockRuleReason {
+  BLOCKRULEREASON_UNKNOWN = 0;
+
+  // This rule is blocking software that is considered malicious.
+  MALWARE = 1;
+
+  // This rule is blocking software that is blocked because of organizational
+  // policies.
+  POLICY = 2;
+}
+
 message Rule {
   // The identifier for this rule. How this field is interpreted depends on the
   // `rule_type` field.
@@ -711,6 +726,10 @@ message Rule {
   // an application is allowed will not be presented until rules for all the
   // binaries have been received.
   uint32 file_bundle_binary_count = 7;
+
+  // If this rule is a BLOCK_ rule, this field may be populated with the reason
+  // that the software is being blocked.
+  BlockRuleReason block_reason = 8;
 
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
