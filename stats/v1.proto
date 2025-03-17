@@ -4,8 +4,8 @@ package santa.stats.v1;
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/stats";
 
-// StatsService is a gRPC service hosted at stats.northpole.security to which
-// the Santa agent will send anonymous usage statistics, IF OPTED IN.
+// StatsService is a ConnectRPC service hosted at polaris.northpole.security to
+// which the Santa agent will send anonymous usage statistics, **IF OPTED IN**.
 // These statistics help development by providing data about what versions are
 // being used and on what macOS versions, particularly when it comes to using
 // new library/SDK features and deprecating older features.
