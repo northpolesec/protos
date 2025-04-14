@@ -702,15 +702,23 @@ message Rule {
   // See: https://santa.dev/deployment/configuration#eventdetailurl
   string custom_url = 5;
 
+  // This field is deprecated, use `notification_app_name` instead.
   // If the `file_bundle_hash` is populated, the client can use this as a signal
   // that an application that previously has been blocked is now allowed and to
-  // show a popup notification that this is the case.
-  string file_bundle_hash = 6;
+  // show a system notification that this is the case.
+  string file_bundle_hash = 6 [deprecated = true];
 
+  // This field is deprecated, use `notification_app_name` instead.
   // If the `file_bundle_binary_count` is populated, the notification shown that
   // an application is allowed will not be presented until rules for all the
   // binaries have been received.
-  uint32 file_bundle_binary_count = 7;
+  uint32 file_bundle_binary_count = 7 [deprecated = true];
+
+  // If `notification_app_name` is populated, a system notification message will
+  // be shown with its content. Ignored during clean sync.
+  // This field supersedes the behavior of `file_bundle_hash` and
+  // `file_bundle_binary_count`.
+  string notification_app_name = 8;
 
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
