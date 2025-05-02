@@ -134,6 +134,11 @@ message PreflightRequest {
 
   // True, if the sync is a result of a push notification.
   bool push_notification_sync = 19 [json_name = "push_notification_sync"];
+
+  // The SIP status of this host at the time this preflight was performed. If
+  // Santa is able to retrieve the value, this field will be populated with the
+  // raw CSR config flags.
+  uint32 sip_status = 20;
 }
 
 enum SyncType {
