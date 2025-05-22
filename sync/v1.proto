@@ -186,6 +186,29 @@ enum FileAccessAction {
   Disable = 3 [deprecated = true];
 }
 
+// Configuration needed by Santa to export data to GCP.
+message GCPConfig {
+  // A signed token that can be exchanged by Santa for a valid GCS token by
+  // the GCP STS.
+  bytes token = 1;
+}
+
+// Configuration needed by Santa to export data to AWS.
+message AWSConfig {
+  // A signed token that can be exchanged by Santa for a valid S3 token by
+  // the AWS STS.
+  bytes token = 1;
+}
+
+// Common export configuration common to all destinations.
+message ExportConfiguration {
+  // Per-destination configuration.
+  oneof destination {
+    GCPConfig gcp_config = 1;
+    AWSConfig aws_config = 2;
+  }
+}
+
 message PreflightResponse {
   // The client mode that the client should move into at the end of this sync.
   // The mode does not change until the Postflight request has been made, to
@@ -275,6 +298,10 @@ message PreflightResponse {
   //   `auditonly`: Actions that would be denied are logged but allowed
   //   `none`: The policy will be applied as written
   optional FileAccessAction override_file_access_action = 15;
+
+  // If set, contains the configuration Santa needs to export data to the
+  // configured destination.
+  optional ExportConfiguration export_configuration = 16;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
