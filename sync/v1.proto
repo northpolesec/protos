@@ -612,6 +612,11 @@ message Event {
   // The signing status of the executing binary. This is calculated from the
   // cs_flags field but is generally easier to utilize.
   SigningStatus signing_status = 31;
+
+  // The secure timestamp of when this binary was signed, as provided by the
+  // timestamp service. Not populated for unsigned or ad-hoc signed binaries,
+  // or if the secure timestamp is missing.
+  uint32 signing_timestamp = 32;
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
