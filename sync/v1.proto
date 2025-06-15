@@ -701,6 +701,14 @@ enum Policy {
   // fallback to rules with lower precedence or ultimately the client mode.
   REMOVE = 5;
 
+  // The outcome of this rule will be determined by evaluating a CEL expression
+  // attached to the rule. The expression will receive details about the binary
+  // being executed and the context of the execution. The expression must return
+  // either a santa.cel.v1.ReturnValue or a boolean, where true is equivalent to
+  // ALLOWLIST and false is equivalent to BLOCKLIST.
+  // See cel/v1.proto for more details.
+  CEL = 6;
+
   // These enum values are deprecated and remain here for backward compatibility.
   WHITELIST = 1;
   WHITELIST_COMPILER = 2;
@@ -774,6 +782,11 @@ message Rule {
   // This field supersedes the behavior of `file_bundle_hash` and
   // `file_bundle_binary_count`.
   string notification_app_name = 8;
+
+  // The CEL expression to run when evaluating this rule.
+  // This field is only used for rules with a Policy of CEL and is required
+  // in this case.
+  string cel_expr = 9;
 
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
