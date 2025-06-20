@@ -96,6 +96,11 @@ message PreflightRequest {
   // or (`MachineOwnerPlist` and `MachineOwnerKey`) configuration options.
   string primary_user = 7 [json_name = "primary_user"];
 
+  // Groups the primary user of this machine should be associated with on the
+  // sync server. Configured by either the `MachineOwnerGroups` or
+  // (`MachineOwnerPlist` and `MachineOwnerGroupsKey`) configuration options.
+  repeated string primary_user_groups = 21 [json_name = "primary_user_groups"];
+
   // If FCM or APNS push notifications are enabled, this will contain the
   // notification token required to send push notifications back to this host.
   string push_notification_token = 8 [json_name = "push_notification_token"];
@@ -139,6 +144,8 @@ message PreflightRequest {
   // Santa is able to retrieve the value, this field will be populated with the
   // raw CSR config flags.
   uint32 sip_status = 20;
+
+  // next ID: 22
 }
 
 enum SyncType {
