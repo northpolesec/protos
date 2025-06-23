@@ -195,9 +195,14 @@ enum FileAccessAction {
 
 // Configuration needed by Santa to export data to GCP.
 message GCPConfig {
-  // A signed token that can be exchanged by Santa for a valid GCS token by
-  // the GCP STS.
-  bytes token = 1;
+  // A temporary bearer token that can be used to authorize requests.
+  string bearer_token = 1;
+
+  // The name of the bucket into which Santa should put objects.
+  string bucket_name = 2;
+
+  // Optional prefix that will be prepended to Santa's auto-generated object key names.
+  string object_key_prefix = 3;
 }
 
 // Configuration needed by Santa to export data to AWS.
