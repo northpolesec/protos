@@ -649,6 +649,54 @@ message Event {
   uint32 signing_time = 33;
 }
 
+// Information about a given process. This can optionally be used to
+// represent a chain of process ancestors.
+message Process {
+  // The path containing this binary, e.g. /usr/bin
+  string file_path = 1 [json_name = "file_path"];
+
+  // The CDHash of the binary, if it is validly signed.
+  string cdhash = 2 [json_name = "cdhash"];
+
+  // The SHA-256 of the binary file being executed.
+  string file_sha256 = 3 [json_name = "file_sha256"];
+
+  // The signing ID of the binary being executed.
+  // For binaries that are part of macOS this will be prefixed with platform:
+  // For binaries that are signed by a valid developer certificate this will
+  //   be prefixed with the signer's team ID.
+  string signing_id = 4 [json_name = "signing_id"];
+
+  // The team ID of the binary being executed.
+  string team_id = 5 [json_name = "team_id"];
+
+  // The process ID of the execution
+  int32 pid = 6 [json_name = "pid"];
+
+  // If the binary is properly signed, this field contains details of all of
+  // the certificates in the signing chain, starting at the leaf certificate
+  // (the one that directly signed the binary) leading up to a root.
+  repeated Certificate signing_chain = 7 [json_name = "signing_chain"];
+
+  // If set, contains information about the parent process.
+  optional Process parent = 8;
+}
+
+// Information related to an FAA policy violation.
+message FileAccessEvent {
+  // The version of the policy when the decision was made.
+  string rule_version = 1;
+
+  // The name of the specific policy that triggered this log.
+  string rule_name = 2;
+
+  // The path that was accessed.
+  string target = 3;
+
+  // Information about the process that triggered this event.
+  Process process = 4;
+}
+
 // Audit Event for when Santa makes a new rule in standalone mode.
 message StandaloneModeRuleCreation {
   Decision decision = 1 [json_name = "decision"]; // Indicates new rule type
@@ -671,9 +719,14 @@ message EventUploadRequest {
   // A possible set of AuditEvents.
   repeated AuditEvent audit_events = 3 [json_name = "audit_events"];
 
+  // The set of FileAccess events being uploaded.
+  repeated FileAccessEvent file_access_events = 4 [json_name = "file_access_events"];
+
   // The UUID of the machine where the event(s) occurred. See the comment
   // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
+
+  // next ID: 5
 }
 
 message EventUploadResponse {
