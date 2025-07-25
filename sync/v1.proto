@@ -145,7 +145,10 @@ message PreflightRequest {
   // raw CSR config flags.
   uint32 sip_status = 20;
 
-  // next ID: 22
+  // Hash of rules.
+  string rules_hash = 22;
+
+  // next ID: 23
 }
 
 enum SyncType {
@@ -898,6 +901,9 @@ message PostflightRequest {
   // The type of sync that the client just completed. This is used to inform
   // the server whether a pending non-standard sync is still required.
   SyncType sync_type = 4;
+
+  // Hash of rules.
+  string rules_hash = 5;
 }
 
 message PostflightResponse {}
