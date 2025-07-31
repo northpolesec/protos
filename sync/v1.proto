@@ -885,15 +885,23 @@ message FileAccessWatchItem {
   }
   message Process {
     oneof identifier {
-      string binary_path = 1;
-      string certificate_sha256 = 2;
-      string signing_id = 3;
+      string cd_hash = 1;
+      string signing_id = 2;
+      string certificate_sha256 = 3;
       string team_id = 4;
-      string cd_hash = 5;
     }
   }
+  message Path {
+    enum PathType {
+      PATH_TYPE_UNSPECIFIED = 0;
+      PATH_TYPE_LITERAL = 1;
+      PATH_TYPE_PREFIX = 2;
+    }
+    string path = 1;
+    PathType path_type = 2;
+  }
   string name = 1;
-  repeated string paths = 2;
+  repeated Path paths = 2;
   bool allow_read_access = 3;
   bool audit_only = 4;
   RuleType rule_type = 5;
