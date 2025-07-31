@@ -884,7 +884,6 @@ message FileAccessWatchItem {
     string signing_id = 3;
     string team_id = 4;
     string cd_hash = 5;
-    bool platform_binary = 6;
   }
   string name = 1;
   repeated string paths = 2;
@@ -915,7 +914,8 @@ message RuleDownloadRequest {
 }
 
 // Only one of `rules` or `file_access_watch_items` should be populated per
-// response. Avoiding using a `onof` for backwards compatibility.
+// response. Avoiding using a `onof` because it cannot be used with repeated
+// fields.
 message RuleDownloadResponse {
   // The set of rules returned in this response.
   repeated Rule rules = 1;
