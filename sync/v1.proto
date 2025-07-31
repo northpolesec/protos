@@ -884,11 +884,13 @@ message FileAccessWatchItem {
     RULE_TYPE_PROCESSES_WITH_DENIED_PATHS = 4;
   }
   message Process {
-    string binary_path = 1;
-    string certificate_sha256 = 2;
-    string signing_id = 3;
-    string team_id = 4;
-    string cd_hash = 5;
+    oneof identifier {
+      string binary_path = 1;
+      string certificate_sha256 = 2;
+      string signing_id = 3;
+      string team_id = 4;
+      string cd_hash = 5;
+    }
   }
   string name = 1;
   repeated string paths = 2;
