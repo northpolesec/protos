@@ -148,7 +148,7 @@ message PreflightRequest {
   // Hash of rules.
   string rules_hash = 22;
 
-  // Hash of the current FAA watch items.
+  // Hash of FAA watch items.
   string file_access_watch_items_hash = 23;
 
   // next ID: 24
@@ -914,6 +914,8 @@ message RuleDownloadRequest {
   string machine_id = 2 [json_name = "machine_id"];
 }
 
+// Only one of `rules` or `file_access_watch_items` should be populated per
+// response. Avoiding using a `onof` for backwards compatibility.
 message RuleDownloadResponse {
   // The set of rules returned in this response.
   repeated Rule rules = 1;
@@ -943,6 +945,9 @@ message PostflightRequest {
 
   // Hash of rules.
   string rules_hash = 5;
+
+  // Hash of FAA watch items.
+  string file_access_watch_items_hash = 6;
 }
 
 message PostflightResponse {}
