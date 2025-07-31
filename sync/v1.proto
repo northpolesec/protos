@@ -173,6 +173,7 @@ enum SyncType {
   clean = 2 [deprecated = true];
 
   // Delete all previously received rules before applying the newly received rules.
+  // Also delete all existing watch items before applying newly received watch items.
   CLEAN_ALL = 3;
   clean_all = 3 [deprecated = true];
 
