@@ -148,7 +148,10 @@ message PreflightRequest {
   // Hash of rules.
   string rules_hash = 22;
 
-  // next ID: 23
+  // Hash of the current FAA watch items.
+  string file_access_watch_items_hash = 23;
+
+  // next ID: 24
 }
 
 enum SyncType {
@@ -328,6 +331,10 @@ message PreflightResponse {
   // If set, contains the configuration Santa needs to export data to the
   // configured destination.
   optional ExportConfiguration export_configuration = 16;
+
+  // The URL and details for an FAA dialog.
+  optional string file_access_event_detail_url = 18;
+  optional string file_access_event_detail_text = 19;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -863,6 +870,35 @@ message Rule {
   ];
 }
 
+message FileAccessWatchItem {
+  enum RuleType {
+    RULE_TYPE_UNSPECIFIED = 0;
+    RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES = 1;
+    RULE_TYPE_PATHS_WITH_DENIED_PROCESSES = 2;
+    RULE_TYPE_PROCESSES_WITH_ALLOWED_PATHS = 3;
+    RULE_TYPE_PROCESSES_WITH_DENIED_PATHS = 4;
+  }
+  message Process {
+    string binary_path = 1;
+    string certificate_sha256 = 2;
+    string signing_id = 3;
+    string team_id = 4;
+    string cd_hash = 5;
+    bool platform_binary = 6;
+  }
+  string name = 1;
+  repeated string paths = 2;
+  bool allow_read_access = 3;
+  bool audit_only = 4;
+  RuleType rule_type = 5;
+  bool enable_silent_mode = 6;
+  bool enable_silent_tty_mode = 7;
+  string block_message = 8;
+  string event_detail_url = 9;
+  string event_detail_text = 10;
+  repeated Process processes = 11;
+}
+
 message RuleDownloadRequest {
   // When Santa downloads rules from the server, the server can return a
   // "cursor" that is sent back in the next request. This can be used to
@@ -884,6 +920,9 @@ message RuleDownloadResponse {
 
   // The aforementioned cursor (see the comment on `RuleDownloadRequest`).
   string cursor = 2;
+
+  // The set of FAA watch items in this response.
+  repeated FileAccessWatchItem file_access_watch_items = 3;
 }
 
 message PostflightRequest {
