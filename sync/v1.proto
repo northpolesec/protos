@@ -901,7 +901,7 @@ message FileAccessWatchItem {
     string path = 1;
     PathType path_type = 2;
   }
-  string name = 1;
+  string id = 1;
   repeated Path paths = 2;
   bool allow_read_access = 3;
   bool audit_only = 4;
@@ -912,6 +912,7 @@ message FileAccessWatchItem {
   string event_detail_url = 9;
   string event_detail_text = 10;
   repeated Process processes = 11;
+  bool remove = 12;
 }
 
 message RuleDownloadRequest {
