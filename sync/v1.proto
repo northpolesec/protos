@@ -169,6 +169,7 @@ enum SyncType {
   normal = 1 [deprecated = true];
 
   // Delete all non-transitive, previously received rules before applying the newly received rules.
+  // Also delete all existing watch items before applying newly received watch items.
   CLEAN = 2;
   clean = 2 [deprecated = true];
 
@@ -180,9 +181,13 @@ enum SyncType {
   // Delete rules created in Standalone mode before applying the newly received rules.
   CLEAN_STANDALONE = 4;
 
+  // Delete all non-transitive, previously received rules before applying the newly received rules.
+  // Only execution rules are deleted, watch items are left alone.
+  CLEAN_RULES = 5;
+
   // Delete all existing watch items before applying newly received watch items.
   // Only watch items are deleted, execution rules are left alone.
-  CLEAN_FILE_ACCESS_WATCH_ITEMS = 5;
+  CLEAN_FILE_ACCESS_WATCH_ITEMS = 6;
 }
 
 enum FileAccessAction {
