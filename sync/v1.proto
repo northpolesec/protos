@@ -200,9 +200,6 @@ message ExportConfiguration {
   // A presigned POST request that can be used to upload data.
   string url = 1;
   map<string, string> values = 2;
-
-  // Optional prefix that will be prepended to Santa's auto-generated object key names.
-  string object_key_prefix = 3;
 }
 
 message PreflightResponse {
