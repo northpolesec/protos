@@ -196,43 +196,14 @@ enum FileAccessAction {
   Disable = 3 [deprecated = true];
 }
 
-// Configuration needed by Santa to export data to GCP.
-message GCPConfig {
-  // A temporary bearer token that can be used to authorize requests.
-  string bearer_token = 1;
-
-  // The name of the bucket into which Santa should put objects.
-  string bucket_name = 2;
-
-  // Optional prefix that will be prepended to Santa's auto-generated object key names.
-  string object_key_prefix = 3;
-}
-
-// Configuration needed by Santa to export data to AWS.
-message AWSConfig {
-  // The access key ID that identifies the temporary security credentials.
-  string access_key = 1;
-
-  // The secret access key that can be used to sign requests.
-  string secret_access_key = 2;
-
-  // The token that users must pass to the service API to use the temporary credentials.
-  string session_token = 3;
-
-  // The name of the bucket into which Santa should put objects.
-  string bucket_name = 4;
-
-  // Optional prefix that will be prepended to Santa's auto-generated object key names.
-  string object_key_prefix = 5;
-}
-
-// Common export configuration common to all destinations.
+// A presigned POST request that can be used to upload data.
 message ExportConfiguration {
-  // Per-destination configuration.
-  oneof destination {
-    GCPConfig gcp_config = 1;
-    AWSConfig aws_config = 2;
-  }
+  // POST URL to send the signed form values and desired data. Use content type
+  // multipart/form-data when making the request.
+  string url = 1;
+  // Signed values which authorize the POST request. Append the desired object
+  // name to the "key" field.
+  map<string, string> form_values = 2;
 }
 
 message PreflightResponse {
