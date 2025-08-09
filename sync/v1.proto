@@ -196,10 +196,14 @@ enum FileAccessAction {
   Disable = 3 [deprecated = true];
 }
 
+// A presigned POST request that can be used to upload data.
 message ExportConfiguration {
-  // A presigned POST request that can be used to upload data.
+  // POST URL to send the signed form values and desired data. Use content type
+  // multipart/form-data when making the request.
   string url = 1;
-  map<string, string> values = 2;
+  // Signed values which authorize the POST request. Append the desired object
+  // name to the "key" field.
+  map<string, string> form_values = 2;
 }
 
 message PreflightResponse {
