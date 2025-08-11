@@ -197,13 +197,19 @@ enum FileAccessAction {
 }
 
 // A presigned POST request that can be used to upload data.
-message ExportConfiguration {
+message SignedPost {
   // POST URL to send the signed form values and desired data. Use content type
   // multipart/form-data when making the request.
   string url = 1;
   // Signed values which authorize the POST request. Append the desired object
   // name to the "key" field.
   map<string, string> form_values = 2;
+}
+
+message ExportConfiguration {
+  // If additional configurations are added, wrap this and the new
+  // configurations in a oneof.
+  SignedPost signed_post = 1;
 }
 
 message PreflightResponse {
