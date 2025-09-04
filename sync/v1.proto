@@ -909,7 +909,7 @@ message FileAccessWatchItem {
   message Add {
     // The primary key.
     string name = 1;
-    // Only used as a description. There can only every be a single active
+    // Only used as a description. There can only ever be a single active
     // version.
     string version = 2;
     repeated Path paths = 3;
@@ -947,9 +947,8 @@ message RuleDownloadRequest {
   string machine_id = 2 [json_name = "machine_id"];
 }
 
-// Only one of `rules` or `file_access_watch_items` should be populated per
-// response. Avoiding using a `onof` because it cannot be used with repeated
-// fields.
+// The consumer should be able to handle processing both rules and
+// file_access_watch_items within a single message.
 message RuleDownloadResponse {
   // The set of rules returned in this response.
   repeated Rule rules = 1;
