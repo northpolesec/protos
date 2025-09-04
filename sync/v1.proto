@@ -906,18 +906,30 @@ message FileAccessWatchItem {
     string path = 1;
     PathType path_type = 2;
   }
-  string id = 1;
-  repeated Path paths = 2;
-  bool allow_read_access = 3;
-  bool audit_only = 4;
-  RuleType rule_type = 5;
-  bool enable_silent_mode = 6;
-  bool enable_silent_tty_mode = 7;
-  string block_message = 8;
-  string event_detail_url = 9;
-  string event_detail_text = 10;
-  repeated Process processes = 11;
-  bool remove = 12;
+  message Add {
+    // The primary key.
+    string name = 1;
+    // Only used as a description. There can only every be a single active
+    // version.
+    string version = 2;
+    repeated Path paths = 3;
+    bool allow_read_access = 4;
+    bool audit_only = 5;
+    RuleType rule_type = 6;
+    bool enable_silent_mode = 7;
+    bool enable_silent_tty_mode = 8;
+    string block_message = 9;
+    string event_detail_url = 10;
+    string event_detail_text = 11;
+    repeated Process processes = 12;
+  }
+  message Remove {
+    string name = 1;
+  }
+  oneof action {
+    Add add = 1;
+    Remove remove = 2;
+  }
 }
 
 message RuleDownloadRequest {
