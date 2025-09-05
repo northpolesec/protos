@@ -148,7 +148,10 @@ message PreflightRequest {
   // Hash of rules.
   string rules_hash = 22;
 
-  // next ID: 23
+  // Hash of FAA watch items.
+  string file_access_watch_items_hash = 23;
+
+  // next ID: 24
 }
 
 enum SyncType {
@@ -166,15 +169,25 @@ enum SyncType {
   normal = 1 [deprecated = true];
 
   // Delete all non-transitive, previously received rules before applying the newly received rules.
+  // Also delete all existing watch items before applying newly received watch items.
   CLEAN = 2;
   clean = 2 [deprecated = true];
 
   // Delete all previously received rules before applying the newly received rules.
+  // Also delete all existing watch items before applying newly received watch items.
   CLEAN_ALL = 3;
   clean_all = 3 [deprecated = true];
 
   // Delete rules created in Standalone mode before applying the newly received rules.
   CLEAN_STANDALONE = 4;
+
+  // Delete all non-transitive, previously received rules before applying the newly received rules.
+  // Only execution rules are deleted, watch items are left alone.
+  CLEAN_RULES = 5;
+
+  // Delete all existing watch items before applying newly received watch items.
+  // Only watch items are deleted, execution rules are left alone.
+  CLEAN_FILE_ACCESS_WATCH_ITEMS = 6;
 }
 
 enum FileAccessAction {
@@ -305,6 +318,10 @@ message PreflightResponse {
   // If set, contains the configuration Santa needs to export data to the
   // configured destination.
   optional ExportConfiguration export_configuration = 16;
+
+  // The URL and details for an FAA dialog.
+  optional string file_access_event_detail_url = 18;
+  optional string file_access_event_detail_text = 19;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -840,6 +857,58 @@ message Rule {
   ];
 }
 
+message FileAccessWatchItem {
+  enum RuleType {
+    RULE_TYPE_UNSPECIFIED = 0;
+    RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES = 1;
+    RULE_TYPE_PATHS_WITH_DENIED_PROCESSES = 2;
+    RULE_TYPE_PROCESSES_WITH_ALLOWED_PATHS = 3;
+    RULE_TYPE_PROCESSES_WITH_DENIED_PATHS = 4;
+  }
+  message Process {
+    oneof identifier {
+      string binary_path = 1;
+      string cd_hash = 2;
+      string signing_id = 3;
+      string certificate_sha256 = 4;
+      string team_id = 5;
+    }
+  }
+  message Path {
+    enum PathType {
+      PATH_TYPE_UNSPECIFIED = 0;
+      PATH_TYPE_LITERAL = 1;
+      PATH_TYPE_PREFIX = 2;
+    }
+    string path = 1;
+    PathType path_type = 2;
+  }
+  message Add {
+    // The primary key.
+    string name = 1;
+    // Only used as a description. There can only ever be a single active
+    // version.
+    string version = 2;
+    repeated Path paths = 3;
+    bool allow_read_access = 4;
+    bool audit_only = 5;
+    RuleType rule_type = 6;
+    bool enable_silent_mode = 7;
+    bool enable_silent_tty_mode = 8;
+    string block_message = 9;
+    string event_detail_url = 10;
+    string event_detail_text = 11;
+    repeated Process processes = 12;
+  }
+  message Remove {
+    string name = 1;
+  }
+  oneof action {
+    Add add = 1;
+    Remove remove = 2;
+  }
+}
+
 message RuleDownloadRequest {
   // When Santa downloads rules from the server, the server can return a
   // "cursor" that is sent back in the next request. This can be used to
@@ -855,12 +924,17 @@ message RuleDownloadRequest {
   string machine_id = 2 [json_name = "machine_id"];
 }
 
+// The consumer should be able to handle processing both rules and
+// file_access_watch_items within a single message.
 message RuleDownloadResponse {
   // The set of rules returned in this response.
   repeated Rule rules = 1;
 
   // The aforementioned cursor (see the comment on `RuleDownloadRequest`).
   string cursor = 2;
+
+  // The set of FAA watch items in this response.
+  repeated FileAccessWatchItem file_access_watch_items = 3;
 }
 
 message PostflightRequest {
@@ -881,6 +955,9 @@ message PostflightRequest {
 
   // Hash of rules.
   string rules_hash = 5;
+
+  // Hash of FAA watch items.
+  string file_access_watch_items_hash = 6;
 }
 
 message PostflightResponse {}
