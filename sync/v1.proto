@@ -679,6 +679,21 @@ message Process {
   optional Process parent = 8;
 }
 
+// The FileAccessDecision enum records the decision Santa made about a file
+// access operation.
+enum FileAccessDecision {
+  FILE_ACCESS_DECISION_UNKNOWN = 0;
+
+  // The access operation was denied due to policy.
+  FILE_ACCESS_DECISION_DENIED = 1;
+
+  // The access was denied because the process's code signature was invalid.
+  FILE_ACCESS_DECISION_DENIED_INVALID_SIGNATURE = 2;
+
+  // The access was allowed, but recorded.
+  FILE_ACCESS_DECISION_AUDIT_ONLY = 3;
+}
+
 // Information related to an FAA policy violation.
 message FileAccessEvent {
   // The version of the policy when the decision was made.
@@ -697,6 +712,9 @@ message FileAccessEvent {
   // UNIX epoch. As a double-precision floating point number it can represent
   // submultiples in its fraction.
   double access_time = 5 [json_name = "access_time"];
+
+  // The decision applied by Santa for this access operation.
+  FileAccessDecision decision = 6 [json_name = "decision"];
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
