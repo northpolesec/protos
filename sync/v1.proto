@@ -148,8 +148,8 @@ message PreflightRequest {
   // Hash of rules.
   string rules_hash = 22;
 
-  // Hash of FAA watch items.
-  string file_access_watch_items_hash = 23;
+  // Hash of FAA rules.
+  string file_access_rules_hash = 23;
 
   // next ID: 24
 }
@@ -169,12 +169,12 @@ enum SyncType {
   normal = 1 [deprecated = true];
 
   // Delete all non-transitive, previously received rules before applying the newly received rules.
-  // Also delete all existing watch items before applying newly received watch items.
+  // Also delete all existing file access rules before applying newly received file access rules.
   CLEAN = 2;
   clean = 2 [deprecated = true];
 
   // Delete all previously received rules before applying the newly received rules.
-  // Also delete all existing watch items before applying newly received watch items.
+  // Also delete all existing file access rules before applying newly received file access rules.
   CLEAN_ALL = 3;
   clean_all = 3 [deprecated = true];
 
@@ -182,12 +182,12 @@ enum SyncType {
   CLEAN_STANDALONE = 4;
 
   // Delete all non-transitive, previously received rules before applying the newly received rules.
-  // Only execution rules are deleted, watch items are left alone.
+  // Only execution rules are deleted, file access rules are left alone.
   CLEAN_RULES = 5;
 
-  // Delete all existing watch items before applying newly received watch items.
-  // Only watch items are deleted, execution rules are left alone.
-  CLEAN_FILE_ACCESS_WATCH_ITEMS = 6;
+  // Delete all existing file access rules before applying newly received file access rules.
+  // Only file access rules are deleted, execution rules are left alone.
+  CLEAN_FILE_ACCESS_RULES = 6;
 }
 
 enum FileAccessAction {
@@ -880,7 +880,7 @@ message Rule {
   ];
 }
 
-message FileAccessWatchItem {
+message FileAccessRule {
   enum RuleType {
     RULE_TYPE_UNSPECIFIED = 0;
     RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES = 1;
@@ -914,7 +914,9 @@ message FileAccessWatchItem {
     string version = 2;
     repeated Path paths = 3;
     bool allow_read_access = 4;
-    bool audit_only = 5;
+    // If true, access violations will be blocked.
+    // Otherwise, the rule operates in audit-only mode.
+    bool block_violations = 5;
     RuleType rule_type = 6;
     bool enable_silent_mode = 7;
     bool enable_silent_tty_mode = 8;
@@ -948,7 +950,7 @@ message RuleDownloadRequest {
 }
 
 // The consumer should be able to handle processing both rules and
-// file_access_watch_items within a single message.
+// file_access_rules within a single message.
 message RuleDownloadResponse {
   // The set of rules returned in this response.
   repeated Rule rules = 1;
@@ -956,8 +958,8 @@ message RuleDownloadResponse {
   // The aforementioned cursor (see the comment on `RuleDownloadRequest`).
   string cursor = 2;
 
-  // The set of FAA watch items in this response.
-  repeated FileAccessWatchItem file_access_watch_items = 3;
+  // The set of FAA rules in this response.
+  repeated FileAccessRule file_access_rules = 3;
 }
 
 message PostflightRequest {
@@ -979,8 +981,8 @@ message PostflightRequest {
   // Hash of rules.
   string rules_hash = 5;
 
-  // Hash of FAA watch items.
-  string file_access_watch_items_hash = 6;
+  // Hash of FAA rules.
+  string file_access_rules_hash = 6;
 }
 
 message PostflightResponse {}
