@@ -970,6 +970,13 @@ message PostflightRequest {
   // The number of valid rules that were successfully imported.
   uint32 rules_processed = 2 [json_name = "rules_processed"];
 
+  // The total number of file access rules that were received by the client
+  // across all RuleDownload requests.
+  uint32 file_access_rules_received = 7 [json_name = "file_access_rules_received"];
+
+  // The number of valid file access rules that were successfully imported.
+  uint32 file_access_rules_processed = 8 [json_name = "file_access_rules_processed"];
+
   // The UUID of the machine requesting rules. See the comment
   // above the same field in `PreflightRequest` for more details.
   string machine_id = 3 [json_name = "machine_id"];
@@ -983,6 +990,8 @@ message PostflightRequest {
 
   // Hash of FAA rules.
   string file_access_rules_hash = 6;
+
+  // next ID: 9
 }
 
 message PostflightResponse {}
