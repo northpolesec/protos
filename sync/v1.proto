@@ -277,7 +277,7 @@ message PreflightResponse {
   // When push notifications are enabled, this overrides the full_sync_interval
   // above. It is expected that Santa will not need to perform a full sync as
   // frequently when push notifications are working.
-  // Defaults to 14400 (6 hours).
+  // Defaults to 14400 (4 hours).
   uint32 push_notification_full_sync_interval_seconds = 9 [json_name = "push_notification_full_sync_interval"];
 
   // The maximum number of seconds Santa can wait before triggering a rule sync
