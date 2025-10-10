@@ -960,7 +960,10 @@ message RuleDownloadResponse {
   string cursor = 2;
 
   // The set of FAA rules in this response.
-  repeated FileAccessRule file_access_rules = 3;
+  // WARNING: This field is currently in beta and should not yet be used. The structure,
+  // types, and names of embedded messages are subject to change and no guarantees to its
+  // stability are currently being made.
+  repeated FileAccessRule BETA_DO_NOT_USE_YET_file_access_rules = 3 [json_name = "BETA_DO_NOT_USE_YET_file_access_rules"];
 }
 
 message PostflightRequest {
