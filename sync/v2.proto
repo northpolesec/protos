@@ -2,7 +2,9 @@
 
 syntax = "proto3";
 
-package santa.sync.v1;
+// The v2 protocol is to be used by North Pole Security only and is
+// not supported for external users.
+package santa.sync.v2;
 
 import "google/api/annotations.proto";
 
@@ -128,6 +130,8 @@ message PreflightRequest {
   uint32 signingid_rule_count = 16 [json_name = "signingid_rule_count"];
   // The number of CDHASH rules in the database.
   uint32 cdhash_rule_count = 17 [json_name = "cdhash_rule_count"];
+  // The number of file access rules in the database.
+  uint32 file_access_rule_count = 24 [json_name = "file_access_rule_count"];
 
   // The UUID of the machine that is sending this preflight.
   // This will always match the UUID included in the request URL.
@@ -148,8 +152,8 @@ message PreflightRequest {
   // Hash of rules.
   string rules_hash = 22;
 
-  // Provided by sync v2
-  reserved 23, 24;
+  // Hash of FAA rules.
+  string file_access_rules_hash = 23;
 
   // next ID: 25
 }
@@ -319,8 +323,9 @@ message PreflightResponse {
   // configured destination.
   optional ExportConfiguration export_configuration = 16;
 
-  // Provided by sync v2
-  reserved 18, 19;
+  // The URL and details for an FAA dialog.
+  optional string file_access_event_detail_url = 18;
+  optional string file_access_event_detail_text = 19;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -878,6 +883,60 @@ message Rule {
   ];
 }
 
+message FileAccessRule {
+  enum RuleType {
+    RULE_TYPE_UNSPECIFIED = 0;
+    RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES = 1;
+    RULE_TYPE_PATHS_WITH_DENIED_PROCESSES = 2;
+    RULE_TYPE_PROCESSES_WITH_ALLOWED_PATHS = 3;
+    RULE_TYPE_PROCESSES_WITH_DENIED_PATHS = 4;
+  }
+  message Process {
+    oneof identifier {
+      string binary_path = 1;
+      string cd_hash = 2;
+      string signing_id = 3;
+      string certificate_sha256 = 4;
+      string team_id = 5;
+    }
+  }
+  message Path {
+    enum PathType {
+      PATH_TYPE_UNSPECIFIED = 0;
+      PATH_TYPE_LITERAL = 1;
+      PATH_TYPE_PREFIX = 2;
+    }
+    string path = 1;
+    PathType path_type = 2;
+  }
+  message Add {
+    // The primary key.
+    string name = 1;
+    // Only used as a description. There can only ever be a single active
+    // version.
+    string version = 2;
+    repeated Path paths = 3;
+    bool allow_read_access = 4;
+    // If true, access violations will be blocked.
+    // Otherwise, the rule operates in audit-only mode.
+    bool block_violations = 5;
+    RuleType rule_type = 6;
+    bool enable_silent_mode = 7;
+    bool enable_silent_tty_mode = 8;
+    string block_message = 9;
+    string event_detail_url = 10;
+    string event_detail_text = 11;
+    repeated Process processes = 12;
+  }
+  message Remove {
+    string name = 1;
+  }
+  oneof action {
+    Add add = 1;
+    Remove remove = 2;
+  }
+}
+
 message RuleDownloadRequest {
   // When Santa downloads rules from the server, the server can return a
   // "cursor" that is sent back in the next request. This can be used to
@@ -893,6 +952,8 @@ message RuleDownloadRequest {
   string machine_id = 2 [json_name = "machine_id"];
 }
 
+// The consumer should be able to handle processing both rules and
+// file_access_rules within a single message.
 message RuleDownloadResponse {
   // The set of rules returned in this response.
   repeated Rule rules = 1;
@@ -900,8 +961,8 @@ message RuleDownloadResponse {
   // The aforementioned cursor (see the comment on `RuleDownloadRequest`).
   string cursor = 2;
 
-  // Provided by sync v2
-  reserved 3;
+  // The set of FAA rules in this response.
+  repeated FileAccessRule file_access_rules = 3 [json_name = "file_access_rules"];
 }
 
 message PostflightRequest {
@@ -911,6 +972,13 @@ message PostflightRequest {
 
   // The number of valid rules that were successfully imported.
   uint32 rules_processed = 2 [json_name = "rules_processed"];
+
+  // The total number of file access rules that were received by the client
+  // across all RuleDownload requests.
+  uint32 file_access_rules_received = 7 [json_name = "file_access_rules_received"];
+
+  // The number of valid file access rules that were successfully imported.
+  uint32 file_access_rules_processed = 8 [json_name = "file_access_rules_processed"];
 
   // The UUID of the machine requesting rules. See the comment
   // above the same field in `PreflightRequest` for more details.
@@ -923,8 +991,8 @@ message PostflightRequest {
   // Hash of rules.
   string rules_hash = 5;
 
-  // Provided by sync v2
-  reserved 6, 7, 8;
+  // Hash of FAA rules.
+  string file_access_rules_hash = 6;
 
   // next ID: 9
 }

@@ -15,3 +15,15 @@ cc_proto_library(
     visibility = ["//visibility:public"],
 )
 
+proto_library(
+    name = "v2_proto",
+    srcs = ["v2.proto"],
+    visibility = ["//visibility:public"],
+    deps = ["@googleapis//google/api:annotations_proto"],
+)
+
+cc_proto_library(
+    name = "v2_cc_proto",
+    deps = [":v2_proto"],
+    visibility = ["//visibility:public"],
+)
