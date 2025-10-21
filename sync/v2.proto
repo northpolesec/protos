@@ -8,7 +8,7 @@ package santa.sync.v2;
 
 import "google/api/annotations.proto";
 
-option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync";
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/syncv2";
 
 // Note: Many of the enums in this proto file do not conform to protocol buffer
 // best practices. The reason for this is that this proto was developed to be
