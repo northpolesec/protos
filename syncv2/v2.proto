@@ -327,6 +327,19 @@ message PreflightResponse {
   optional string file_access_event_detail_url = 18;
   optional string file_access_event_detail_text = 19;
 
+  // Push Notification Service fields
+  // The domain of the server (assumes push.northpole.security is appened)
+  string PushServer = 20;     
+
+  // The signed JWT authorizing the host to their topics
+  string PushToken = 21;
+  // The NKEY to identify
+  string PushKey = 22;
+  // The Random identifier for this host.
+  string DeviceID = 23;
+  // The list of Workshop tags this hosts is a member of.
+  optional repeated string tags = 24; 
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
