@@ -329,7 +329,7 @@ message PreflightResponse {
 
   // Push Notification Service fields
   // The domain of the server (assumes push.northpole.security is appened)
-  string push_server = 20;     
+  string push_server = 20;
   // The signed JWT authorizing the host to their topics
   string push_token = 21;
   // The NKEY to identify
@@ -337,7 +337,7 @@ message PreflightResponse {
   // The Random identifier for this host.
   string push_deviceid = 23;
   // The list of Workshop tags this hosts is a member of.
-  repeated string push_tags = 24; 
+  repeated string push_tags = 24;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
