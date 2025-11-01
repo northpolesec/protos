@@ -322,7 +322,6 @@ message PreflightResponse {
   // Provided by sync v2
   reserved 18 to 25;
 
-
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
