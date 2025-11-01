@@ -320,7 +320,8 @@ message PreflightResponse {
   optional ExportConfiguration export_configuration = 16;
 
   // Provided by sync v2
-  reserved 18, 19;
+  reserved 18 to 25;
+
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
