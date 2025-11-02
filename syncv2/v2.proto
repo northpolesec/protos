@@ -229,6 +229,31 @@ message ExportConfiguration {
   SignedPost signed_post = 1;
 }
 
+// On-demand monitor mode settings
+message OnDemandMonitorMode {
+  // Maximum number of minutes a machine is allowed to transition
+  // into Monitor Mode.
+  uint32 max_minutes = 1;
+
+  // The default number of minutes of Monitor Mode granted to a machine
+  // when requested if no duration is explicitly specified.
+  // If not specified or 0, "max_minutes" is the default.
+  optional uint32 default_duration_minutes = 2;
+}
+
+// This specifies the valid mode transition settings for a machine
+message ModeTransition {
+  oneof transition {
+    // When set and true, the machine will no longer be able to enter
+    // on-demand Monitor Mode, and any active on-demand session will
+    // immediately be terminated.
+    bool revoke = 1;
+
+    // When set, contains the allowed on-demand Monitor Mode settings.
+    OnDemandMonitorMode on_demand_monitor_mode = 2;
+  }
+}
+
 message PreflightResponse {
   // The client mode that the client should move into at the end of this sync.
   // The mode does not change until the Postflight request has been made, to
@@ -338,6 +363,8 @@ message PreflightResponse {
   string push_deviceid = 23;
   // The list of Workshop tags this hosts is a member of.
   repeated string push_tags = 24;
+
+  optional ModeTransition mode_transition = 25;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
