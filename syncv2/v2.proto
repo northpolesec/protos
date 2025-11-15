@@ -366,6 +366,17 @@ message PreflightResponse {
 
   optional ModeTransition mode_transition = 25;
 
+  // The URL to open when the user clicks the button on a block notification.
+  // This URL will be used for all rules unless overridden by a rule-specific
+  // option. This property supports several placeholders in the string that
+  // will be replaced before the URL is constructed. Refer to Santa
+  // documentation for a complete list of supported placeholders.
+  optional string event_detail_url = 26;
+
+  // Related to the event_detail_url, this string represents the text to show
+  // on the button of the block notification show to a user.
+  optional string event_detail_text = 27;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
