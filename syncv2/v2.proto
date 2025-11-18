@@ -784,8 +784,7 @@ message TemporaryMonitorModeEnter {
 }
 
 // Audit event emitted when Santa leaves Monitor Mode temporarily
-message TemporaryMonitorModeLeave {
-}
+message TemporaryMonitorModeLeave {}
 
 message TemporaryMonitorMode {
   oneof transition {
