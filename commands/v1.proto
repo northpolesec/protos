@@ -33,8 +33,10 @@ enum SantaCommandResponseCode {
 }
 
 message SantaCommandResponse {
-  SantaCommandResponseCode result = 1;
-  bytes output = 2;
+  SantaCommandResponseCode code = 1;
+  oneof result {
+     PingResponse ping = 2;
+  }
 }
 
 // An empty message just to send request a ping
