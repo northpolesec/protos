@@ -35,7 +35,7 @@ enum SantaCommandResponseCode {
 message SantaCommandResponse {
   SantaCommandResponseCode code = 1;
   oneof result {
-     PingResponse ping = 2;
+    PingResponse ping = 2;
   }
 }
 
