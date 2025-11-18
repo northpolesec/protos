@@ -777,11 +777,29 @@ message StandaloneModeRuleCreation {
   uint32 timestamp = 3 [json_name = "timestamp"]; // Timestamp of rule creation
 }
 
+// Audit event emitted when Santa enters Monitor Mode temporarily
+message TemporaryMonitorModeEnter {
+  // Maximum number of seconds the monitor mode session will last
+  optional uint64 seconds = 2;
+}
+
+// Audit event emitted when Santa leaves Monitor Mode temporarily
+message TemporaryMonitorModeLeave {
+}
+
+message TemporaryMonitorMode {
+  oneof transition {
+    TemporaryMonitorModeEnter enter = 1;
+    TemporaryMonitorModeLeave leave = 2;
+  }
+}
+
 // AuditEvents are events sent by Santa to communicate context to the sync
 // service.
 message AuditEvent {
   oneof event {
     StandaloneModeRuleCreation standalone_mode_rule_creation = 1 [json_name = "standalone_mode_rule_creation"];
+    TemporaryMonitorMode temporary_monitor_mode = 2;
   }
 }
 

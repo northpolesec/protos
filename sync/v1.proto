@@ -739,6 +739,7 @@ message AuditEvent {
   oneof event {
     StandaloneModeRuleCreation standalone_mode_rule_creation = 1 [json_name = "standalone_mode_rule_creation"];
   }
+  reserved 2;
 }
 
 message EventUploadRequest {
