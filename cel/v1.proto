@@ -52,6 +52,10 @@ message ExecutionContext {
   // The environment variables being passed to the new process.
   // Using this field will prevent the result from being cached.
   map<string, string> envs = 3;
+
+  // The effective user ID of the executing user.
+  // Using this field will prevent the result from being cached.
+  int32 euid = 4;
 }
 
 // The fields in this message are provided to the CEL program and are static,
