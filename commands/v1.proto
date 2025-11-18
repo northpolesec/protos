@@ -17,7 +17,6 @@ syntax = "proto3";
 package santa.commands.v1;
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/commands";
-option objc_class_prefix = "SNTCmd";
 
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
