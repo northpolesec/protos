@@ -774,31 +774,74 @@ message FileAccessEvent {
 message StandaloneModeRuleCreation {
   Decision decision = 1 [json_name = "decision"]; // Indicates new rule type
   string identifier = 2 [json_name = "identifier"]; // Indicates new rule identifier
-  uint32 timestamp = 3 [json_name = "timestamp"]; // Timestamp of rule creation
 }
 
-// Audit event emitted when Santa enters Monitor Mode temporarily
+// Audit event emitted when Santa enters Monitor Mode temporarily.
 message TemporaryMonitorModeEnter {
-  // Maximum number of seconds the monitor mode session will last
+  // Maximum number of seconds the monitor mode session will last.
   optional uint64 seconds = 2;
+
+  // Reasons why temporary Monitor Mode can be entered.
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+
+    // Requested by a user with a valid on-demand policy.
+    REASON_ON_DEMAND = 1;
+
+    // User had an active temporary Monitor Mode session and changed the duration.
+    REASON_ON_DEMAND_REFRESH = 2;
+
+    // Santa automatically re-entered Monitor Mode after a process restart.
+    REASON_RESTART = 3;
+  }
+
+  // The reason for entering Monitor Mode temporarily.
+  Reason reason = 1;
 }
 
-// Audit event emitted when Santa leaves Monitor Mode temporarily
-message TemporaryMonitorModeLeave {}
+// Audit event emitted when Santa leaves Monitor Mode temporarily.
+message TemporaryMonitorModeLeave {
+  // Reasons why temporary Monitor Mode can be left.
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+
+    // The temporary duration expired.
+    REASON_EXPIRY = 1;
+
+    // The user manually cancelled the session.
+    REASON_CANCELLED = 2;
+
+    // The sync server revoked the machines eligibility for temporary Monitor Mode.
+    REASON_REVOKED = 3;
+
+    // The machine's SyncBaseURL configuration changed, causing eligibility to be revoked.
+    REASON_SYNC_SERVER_CHANGED = 4;
+  }
+
+  // The reason for leaving a temporary Monitor Mode session.
+  Reason reason = 1;
+}
 
 message TemporaryMonitorMode {
+  // A unique identifier to tie together different Monitor Mode transition events.
+  string session_id = 1;
+
   oneof transition {
-    TemporaryMonitorModeEnter enter = 1;
-    TemporaryMonitorModeLeave leave = 2;
+    TemporaryMonitorModeEnter enter = 2;
+    TemporaryMonitorModeLeave leave = 3;
   }
 }
 
 // AuditEvents are events sent by Santa to communicate context to the sync
 // service.
 message AuditEvent {
+  // Timestamp, in seconds since UNIX epoch, when the audit event was emitted.
+  uint64 timestamp = 1;
+
+  // Supported audit event types
   oneof event {
-    StandaloneModeRuleCreation standalone_mode_rule_creation = 1 [json_name = "standalone_mode_rule_creation"];
-    TemporaryMonitorMode temporary_monitor_mode = 2;
+    StandaloneModeRuleCreation standalone_mode_rule_creation = 2 [json_name = "standalone_mode_rule_creation"];
+    TemporaryMonitorMode temporary_monitor_mode = 3 [json_name = "temporary_monitor_mode"];
   }
 }
 
