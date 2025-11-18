@@ -6,7 +6,7 @@ proto_library(
     name = "v1_proto",
     srcs = ["v1.proto"],
     visibility = ["//visibility:public"],
-    deps = ["@googleapis//google/api:annotations_proto"],
+    deps = [],
 )
 
 cc_proto_library(
