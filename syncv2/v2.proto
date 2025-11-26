@@ -816,6 +816,9 @@ message TemporaryMonitorModeLeave {
 
     // The machine's SyncBaseURL configuration changed, causing eligibility to be revoked.
     REASON_SYNC_SERVER_CHANGED = 4;
+
+    // The machine rebooted and will not attempt to continue the previous session.
+    REASON_REBOOT = 5;
   }
 
   // The reason for leaving a temporary Monitor Mode session.
