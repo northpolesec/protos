@@ -827,7 +827,7 @@ message TemporaryMonitorModeLeave {
 
 message TemporaryMonitorMode {
   // A unique identifier to tie together different Monitor Mode transition events.
-  string session_id = 1;
+  string session_id = 1 [json_name = "session_id"];
 
   oneof transition {
     TemporaryMonitorModeEnter enter = 2;
