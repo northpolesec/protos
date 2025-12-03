@@ -18,10 +18,36 @@ package santa.commands.v1;
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/commands";
 
+message RunningProcess {
+  int32 pid = 1;
+  int32 pidversion = 2;
+  string boot_session_uuid = 3 [json_name = "boot_session_uuid"];
+}
+
+message KillRequest {
+  oneof process {
+    RunningProcess running_process = 1 [json_name = "running_process"];
+    string cdhash = 2;
+    string singing_id = 3 [json_name = "signing_id"];
+    string team_id = 4 [json_name = "team_id"];
+  }
+}
+
+message KillResponse {
+  message Process {
+    int32 pid = 1;
+    int32 pidversion = 2;
+    optional int32 error = 3;
+  }
+
+  repeated Process processes = 1;
+}
+
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
   oneof command {
     PingRequest ping = 1;
+    KillRequest kill = 2;
   }
 }
 
@@ -35,6 +61,7 @@ message SantaCommandResponse {
   SantaCommandResponseCode code = 1;
   oneof result {
     PingResponse ping = 2;
+    KillResponse kill = 3;
   }
 }
 
