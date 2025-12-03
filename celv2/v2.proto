@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package santa.cel.v1;
+package santa.cel.v2;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/cel";
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/celv2";
 
 // ReturnValue is the type that should be returned from the expression and
 // indicates to Santa the decision that should be applied to the execution.
@@ -37,8 +37,10 @@ enum ReturnValue {
   // silently blocked can be very confusing for users.
   SILENT_BLOCKLIST = 4;
 
-  reserved 5;
-  reserved "REQUIRE_TOUCHID";
+  // Hold the process until the user has authorized it using biometrics (or, if
+  // EnableStandalonePasswordFallback is enabled, with a password), allowing or
+  // denying the execution as appropriate.
+  REQUIRE_TOUCHID = 5;
 }
 
 // The fields in this message provided to CEL programs.
