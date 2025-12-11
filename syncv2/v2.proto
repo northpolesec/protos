@@ -364,6 +364,9 @@ message PreflightResponse {
   // The list of Workshop tags this hosts is a member of.
   repeated string push_tags = 24;
 
+  // Key material for validating push command HMAC
+  bytes push_hmac_key = 28;
+
   optional ModeTransition mode_transition = 25;
 
   // The URL to open when the user clicks the button on a block notification.

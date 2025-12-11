@@ -74,6 +74,13 @@ message SantaCommandRequest {
     PingRequest ping = 10;
     KillRequest kill = 11;
   }
+
+  // HMAC of the uuid concatenated with the command values.
+  // This should be HMAC(uuid + command bytes)
+  //
+  // To calculate this copy the value, set it to nil in the message and then
+  // marshal the message and compare.
+  bytes hmac = 2;
 }
 
 message SantaCommandResponse {
