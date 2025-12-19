@@ -365,7 +365,7 @@ message PreflightResponse {
   repeated string push_tags = 24;
 
   // Key material for validating push command HMAC
-  bytes push_hmac_key = 28;
+  bytes push_hmac_key = 31;
 
   optional ModeTransition mode_transition = 25;
 
