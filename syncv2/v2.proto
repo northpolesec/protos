@@ -377,6 +377,18 @@ message PreflightResponse {
   // on the button of the block notification show to a user.
   optional string event_detail_text = 27;
 
+  // If True, mounting of network filesystems will be blocked (modulo the
+  // `allowed_network_mount_hosts` setting below) and the user will be notified.
+  optional bool block_network_mount = 28;
+
+  // The message to be displayed to users when a network share
+  // is prevented from being mounted.
+  optional string banned_network_mount_block_message = 29;
+
+  // The list of network share hosts that will still be allowed to be mounted
+  // when `block_network_mount` is true.
+  repeated string allowed_network_mount_hosts = 30;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [

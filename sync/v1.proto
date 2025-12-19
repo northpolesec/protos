@@ -333,6 +333,9 @@ message PreflightResponse {
   // on the button of the block notification show to a user.
   optional string event_detail_text = 27;
 
+  // Provided by sync v2
+  reserved 28 to 30;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
