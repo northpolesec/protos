@@ -68,7 +68,7 @@ message KillResponse {
 
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
-  // Nonce 
+  // Nonce
   string uuid = 1;
 
   // timestamp in second to prevent replays
