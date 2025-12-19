@@ -381,7 +381,7 @@ message PreflightResponse {
   // `allowed_network_mount_hosts` setting below) and the user will be notified.
   optional bool block_network_mount = 28;
 
-  // The message to be displayed to users when a network share is blocked
+  // The message to be displayed to users when a network share
   // is prevented from being mounted.
   optional string banned_network_mount_block_message = 29;
 
