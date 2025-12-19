@@ -86,9 +86,8 @@ message SantaCommandRequest {
     KillRequest kill = 11;
   }
 
-  // timestamp to prevent replays
-  int64 timestamp = 2;
-
+  // timestamp in ms to prevent replays
+  int64 issued_at_ms = 2;
 
   // HMAC of the uuid concatenated with the command values.
   // This should be HMAC(uuid + command bytes)
