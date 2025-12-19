@@ -68,6 +68,7 @@ message KillResponse {
 
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
+  // Nonce 
   string uuid = 1;
 
   oneof command {
@@ -75,12 +76,16 @@ message SantaCommandRequest {
     KillRequest kill = 11;
   }
 
+  // timestamp to prevent replays
+  int64 timestamp = 2;
+
+
   // HMAC of the uuid concatenated with the command values.
   // This should be HMAC(uuid + command bytes)
   //
   // To calculate this copy the value, set it to nil in the message and then
   // marshal the message and compare.
-  bytes hmac = 2;
+  bytes hmac = 3;
 }
 
 message SantaCommandResponse {
