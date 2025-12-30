@@ -199,6 +199,9 @@ message ProcessInfo {
 
   // Time the process was started
   optional google.protobuf.Timestamp start_time = 17;
+
+  // Process annotations - not currently used.
+  reserved 18;
 }
 
 // Light variant of ProcessInfo message to help minimize on-disk/on-wire sizes
@@ -228,6 +231,9 @@ message ProcessInfoLight {
 
   // File information for the executable backing this process
   optional FileInfoLight executable = 10;
+
+  // Process annotations - not currently used.
+  reserved 11;
 }
 
 // Certificate information
@@ -458,6 +464,7 @@ message Disk {
     ACTION_UNKNOWN = 0;
     ACTION_APPEARED = 1;
     ACTION_DISAPPEARED = 2;
+    ACTION_BLOCKED = 3;
   }
   optional Action action = 1;
 
@@ -528,7 +535,7 @@ message FileAccess {
   optional ProcessInfo instigator = 1;
 
   // The path that was accessed
-  optional FileInfoLight target = 2;
+  optional FileInfo target = 2;
 
   // The version of the policy when the decision was made
   optional string policy_version = 3;
