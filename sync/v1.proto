@@ -742,7 +742,9 @@ message AuditEvent {
   oneof event {
     StandaloneModeRuleCreation standalone_mode_rule_creation = 1 [json_name = "standalone_mode_rule_creation"];
   }
-  reserved 2;
+
+  // Provided by sync v2
+  reserved 2 to 3;
 }
 
 message EventUploadRequest {
@@ -759,7 +761,10 @@ message EventUploadRequest {
   // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
 
-  // next ID: 5
+  // Provided by sync v2
+  reserved 5;
+
+  // next ID: 6
 }
 
 message EventUploadResponse {

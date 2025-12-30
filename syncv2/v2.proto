@@ -785,6 +785,21 @@ message FileAccessEvent {
   FileAccessDecision decision = 6 [json_name = "decision"];
 }
 
+// Information related to a network share that was blocked
+message NetworkMountEvent {
+  // A unique identifier for the event
+  string uuid = 1;
+
+  // The URL of the network share that was attempted to be mounted.
+  string mount_from = 2 [json_name = "mount_from"];
+
+  // The destination of the mount attempt.
+  string mount_on = 3 [json_name = "mount_on"];
+
+  // The filesystem type of the mount.
+  string fs_type = 4 [json_name = "fs_type"];
+}
+
 // Audit Event for when Santa makes a new rule in standalone mode.
 message StandaloneModeRuleCreation {
   Decision decision = 1 [json_name = "decision"]; // Indicates new rule type
@@ -873,11 +888,14 @@ message EventUploadRequest {
   // The set of FileAccess events being uploaded.
   repeated FileAccessEvent file_access_events = 4 [json_name = "file_access_events"];
 
+  // The set of network mount events being uploaded.
+  repeated NetworkMountEvent network_mount_events = 5 [json_name = "network_mount_events"];
+
   // The UUID of the machine where the event(s) occurred. See the comment
   // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
 
-  // next ID: 5
+  // next ID: 6
 }
 
 message EventUploadResponse {
