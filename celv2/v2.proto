@@ -69,6 +69,11 @@ message ExecutionContext {
   // The current working directory of the process being executed.
   // Using this field will prevent the result from being cached.
   string cwd = 5;
+
+  // The ancestor tree for this process. The first process in the list is
+  // the immediate parent, followed by its parent, all the way up to launchd.
+  // Using this field will prevent the result from being cached.
+  repeated Ancestor ancestors = 6;
 }
 
 // The fields in this message are provided to the CEL program and are static,
@@ -89,4 +94,18 @@ message ExecutableFile {
   // This timestamp is the secure timestamp that was certified by Apple's timestamp
   // authority service and can be trusted.
   optional google.protobuf.Timestamp secure_signing_time = 2;
+}
+
+message Ancestor {
+  // The path of the executable for this process.
+  string path = 1;
+
+  // This process's signing ID, if the process is validly signed.
+  string signing_id = 2;
+
+  // This process's team ID, if the process is validly signed.
+  string team_id = 3;
+
+  // This process's CDHash, if this process is validly signed.
+  string cdhash = 4;
 }
