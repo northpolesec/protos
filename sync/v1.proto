@@ -334,7 +334,7 @@ message PreflightResponse {
   optional string event_detail_text = 27;
 
   // Provided by sync v2
-  reserved 28 to 31;
+  reserved 28 to 32;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -374,6 +374,8 @@ message PreflightResponse {
     json_name = "clean_sync",
     deprecated = true
   ];
+
+  // next ID: 33
 }
 
 // The Decision enum records what decision Santa made about an execution.
