@@ -44,7 +44,7 @@ enum ReturnValue {
 
   // Identical to REQUIRE_TOUCHID but goes straight to TouchID authorization
   // without showing the usual Santa block dialog.
-  REQUIRE_TOUCHID_SILENT = 6;
+  REQUIRE_TOUCHID_ONLY = 6;
 }
 
 // The fields in this message provided to CEL programs.
