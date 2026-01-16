@@ -254,6 +254,12 @@ message ModeTransition {
   }
 }
 
+// The specifies the settings related to Santa's networking features
+message NetworkExtension {
+  // Whether or not to enable networking features.
+  bool enable = 1;
+}
+
 message PreflightResponse {
   // The client mode that the client should move into at the end of this sync.
   // The mode does not change until the Postflight request has been made, to
@@ -367,6 +373,7 @@ message PreflightResponse {
   // Key material for validating push command HMAC
   bytes push_hmac_key = 31;
 
+  // Settings related to on-demand monitor mode.
   optional ModeTransition mode_transition = 25;
 
   // The URL to open when the user clicks the button on a block notification.
@@ -391,6 +398,9 @@ message PreflightResponse {
   // The list of network share hosts that will still be allowed to be mounted
   // when `block_network_mount` is true.
   repeated string allowed_network_mount_hosts = 30;
+
+  // Settings related to Santa's network monitoring/authorization features
+  optional NetworkExtension network_extension = 32;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -430,6 +440,8 @@ message PreflightResponse {
     json_name = "clean_sync",
     deprecated = true
   ];
+
+  // next ID: 33
 }
 
 // The Decision enum records what decision Santa made about an execution.
