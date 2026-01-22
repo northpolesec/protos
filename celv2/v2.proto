@@ -90,3 +90,17 @@ message ExecutableFile {
   // authority service and can be trusted.
   optional google.protobuf.Timestamp secure_signing_time = 2;
 }
+
+// TouchIDResult is returned by the require_touchid_with_cooldown_minutes()
+// and require_touchid_only_with_cooldown_minutes() CEL functions.
+// It contains both the decision (REQUIRE_TOUCHID or REQUIRE_TOUCHID_ONLY)
+// and the cooldown period in minutes.
+message TouchIDResult {
+  // The return value (REQUIRE_TOUCHID or REQUIRE_TOUCHID_ONLY)
+  santa.cel.v2.ReturnValue value = 1;
+
+  // The cooldown period in minutes. If 0, there is no cooldown and auth
+  // must be provided for each execution.
+  uint64 cooldown_minutes = 2;
+}
+
