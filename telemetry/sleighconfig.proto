@@ -19,6 +19,8 @@ package santa.telemetry.v1;
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
 option objc_class_prefix = "SNTPB";
 
+// SignedPost maps to the same message in syncv2. It's a separate message to
+// allow the messages to be changed independently.
 message SignedPost {
   // POST URL to send the signed form values and desired data. Use content type
   // multipart/form-data when making the request.
@@ -28,19 +30,34 @@ message SignedPost {
   map<string, string> form_values = 2;
 }
 
+// ExportConfiguration maps to the same message in syncv2. It's a separate
+// message to allow the messages to be changed independently.
 message ExportConfiguration {
   oneof export {
     SignedPost signed_post = 1;
   }
 }
 
+// SleighConfig contains the configuration data to be passed to Sleigh when
+// Sleigh is started.
 message SleighConfig {
+  // The host_id for this host as sent up to Workshop. This will be used for
+  // the export folder.
   string host_id = 1;
+
+  // The host_name for this host as sent up to Workshop.
   string host_name = 2;
 
+  // The list of files to be processed during this run. Should be passed
+  // as full paths.
   repeated string input_files = 3;
 
-  repeated string filter_expressions = 4;
+  // Configuration for uploading the converted telemetry files.
+  ExportConfiguration export_config = 4;
 
-  ExportConfiguration export_config = 5;
+  // A set of CEL expressions to use to filter events as they are processed.
+  // If an expression returns true the event is dropped. Expressions can also
+  // redact fields instead of dropping.
+  repeated string filter_expressions = 5;
+
 }
