@@ -59,5 +59,4 @@ message SleighConfig {
   // If an expression returns true the event is dropped. Expressions can also
   // redact fields instead of dropping.
   repeated string filter_expressions = 5;
-
 }
