@@ -66,6 +66,25 @@ message KillResponse {
   repeated Process processes = 2;
 }
 
+// Command for sending a notification for Santa to display.
+message NotificationRequest {
+  string message = 1;
+}
+
+message NotificationResponse {}
+
+// Command for asking Santa to perform an inventory at a specific
+// directory
+// This essentially is a server triggered version of 
+//   santactl eventupload <path>
+message EventUploadRequest {
+  string path = 1;
+}
+
+// Events are sent up via the sync protocol so this just signals that the
+// command succeeded.
+message EventUploadResponse {}
+
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
   // Nonce
@@ -82,8 +101,10 @@ message SantaCommandRequest {
   bytes hmac = 3;
 
   oneof command {
-    PingRequest ping = 10;
-    KillRequest kill = 11;
+    PingRequest  ping = 10;
+    KillRequest  kill = 11;
+    NotificationRequest notification = 12;
+    EventUploadRequest  event_upload = 13;
   }
 }
 
@@ -94,6 +115,7 @@ message SantaCommandResponse {
     ERROR_DESERIALIZATION = 2;
     ERROR_INVALID_UUID = 3;
     ERROR_UNKNOWN_REQUEST_TYPE = 4;
+    ERROR_COMMAND_DISABLED = 5;
   }
 
   optional Error error = 1;
