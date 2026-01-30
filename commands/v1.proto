@@ -1,4 +1,4 @@
-/// Copyright 2025 North Pole Security, Inc.
+/// Copyright 2026 North Pole Security, Inc.
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -123,6 +123,8 @@ message SantaCommandResponse {
   oneof result {
     PingResponse ping = 2;
     KillResponse kill = 3;
+    NotificationResponse notification = 4;
+    EventUploadResponse event_upload = 5;
   }
 }
 
