@@ -75,7 +75,7 @@ message NotificationResponse {}
 
 // Command for asking Santa to perform an inventory at a specific
 // directory
-// This essentially is a server triggered version of 
+// This essentially is a server triggered version of
 //   santactl eventupload <path>
 message EventUploadRequest {
   string path = 1;
@@ -101,10 +101,10 @@ message SantaCommandRequest {
   bytes hmac = 3;
 
   oneof command {
-    PingRequest  ping = 10;
-    KillRequest  kill = 11;
+    PingRequest ping = 10;
+    KillRequest kill = 11;
     NotificationRequest notification = 12;
-    EventUploadRequest  event_upload = 13;
+    EventUploadRequest event_upload = 13;
   }
 }
 
