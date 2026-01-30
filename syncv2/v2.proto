@@ -812,6 +812,24 @@ message NetworkMountEvent {
   string fs_type = 4 [json_name = "fs_type"];
 }
 
+// Information related to a USB mount that was blocked
+message USBMountEvent {
+  // A unique identifier for the event
+  string uuid = 1;
+
+  // The protocol the device is using
+  string protocol = 2 [json_name = "protocol"];
+
+  // The device model of the USB device
+  optional string device_model = 3 [json_name = "device_model"];
+
+  // The device vendor of the USB device
+  optional string device_vendor = 4 [json_name = "device_vendor"];
+
+  // The destination of the mount attempt.
+  string mount_on = 5 [json_name = "mount_on"];
+}
+
 // Audit Event for when Santa makes a new rule in standalone mode.
 message StandaloneModeRuleCreation {
   Decision decision = 1 [json_name = "decision"]; // Indicates new rule type
@@ -903,11 +921,14 @@ message EventUploadRequest {
   // The set of network mount events being uploaded.
   repeated NetworkMountEvent network_mount_events = 5 [json_name = "network_mount_events"];
 
+  // The set of USB mount events being uploaded.
+  repeated USBMountEvent usb_mount_events = 6 [json_name = "usb_mount_events"];
+
   // The UUID of the machine where the event(s) occurred. See the comment
   // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
 
-  // next ID: 6
+  // next ID: 7
 }
 
 message EventUploadResponse {
