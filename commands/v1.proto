@@ -66,6 +66,12 @@ message KillResponse {
   repeated Process processes = 2;
 }
 
+// Command to request Santa's bundle service inventory a specific directory and
+// upload it via the sync protocol.
+message EventUploadRequest {
+  string path = 1;
+}
+
 // Events are sent up via the sync protocol so this just signals that the
 // command succeeded.
 message EventUploadResponse {}
