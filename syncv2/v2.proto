@@ -810,6 +810,11 @@ message NetworkMountEvent {
 
   // The filesystem type of the mount.
   string fs_type = 4 [json_name = "fs_type"];
+
+  // The time of the access, represented as the number of seconds since the
+  // UNIX epoch. As a double-precision floating point number it can represent
+  // submultiples in its fraction.
+  double access_time = 5 [json_name = "access_time"];
 }
 
 // Information related to a USB mount that was blocked
@@ -828,6 +833,11 @@ message USBMountEvent {
 
   // The destination of the mount attempt.
   string mount_on = 5 [json_name = "mount_on"];
+
+  // The time of the access, represented as the number of seconds since the
+  // UNIX epoch. As a double-precision floating point number it can represent
+  // submultiples in its fraction.
+  double access_time = 6 [json_name = "access_time"];
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
