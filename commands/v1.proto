@@ -66,21 +66,6 @@ message KillResponse {
   repeated Process processes = 2;
 }
 
-// Command for sending a notification for Santa to display.
-message NotificationRequest {
-  string message = 1;
-}
-
-message NotificationResponse {}
-
-// Command for asking Santa to perform an inventory at a specific
-// directory
-// This essentially is a server triggered version of
-//   santactl eventupload <path>
-message EventUploadRequest {
-  string path = 1;
-}
-
 // Events are sent up via the sync protocol so this just signals that the
 // command succeeded.
 message EventUploadResponse {}
@@ -103,8 +88,7 @@ message SantaCommandRequest {
   oneof command {
     PingRequest ping = 10;
     KillRequest kill = 11;
-    NotificationRequest notification = 12;
-    EventUploadRequest event_upload = 13;
+    EventUploadRequest event_upload = 12;
   }
 }
 
@@ -123,8 +107,7 @@ message SantaCommandResponse {
   oneof result {
     PingResponse ping = 2;
     KillResponse kill = 3;
-    NotificationResponse notification = 4;
-    EventUploadResponse event_upload = 5;
+    EventUploadResponse event_upload = 4;
   }
 }
 
