@@ -1,4 +1,4 @@
-/// Copyright 2025 North Pole Security, Inc.
+/// Copyright 2026 North Pole Security, Inc.
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -66,6 +66,16 @@ message KillResponse {
   repeated Process processes = 2;
 }
 
+// Command to request Santa's bundle service inventory a specific directory and
+// upload it via the sync protocol.
+message EventUploadRequest {
+  string path = 1;
+}
+
+// Events are sent up via the sync protocol so this just signals that the
+// command succeeded.
+message EventUploadResponse {}
+
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
   // Nonce
@@ -84,6 +94,7 @@ message SantaCommandRequest {
   oneof command {
     PingRequest ping = 10;
     KillRequest kill = 11;
+    EventUploadRequest event_upload = 12;
   }
 }
 
@@ -94,6 +105,7 @@ message SantaCommandResponse {
     ERROR_DESERIALIZATION = 2;
     ERROR_INVALID_UUID = 3;
     ERROR_UNKNOWN_REQUEST_TYPE = 4;
+    ERROR_COMMAND_DISABLED = 5;
   }
 
   optional Error error = 1;
@@ -101,6 +113,7 @@ message SantaCommandResponse {
   oneof result {
     PingResponse ping = 2;
     KillResponse kill = 3;
+    EventUploadResponse event_upload = 4;
   }
 }
 
