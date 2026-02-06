@@ -18,3 +18,14 @@ cc_proto_library(
     visibility = ["//visibility:public"],
 )
 
+proto_library(
+    name = "sleighconfig_proto",
+    srcs = ["sleighconfig.proto"],
+    visibility = ["//visibility:public"],
+)
+
+cc_proto_library(
+    name = "sleighconfig_cc_proto",
+    deps = [":sleighconfig_proto"],
+    visibility = ["//visibility:public"],
+)

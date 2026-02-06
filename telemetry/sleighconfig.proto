@@ -1,0 +1,62 @@
+/// Copyright 2026 North Pole Security, Inc.
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///     http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+
+syntax = "proto3";
+
+package santa.telemetry.v1;
+
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
+option objc_class_prefix = "SNTPB";
+
+// SignedPost maps to the same message in syncv2. It's a separate message to
+// allow the messages to be changed independently.
+message SignedPost {
+  // POST URL to send the signed form values and desired data. Use content type
+  // multipart/form-data when making the request.
+  string url = 1;
+  // Signed values which authorize the POST request. Append the desired object
+  // name to the "key" field.
+  map<string, string> form_values = 2;
+}
+
+// ExportConfiguration maps to the same message in syncv2. It's a separate
+// message to allow the messages to be changed independently.
+message ExportConfiguration {
+  oneof export {
+    SignedPost signed_post = 1;
+  }
+}
+
+// SleighConfig contains the configuration data to be passed to Sleigh when
+// Sleigh is started.
+message SleighConfig {
+  // The host_id for this host as sent up to Workshop. This will be used for
+  // the export folder.
+  string host_id = 1;
+
+  // The host_name for this host as sent up to Workshop.
+  string host_name = 2;
+
+  // The list of files to be processed during this run. Should be passed
+  // as full paths.
+  repeated string input_files = 3;
+
+  // Configuration for uploading the converted telemetry files.
+  ExportConfiguration export_config = 4;
+
+  // A set of CEL expressions to use to filter events as they are processed.
+  // If an expression returns true the event is dropped. Expressions can also
+  // redact fields instead of dropping.
+  repeated string filter_expressions = 5;
+}
