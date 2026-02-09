@@ -48,9 +48,8 @@ message SleighConfig {
   // The host_name for this host as sent up to Workshop.
   string host_name = 2;
 
-  // The list of files to be processed during this run. Should be passed
-  // as full paths.
-  repeated string input_files = 3;
+  // The files to be exported, passed as a set of already open file descriptors.
+  repeated int32 input_fds = 3;
 
   // Configuration for uploading the converted telemetry files.
   ExportConfiguration export_config = 4;
