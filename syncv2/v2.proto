@@ -367,6 +367,9 @@ message PreflightResponse {
   string push_key = 22;
   // The Random identifier for this host.
   string push_deviceid = 23;
+  // The signed JWT of the issuer of the push token. Used to build a chain of
+  // trust for the push token.
+  string push_issuer_token = 33;
   // The list of Workshop tags this hosts is a member of.
   repeated string push_tags = 24;
 
@@ -441,7 +444,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 33
+  // next ID: 34
 }
 
 // The Decision enum records what decision Santa made about an execution.
