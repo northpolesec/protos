@@ -367,6 +367,9 @@ message PreflightResponse {
   string push_key = 22;
   // The Random identifier for this host.
   string push_deviceid = 23;
+  // The signed JWT of the issuer of the push token. Used to build a chain of
+  // trust for the push token.
+  string push_issuer_token = 33;
   // The list of Workshop tags this hosts is a member of.
   repeated string push_tags = 24;
 
@@ -441,7 +444,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 33
+  // next ID: 34
 }
 
 // The Decision enum records what decision Santa made about an execution.
@@ -838,6 +841,23 @@ message USBMountEvent {
   // UNIX epoch. As a double-precision floating point number it can represent
   // submultiples in its fraction.
   double access_time = 6 [json_name = "access_time"];
+
+  // The remount flags
+  repeated string remount_flags = 7 [json_name = "remount_flags"];
+
+  // Represents the decision Santa made about a USB operation.
+  enum USBMountDecision {
+    USB_MOUNT_DECISION_UNSPECIFIED = 0;
+
+    // The BLOCK decision due to policy.
+    USB_MOUNT_DECISION_BLOCKED = 1;
+
+    // Indicates that Santa blocked the initial mount operation, but remounted
+    // with the flags that were configured.
+    USB_MOUNT_DECISION_ALLOWED_WITH_REMOUNT = 2;
+  }
+
+  USBMountDecision decision = 8 [json_name = "decision"];
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
