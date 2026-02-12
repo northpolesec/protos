@@ -841,6 +841,23 @@ message USBMountEvent {
   // UNIX epoch. As a double-precision floating point number it can represent
   // submultiples in its fraction.
   double access_time = 6 [json_name = "access_time"];
+
+  // The remount flags
+  repeated string remount_flags = 7 [json_name = "remount_flags"];
+
+  // Represents the decision Santa made about a USB operation.
+  enum USBMountDecision {
+    USB_MOUNT_DECISION_UNSPECIFIED = 0;
+
+    // The BLOCK decision due to policy.
+    USB_MOUNT_DECISION_BLOCKED = 1;
+
+    // Indicates that Santa blocked the initial mount operation, but remounted
+    // with the flags that were configured.
+    USB_MOUNT_DECISION_ALLOWED_WITH_REMOUNT = 2;
+  }
+
+  USBMountDecision decision = 8 [json_name = "decision"];
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
