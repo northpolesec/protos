@@ -730,7 +730,7 @@ message Event {
   uint32 signing_time = 33;
 
   // This flag indicates that a StaticRule was applied to this event
-  bool static_rule = 34;
+  bool static_rule = 34 [json_name = "static_rule"];
 }
 
 // Information about a given process. This can optionally be used to
