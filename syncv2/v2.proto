@@ -728,6 +728,9 @@ message Event {
   // unlike the secure_signing_time.
   // Number of seconds since UNIX epoch.
   uint32 signing_time = 33;
+
+  // This flag indicates that a StaticRule was applied to this event
+  bool static_rule = 34;
 }
 
 // Information about a given process. This can optionally be used to
