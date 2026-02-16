@@ -367,6 +367,9 @@ message PreflightResponse {
   string push_key = 22;
   // The Random identifier for this host.
   string push_deviceid = 23;
+  // The signed JWT of the issuer of the push token. Used to build a chain of
+  // trust for the push token.
+  string push_issuer_token = 33;
   // The list of Workshop tags this hosts is a member of.
   repeated string push_tags = 24;
 
@@ -441,7 +444,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 33
+  // next ID: 34
 }
 
 // The Decision enum records what decision Santa made about an execution.
@@ -725,6 +728,9 @@ message Event {
   // unlike the secure_signing_time.
   // Number of seconds since UNIX epoch.
   uint32 signing_time = 33;
+
+  // This flag indicates that a StaticRule was applied to this event
+  bool static_rule = 34 [json_name = "static_rule"];
 }
 
 // Information about a given process. This can optionally be used to
@@ -810,6 +816,51 @@ message NetworkMountEvent {
 
   // The filesystem type of the mount.
   string fs_type = 4 [json_name = "fs_type"];
+
+  // The time of the access, represented as the number of seconds since the
+  // UNIX epoch. As a double-precision floating point number it can represent
+  // submultiples in its fraction.
+  double access_time = 5 [json_name = "access_time"];
+}
+
+// Information related to a USB mount that was blocked
+message USBMountEvent {
+  // A unique identifier for the event
+  string uuid = 1;
+
+  // The protocol the device is using
+  string protocol = 2 [json_name = "protocol"];
+
+  // The device model of the USB device
+  optional string device_model = 3 [json_name = "device_model"];
+
+  // The device vendor of the USB device
+  optional string device_vendor = 4 [json_name = "device_vendor"];
+
+  // The destination of the mount attempt.
+  string mount_on = 5 [json_name = "mount_on"];
+
+  // The time of the access, represented as the number of seconds since the
+  // UNIX epoch. As a double-precision floating point number it can represent
+  // submultiples in its fraction.
+  double access_time = 6 [json_name = "access_time"];
+
+  // The remount flags
+  repeated string remount_flags = 7 [json_name = "remount_flags"];
+
+  // Represents the decision Santa made about a USB operation.
+  enum USBMountDecision {
+    USB_MOUNT_DECISION_UNSPECIFIED = 0;
+
+    // The BLOCK decision due to policy.
+    USB_MOUNT_DECISION_BLOCKED = 1;
+
+    // Indicates that Santa blocked the initial mount operation, but remounted
+    // with the flags that were configured.
+    USB_MOUNT_DECISION_ALLOWED_WITH_REMOUNT = 2;
+  }
+
+  USBMountDecision decision = 8 [json_name = "decision"];
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
@@ -903,11 +954,14 @@ message EventUploadRequest {
   // The set of network mount events being uploaded.
   repeated NetworkMountEvent network_mount_events = 5 [json_name = "network_mount_events"];
 
+  // The set of USB mount events being uploaded.
+  repeated USBMountEvent usb_mount_events = 6 [json_name = "usb_mount_events"];
+
   // The UUID of the machine where the event(s) occurred. See the comment
   // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
 
-  // next ID: 6
+  // next ID: 7
 }
 
 message EventUploadResponse {
