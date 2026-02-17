@@ -74,7 +74,14 @@ message EventUploadRequest {
 
 // Events are sent up via the sync protocol so this just signals that the
 // command succeeded.
-message EventUploadResponse {}
+message EventUploadResponse {
+  enum Error {
+    ERROR_UNSPECIFIED = 0;
+    ERROR_INVALID_PATH = 1;
+    ERROR_INTERNAL = 2;
+  }
+  optional Error error = 1;
+}
 
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
