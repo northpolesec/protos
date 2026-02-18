@@ -99,6 +99,9 @@ message ExecutableFile {
   string signing_id = 3;
 
   // The entitlements of the binary, if it is validly signed.
+  // The value will be a JSON representation. Entitlement values are generally
+  // either a boolean or a JSON object so when comparing boolean values be sure
+  // to use boolean strings "true" or "false".
   map<string, string> entitlements = 4;
 }
 
