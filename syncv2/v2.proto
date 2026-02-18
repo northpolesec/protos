@@ -405,6 +405,9 @@ message PreflightResponse {
   // Settings related to Santa's network monitoring/authorization features
   optional NetworkExtension network_extension = 32;
 
+  // If set, the CEL expression to use as a fallback when no other rules match.
+  string cel_fallback = 34;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -444,7 +447,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 34
+  // next ID: 35
 }
 
 // The Decision enum records what decision Santa made about an execution.

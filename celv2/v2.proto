@@ -97,6 +97,9 @@ message ExecutableFile {
 
   // The signing ID of the binary, if it is validly signed.
   string signing_id = 3;
+
+  // The entitlements of the binary, if it is validly signed.
+  map<string, string> entitlements = 4;
 }
 
 message Ancestor {
