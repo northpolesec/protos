@@ -94,6 +94,9 @@ message ExecutableFile {
   // This timestamp is the secure timestamp that was certified by Apple's timestamp
   // authority service and can be trusted.
   optional google.protobuf.Timestamp secure_signing_time = 2;
+
+  // The signing ID of the binary, if it is validly signed.
+  string signing_id = 3;
 }
 
 message Ancestor {
