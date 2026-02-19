@@ -1173,6 +1173,74 @@ message XProtect {
   }
 }
 
+// Per-process network activity collected during a single monitoring window
+// Note: The SantaMessage fields 'event_time' and 'processed_time' are set
+// to the start and end times of the window within which the NetworkActivity
+// was collected.
+message NetworkActivity {
+  // A single network socket flow observed during the monitoring window
+  message Flow {
+    // Identifier for this flow.
+    // Note: Apple can reuse flow identifiers under certain conditions.
+    // Use `id + hash` as a unique identifier.
+    optional string id = 1;
+
+    // A Santa-computed identifier to help distinguish duplicate flow ids.
+    optional string hash = 2;
+
+    // Remote endpoint address (IPv4 or IPv6 string representation)
+    optional string remote_address = 3;
+    optional uint32 remote_port = 4;
+
+    // Local endpoint address (IPv4 or IPv6 string representation)
+    optional string local_address = 5;
+    optional uint32 local_port = 6;
+
+    // IP protocol number (e.g. 6 for TCP, 17 for UDP)
+    optional int32 protocol = 7;
+
+    enum SocketFamily {
+      SOCKET_FAMILY_UNKNOWN = 0;
+      SOCKET_FAMILY_INET = 1;
+      SOCKET_FAMILY_INET6 = 2;
+    }
+    optional SocketFamily socket_family = 8;
+
+    enum Direction {
+      DIRECTION_UNKNOWN = 0;
+      DIRECTION_INBOUND = 1;
+      DIRECTION_OUTBOUND = 2;
+    }
+    optional Direction direction = 9;
+
+    // Cumulative byte counts for this flow
+    optional uint64 bytes_inbound = 10;
+    optional uint64 bytes_outbound = 11;
+
+    // When the flow was first observed
+    // Only present if the flow started during this window
+    // If a flow began before Santa began monitoring then this field will never
+    // be set for the flow id
+    optional google.protobuf.Timestamp start_time = 12;
+
+    // When the flow was closed
+    // Only present if the flow closed during this window
+    optional google.protobuf.Timestamp close_time = 13;
+  }
+
+  // Network activity for a single process
+  message Process {
+    // Information about the process performing network activity
+    optional ProcessInfo process = 1;
+
+    // Active flows for this process during the window
+    repeated Flow flows = 2;
+  }
+
+  // All processes with network activity during this window
+  repeated Process processes = 1;
+}
+
 // A message encapsulating a single event
 message SantaMessage {
   // Machine ID of the host emitting this log
@@ -1215,6 +1283,7 @@ message SantaMessage {
     LaunchItem launch_item = 31;
     TCCModification tcc_modification = 32;
     XProtect xprotect = 33;
+    NetworkActivity network_activity = 34;
   }
 }
 
