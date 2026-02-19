@@ -408,6 +408,9 @@ message PreflightResponse {
   // If set, the CEL expression to use as a fallback when no other rules match.
   string cel_fallback = 34;
 
+  // A set of CEL expressions to apply to telemetry before upload.
+  repeated string telemetry_filter_expressions = 35;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -447,7 +450,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 35
+  // next ID: 36
 }
 
 // The Decision enum records what decision Santa made about an execution.
