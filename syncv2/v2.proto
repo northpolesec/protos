@@ -406,7 +406,7 @@ message PreflightResponse {
   optional NetworkExtension network_extension = 32;
 
   // If set, the CEL expression to use as a fallback when no other rules match.
-  string cel_fallback = 34;
+  repeated string cel_fallback_expressions = 34;
 
   // A set of CEL expressions to apply to telemetry before upload.
   repeated string telemetry_filter_expressions = 35;
