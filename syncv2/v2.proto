@@ -405,8 +405,8 @@ message PreflightResponse {
   // Settings related to Santa's network monitoring/authorization features
   optional NetworkExtension network_extension = 32;
 
-  // If set, the CEL expression to use as a fallback when no other rules match.
-  string cel_fallback = 34;
+  // If set, a set of CEL expressions to use as a fallback when no other rules match.
+  repeated string cel_fallback_expressions = 34;
 
   // A set of CEL expressions to apply to telemetry before upload.
   repeated string telemetry_filter_expressions = 35;
