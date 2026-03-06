@@ -117,4 +117,7 @@ message Ancestor {
 
   // This process's CDHash, if this process is validly signed.
   string cdhash = 4;
+
+  // The command-line arguments for this process.
+  repeated string args = 5;
 }
