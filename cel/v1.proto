@@ -37,8 +37,9 @@ enum ReturnValue {
   // silently blocked can be very confusing for users.
   SILENT_BLOCKLIST = 4;
 
-  reserved 5;
-  reserved "REQUIRE_TOUCHID";
+  // Provided by cel v2
+  reserved 5, 6;
+  reserved "REQUIRE_TOUCHID", "REQUIRE_TOUCHID_ONLY";
 }
 
 // The fields in this message provided to CEL programs.
@@ -63,6 +64,9 @@ message ExecutionContext {
   // The current working directory of the process being executed.
   // Using this field will prevent the result from being cached.
   string cwd = 5;
+
+  // Provided by cel v2
+  reserved 6;
 }
 
 // The fields in this message are provided to the CEL program and are static,
@@ -86,4 +90,7 @@ message ExecutableFile {
 
   // The signing ID of the binary, if it is validly signed.
   string signing_id = 3;
+
+  // Provided by cel v2
+  reserved 4;
 }
