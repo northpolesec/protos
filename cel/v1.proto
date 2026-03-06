@@ -37,6 +37,7 @@ enum ReturnValue {
   // silently blocked can be very confusing for users.
   SILENT_BLOCKLIST = 4;
 
+  // Provided by cel v2
   reserved 5, 6;
   reserved "REQUIRE_TOUCHID", "REQUIRE_TOUCHID_ONLY";
 }
