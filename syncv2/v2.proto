@@ -406,8 +406,6 @@ message PreflightResponse {
   optional NetworkExtension network_extension = 32;
 
   // If set, a set of CEL rules to use as a fallback when no other rules match.
-  // While the type of this field is Rule, the identifier, rule_type, and policy
-  // fields are ignored.
   repeated CELFallbackRule cel_fallback_rules = 34;
 
   // A set of CEL expressions to apply to telemetry before upload.
