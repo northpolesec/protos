@@ -405,8 +405,10 @@ message PreflightResponse {
   // Settings related to Santa's network monitoring/authorization features
   optional NetworkExtension network_extension = 32;
 
-  // If set, a set of CEL expressions to use as a fallback when no other rules match.
-  repeated string cel_fallback_expressions = 34;
+  // If set, a set of CEL rules to use as a fallback when no other rules match.
+  // While the type of this field is Rule, the identifier, rule_type, and policy
+  // fields are ignored.
+  repeated CELFallbackRule cel_fallback_rules = 34;
 
   // A set of CEL expressions to apply to telemetry before upload.
   repeated string telemetry_filter_expressions = 35;
@@ -513,6 +515,12 @@ enum Decision {
   // BUNDLE_BINARY events don't represent an execution but are sent to a server
   // that requested details about all of the binaries contained within a bundle.
   BUNDLE_BINARY = 15;
+
+  // The execution was allowed because of a CEL fallback rule.
+  ALLOW_CEL_FALLBACK = 16;
+
+  // The execution was blocked because of a CEL fallback rule.
+  BLOCK_CEL_FALLBACK = 17;
 }
 
 message Certificate {
@@ -1099,6 +1107,21 @@ message Rule {
     json_name = "sha256",
     deprecated = true
   ];
+}
+
+message CELFallbackRule {
+  // The CEL expression to run when evaluating this rule. Required.
+  string cel_expr = 1;
+
+  // For expressions that lead to a modal notification, this field can be used
+  // to override the message shown in the modal.
+  string custom_msg = 2;
+
+  // For expressions that lead to a modal notification, this field can be used
+  // to override the URL used by the "Open" button. The same format values used
+  // by the EventDetailURL configuration value can be used here.
+  // See: https://santa.dev/deployment/configuration#eventdetailurl
+  string custom_url = 3;
 }
 
 message FileAccessRule {

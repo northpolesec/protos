@@ -342,7 +342,9 @@ message PreflightResponse {
   optional string event_detail_text = 27;
 
   // Provided by sync v2
-  reserved 28 to 32;
+  reserved 28 to 30;
+  reserved 32;
+  reserved 34 to 35;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -446,6 +448,10 @@ enum Decision {
   // BUNDLE_BINARY events don't represent an execution but are sent to a server
   // that requested details about all of the binaries contained within a bundle.
   BUNDLE_BINARY = 15;
+
+  // Provided by sync v2
+  reserved "ALLOW_CEL_FALLBACK", "BLOCK_CEL_FALLBACK";
+  reserved 16 to 17;
 }
 
 message Certificate {
