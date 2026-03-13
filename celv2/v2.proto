@@ -74,6 +74,10 @@ message ExecutionContext {
   // the immediate parent, followed by its parent, all the way up to launchd.
   // Using this field will prevent the result from being cached.
   repeated Ancestor ancestors = 6;
+
+  // The file descriptors associated with this process.
+  // Using this field will prevent the result from being cached.
+  repeated FileDescriptor fds = 7;
 }
 
 // The fields in this message are provided to the CEL program and are static,
@@ -121,3 +125,12 @@ message Ancestor {
   // The command-line arguments for this process.
   repeated string args = 5;
 }
+
+message FileDescriptor {
+  // The file descriptor number.
+  int32 fd = 1;
+
+  // The type of the file descriptor, e.g: "pipe", "socket"
+  string type = 2;
+}
+
