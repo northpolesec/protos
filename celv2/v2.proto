@@ -133,4 +133,3 @@ message FileDescriptor {
   // The type of the file descriptor, e.g: "pipe", "socket"
   string type = 2;
 }
-
