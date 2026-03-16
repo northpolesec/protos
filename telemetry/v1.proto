@@ -500,6 +500,9 @@ message Disk {
 
   // Path mounted from
   optional string mount_from = 11;
+
+  // Indicates whether the disk is encrypted or not
+  optional bool encrypted = 12;
 }
 
 // Information emitted when Santa captures bundle information
