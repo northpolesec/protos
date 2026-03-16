@@ -128,8 +128,24 @@ message Ancestor {
 
 message FileDescriptor {
   // The file descriptor number.
-  int32 fd = 1;
+  uint32 fd = 1;
 
-  // The type of the file descriptor, e.g: "pipe", "socket"
-  string type = 2;
+  // Enum types gathered from `<sys/proc_info.h>`
+  enum FDType {
+    FD_TYPE_UNKNOWN = 0;
+    FD_TYPE_ATALK = 1;
+    FD_TYPE_VNODE = 2;
+    FD_TYPE_SOCKET = 3;
+    FD_TYPE_PSHM = 4;
+    FD_TYPE_PSEM = 5;
+    FD_TYPE_KQUEUE = 6;
+    FD_TYPE_PIPE = 7;
+    FD_TYPE_FSEVENTS = 8;
+    FD_TYPE_NETPOLICY = 9;
+    FD_TYPE_CHANNEL = 10;
+    FD_TYPE_NEXUS = 11;
+  }
+
+  // The type of the file descriptor.
+  FDType type = 2;
 }
