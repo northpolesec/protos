@@ -74,6 +74,10 @@ message ExecutionContext {
   // the immediate parent, followed by its parent, all the way up to launchd.
   // Using this field will prevent the result from being cached.
   repeated Ancestor ancestors = 6;
+
+  // The file descriptors associated with this process.
+  // Using this field will prevent the result from being cached.
+  repeated FileDescriptor fds = 7;
 }
 
 // The fields in this message are provided to the CEL program and are static,
@@ -120,4 +124,28 @@ message Ancestor {
 
   // The command-line arguments for this process.
   repeated string args = 5;
+}
+
+message FileDescriptor {
+  // The file descriptor number.
+  uint32 fd = 1;
+
+  // Enum types gathered from `<sys/proc_info.h>`
+  enum FDType {
+    FD_TYPE_UNKNOWN = 0;
+    FD_TYPE_ATALK = 1;
+    FD_TYPE_VNODE = 2;
+    FD_TYPE_SOCKET = 3;
+    FD_TYPE_PSHM = 4;
+    FD_TYPE_PSEM = 5;
+    FD_TYPE_KQUEUE = 6;
+    FD_TYPE_PIPE = 7;
+    FD_TYPE_FSEVENTS = 8;
+    FD_TYPE_NETPOLICY = 9;
+    FD_TYPE_CHANNEL = 10;
+    FD_TYPE_NEXUS = 11;
+  }
+
+  // The type of the file descriptor.
+  FDType type = 2;
 }
