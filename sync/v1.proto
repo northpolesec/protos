@@ -303,6 +303,14 @@ message PreflightResponse {
   // (modulo the `remount_usb_mode` setting below) and the user will be notified.
   optional bool block_usb_mount = 13;
 
+  // If True, mounting of UNENCRYPTED volumes on the removable media
+  // (e.g. USB devices) will be blocked.
+  // If True, ENCRYPTED volumes are still subject to `remount_usb_mode` below
+  // Note: `block_usb_mount` above takes precedence, meaning that
+  // if `block_usb_mount` is true, then `block_unencrypted_removable_media`
+  // has no effect.
+  optional bool block_unencrypted_removable_media = 36;
+
   // If set, if a mount of a USB device happens and the mount flags match, the
   // mount will be allowed. If the flags do not match, Santa will deny the mount
   // but then remount with the provided flags.
@@ -385,7 +393,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 34
+  // next ID: 37
 }
 
 // The Decision enum records what decision Santa made about an execution.
