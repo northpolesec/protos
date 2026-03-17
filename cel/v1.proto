@@ -66,7 +66,12 @@ message ExecutionContext {
   string cwd = 5;
 
   // Provided by cel v2
-  reserved 6;
+  reserved 6, 7;
+
+  // The path that the executable was run from. This will be the
+  // full resolved path.
+  // Using this field will prevent the result from being cached.
+  string path = 8;
 }
 
 // The fields in this message are provided to the CEL program and are static,
@@ -93,4 +98,10 @@ message ExecutableFile {
 
   // Provided by cel v2
   reserved 4;
+
+  // Whether or not this executable is a platform binary.
+  bool is_platform_binary = 5;
+
+  // The team ID of the binary, if it is validly signed.
+  string team_id = 6;
 }
