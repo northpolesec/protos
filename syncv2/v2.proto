@@ -881,6 +881,9 @@ message USBMountEvent {
   }
 
   USBMountDecision decision = 8 [json_name = "decision"];
+
+  // Indicates whether the disk that is being mounted is encrypted or not
+  optional bool encrypted = 9 [json_name = "encrypted"];
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
