@@ -51,6 +51,15 @@ service SantaSync {
       body: "*"
     };
   }
+
+  // PublishMetrics publishes metrics to the server. This method is not part of
+  // a "normal" sync flow but happens periodically.
+  rpc PublishMetrics(PublishMetricsRequest) returns (PublishMetricsResponse) {
+    option (google.api.http) = {
+      post: "/metrics/{machine_id}"
+      body: "*"
+    };
+  }
 }
 
 // ClientMode represents the operating mode for an agent.
@@ -1248,3 +1257,48 @@ message PostflightRequest {
 }
 
 message PostflightResponse {}
+
+message PublishMetricsRequest {
+  message Metric {
+    // The path for this metric, e.g. "/proc/memory/virtual_size",
+    // "/santa/mode", "/santa/events".
+    string path = 1;
+
+    // The kind of this metric.
+    // Constant is a simple value, usually used for string/bool values
+    // Gauge is a numerical value that can go up and down
+    // Counter is a cumulative metric that can only increase or be reset to 0.
+    enum MetricKind {
+      MetricKind_UNKNOWN = 0;
+      MetricKind_CONSTANT = 1;
+      MetricKind_GAUGE = 2;
+      MetricKind_COUNTER = 3;
+    }
+    MetricKind kind = 2;
+
+    // Values, mapped to fields. For each set of fields, a separate Value will
+    // be produced.
+    message Value {
+      // Fields allow for producing multiple values for a single metric.
+      repeated string fields = 1;
+
+      // Metric values can be emitted as one of the following value types.
+      oneof metric_value {
+        int64 int64 = 2;
+        bool bool = 3;
+        string string = 4;
+        double double = 5;
+      }
+    }
+    repeated Value values = 3;
+  }
+  repeated Metric metrics = 1;
+
+  // The root labels attached to this metric submission.
+  map<string, string> root_labels = 2;
+
+  // The machine to submit metrics for.
+  string machine_id = 3 [json_name = "machine_id"];
+}
+
+message PublishMetricsResponse {}
