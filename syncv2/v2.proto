@@ -59,7 +59,7 @@ service SantaSync {
       post: "/metrics/{machine_id}"
       body: "*"
     };
-  };
+  }
 }
 
 // ClientMode represents the operating mode for an agent.
@@ -1266,7 +1266,7 @@ message PublishMetricsRequest {
 
     // The kind of metrics this is.
     enum MetricKind {
-      MetricKind_UNSPECIFIED = 0;
+      MetricKind_UNKNOWN = 0;
       MetricKind_CONSTANT = 1;
       MetricKind_GAUGE = 2;
       MetricKind_COUNTER = 3;
