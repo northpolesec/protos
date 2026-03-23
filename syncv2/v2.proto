@@ -751,6 +751,10 @@ message Event {
 
   // This flag indicates that a StaticRule was applied to this event
   bool static_rule = 34 [json_name = "static_rule"];
+
+  // The rule ID that matched this event (if any), as provided during rule
+  // download. If there was no matching rule, this value wil be zero.
+  uint64 rule_id = 35;
 }
 
 // Information about a given process. This can optionally be used to
@@ -821,6 +825,10 @@ message FileAccessEvent {
 
   // The decision applied by Santa for this access operation.
   FileAccessDecision decision = 6 [json_name = "decision"];
+
+  // The rule ID that matched this event (if any), as provided during rule
+  // download. If there is no matching rule, this value will be zero.
+  uint64 rule_id = 7;
 }
 
 // Information related to a network share that was blocked
@@ -1116,6 +1124,10 @@ message Rule {
     json_name = "sha256",
     deprecated = true
   ];
+
+  // A server-side identifier that will be echoed for events that match this
+  // rule.
+  uint64 rule_id = 10;
 }
 
 message CELFallbackRule {
@@ -1177,6 +1189,9 @@ message FileAccessRule {
     string event_detail_url = 10;
     string event_detail_text = 11;
     repeated Process processes = 12;
+    // A server-side identifier that will be echoed for events that match this
+    // rule.
+    uint64 rule_id = 13;
   }
   message Remove {
     string name = 1;
