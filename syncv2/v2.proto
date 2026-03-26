@@ -763,7 +763,7 @@ message Event {
 
   // The rule ID that matched this event (if any), as provided during rule
   // download. If there was no matching rule, this value will be zero.
-  uint64 rule_id = 35;
+  int64 rule_id = 35;
 }
 
 // Information about a given process. This can optionally be used to
@@ -837,7 +837,7 @@ message FileAccessEvent {
 
   // The rule ID that matched this event (if any), as provided during rule
   // download. If there is no matching rule, this value will be zero.
-  uint64 rule_id = 7;
+  int64 rule_id = 7;
 }
 
 // Information related to a network share that was blocked
@@ -1136,7 +1136,7 @@ message Rule {
 
   // A server-side identifier that will be echoed for events that match this
   // rule.
-  uint64 rule_id = 10;
+  int64 rule_id = 10;
 }
 
 message CELFallbackRule {
@@ -1200,7 +1200,7 @@ message FileAccessRule {
     repeated Process processes = 12;
     // A server-side identifier that will be echoed for events that match this
     // rule.
-    uint64 rule_id = 13;
+    int64 rule_id = 13;
   }
   message Remove {
     string name = 1;
