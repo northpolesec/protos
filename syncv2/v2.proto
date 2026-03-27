@@ -165,6 +165,7 @@ message PreflightRequest {
   string file_access_rules_hash = 23;
 
   // next ID: 25
+
 }
 
 enum SyncType {
@@ -346,6 +347,7 @@ message PreflightResponse {
   // If True, mounting of filesystem from external USB devices will be blocked
   // (modulo the `remount_usb_mode` setting below) and the user will be notified.
   optional bool block_usb_mount = 13;
+  // alias for block_removable_
 
   // If True, mounting of UNENCRYPTED volumes on the removable media
   // (e.g. USB devices) will be blocked.
@@ -355,10 +357,25 @@ message PreflightResponse {
   // has no effect.
   optional bool block_unencrypted_removable_media = 36;
 
+  // block_removable_media_mount_allow_encrypted
+  // alias block_usb_allow_encrypted
+
   // If set, if a mount of a USB device happens and the mount flags match, the
   // mount will be allowed. If the flags do not match, Santa will deny the mount
   // but then remount with the provided flags.
   repeated string remount_usb_mode = 14;
+
+  // repeated string remount_encrypted_args
+
+  enum RemovableMediaMountControl {
+    // allow all
+    // block all
+    // block all (still allows remount), allow encrypted (default, unless one has encrypted remount args)
+
+    
+  }
+  // repeated string uncrypt remount args ==> same as remount_args
+  // repeated string encrypted remount args
 
   // Overrides the File Access Authorization (FAA) policy to change the performed action.
   // Allowed values:
