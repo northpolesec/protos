@@ -165,7 +165,6 @@ message PreflightRequest {
   string file_access_rules_hash = 23;
 
   // next ID: 25
-
 }
 
 enum SyncType {
@@ -362,7 +361,7 @@ message PreflightResponse {
 
     // All removable media mounts are blocked. Unencrypted volumes are
     // subject to `remount_usb_mode`. Encrypted volumes are allowed,
-    // subject to `remount_encrypted_args`.
+    // subject to `remount_encrypted_mode`.
     REMOVABLE_MEDIA_MOUNT_CONTROL_BLOCK_ALL_ALLOW_ENCRYPTED = 3;
   }
   optional RemovableMediaMountControl removable_media_mount_control = 37;
@@ -376,7 +375,7 @@ message PreflightResponse {
 
   // Remount flags for encrypted volumes. Applies when
   // `removable_media_mount_control` is `BLOCK_ALL_ALLOW_ENCRYPTED`.
-  repeated string remount_encrypted_args = 38;
+  repeated string remount_encrypted_mode = 38;
 
   // Overrides the File Access Authorization (FAA) policy to change the performed action.
   // Allowed values:
