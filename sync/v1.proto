@@ -302,9 +302,6 @@ message PreflightResponse {
   // Deprecated: use `removable_media_mount_control` instead.
   optional bool block_usb_mount = 13 [deprecated = true];
 
-  reserved 36;
-  reserved "block_unencrypted_removable_media";
-
   // Controls how removable media mounts (e.g. USB devices) are handled.
   // When set, this field supersedes the deprecated `block_usb_mount` bool.
   // If unset (UNSPECIFIED), the client falls back to `block_usb_mount`.
