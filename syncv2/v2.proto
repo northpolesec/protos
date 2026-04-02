@@ -364,7 +364,7 @@ message PreflightResponse {
     // subject to `remount_encrypted_mode`.
     REMOVABLE_MEDIA_MOUNT_CONTROL_BLOCK_ALL_ALLOW_ENCRYPTED = 3;
   }
-  optional RemovableMediaMountControl removable_media_mount_control = 37;
+  optional RemovableMediaMountControl removable_media_mount_control = 36;
 
   // If set, if a mount of a USB device happens and the mount flags match, the
   // mount will be allowed. If the flags do not match, Santa will deny the mount
@@ -375,7 +375,7 @@ message PreflightResponse {
 
   // Remount flags for encrypted volumes. Applies when
   // `removable_media_mount_control` is `BLOCK_ALL_ALLOW_ENCRYPTED`.
-  repeated string remount_encrypted_mode = 38;
+  repeated string remount_encrypted_mode = 37;
 
   // Overrides the File Access Authorization (FAA) policy to change the performed action.
   // Allowed values:
@@ -484,7 +484,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 39
+  // next ID: 38
 }
 
 // The Decision enum records what decision Santa made about an execution.
