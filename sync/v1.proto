@@ -329,9 +329,8 @@ message PreflightResponse {
   // If set, if a mount of a USB device happens and the mount flags match, the
   // mount will be allowed. If the flags do not match, Santa will deny the mount
   // but then remount with the provided flags.
-  // Applies when `removable_media_mount_control` is `BLOCK_ALL` or
-  // `BLOCK_ALL_ALLOW_ENCRYPTED` (for unencrypted volumes).
-  repeated string remount_usb_mode = 14;
+  // `remount_usb_mode` is deprecated. Use removable_media_policy instead.
+  repeated string remount_usb_mode = 14 [deprecated = true];
 
   // Overrides the File Access Authorization (FAA) policy to change the performed action.
   // Allowed values:
