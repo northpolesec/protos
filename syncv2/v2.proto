@@ -1149,23 +1149,23 @@ message Rule {
   // in this case.
   string cel_expr = 9;
 
+  // A server-side identifier that will be echoed for events that match this
+  // rule.
+  int64 rule_id = 10;
+
   // The seatbelt policy to apply when running the targeted process under
   // `santactl sandbox`. Required for rules with a policy of `SEATBELT`.
   // Must also be supplied for `CEL` rules that use a return value of `SEATBELT`.
   // Optional in all other cases; the rule will not enforce that the process
   // is run under sandbox but if the rule allows execution it /can/ be used
   // with the sandbox if desired.
-  string seatbelt_policy = 10;
+  string seatbelt_policy = 11;
 
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
     json_name = "sha256",
     deprecated = true
   ];
-
-  // A server-side identifier that will be echoed for events that match this
-  // rule.
-  int64 rule_id = 10;
 }
 
 message CELFallbackRule {
