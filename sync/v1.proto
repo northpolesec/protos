@@ -839,6 +839,9 @@ enum Policy {
   // See cel/v1.proto for more details.
   CEL = 6;
 
+  reserved 7;
+  reserved "SEATBELT";
+
   // These enum values are deprecated and remain here for backward compatibility.
   WHITELIST = 1;
   WHITELIST_COMPILER = 2;

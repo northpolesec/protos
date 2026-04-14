@@ -1041,6 +1041,11 @@ enum Policy {
   // See cel/v1.proto for more details.
   CEL = 6;
 
+  // This rule prevents execution unless the targeted process is executed using
+  // the `santactl sandbox` command. A rule using this policy should also supply
+  // a valid seatbelt policy in the `seatbelt_policy` field.
+  SEATBELT = 7;
+
   // These enum values are deprecated and remain here for backward compatibility.
   WHITELIST = 1;
   WHITELIST_COMPILER = 2;
@@ -1119,6 +1124,14 @@ message Rule {
   // This field is only used for rules with a Policy of CEL and is required
   // in this case.
   string cel_expr = 9;
+
+  // The seatbelt policy to apply when running the targeted process under
+  // `santactl sandbox`. Required for rules with a policy of `SEATBELT`.
+  // Must also be supplied for `CEL` rules that use a return value of `SEATBELT`.
+  // Optional in all other cases; the rule will not enforce that the process
+  // is run under sandbox but if the rule allows execution it /can/ be used
+  // with the sandbox if desired.
+  string seatbelt_policy = 10;
 
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
