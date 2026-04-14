@@ -225,6 +225,22 @@ message ExportConfiguration {
   SignedPost signed_post = 1;
 }
 
+// If set, if a mount of a USB device happens and the mount flags match, the
+// mount will be allowed. If the flags do not match, Santa will deny the mount
+// but then remount with the provided flags.
+message RemountPolicy {
+  repeated string flags = 1;
+}
+
+// Controls how removable media mounts (e.g. USB devices) are handled.
+message RemovableMediaPolicy {
+  oneof action {
+    bool allow = 1;
+    bool block = 2;
+    RemountPolicy remount = 3;
+  }
+}
+
 message PreflightResponse {
   // The client mode that the client should move into at the end of this sync.
   // The mode does not change until the Postflight request has been made, to
@@ -299,22 +315,22 @@ message PreflightResponse {
   // be very carefully considered as it is much riskier than real rules.
   optional string blocked_path_regex = 12;
 
-  // If True, mounting of filesystem from external USB devices will be blocked
-  // (modulo the `remount_usb_mode` setting below) and the user will be notified.
-  optional bool block_usb_mount = 13;
+  // Deprecated: use `removable_media_mount_control` instead.
+  optional bool block_usb_mount = 13 [deprecated = true];
 
-  // If True, mounting of UNENCRYPTED volumes on the removable media
-  // (e.g. USB devices) will be blocked.
-  // If True, ENCRYPTED volumes are still subject to `remount_usb_mode` below
-  // Note: `block_usb_mount` above takes precedence, meaning that
-  // if `block_usb_mount` is true, then `block_unencrypted_removable_media`
-  // has no effect.
-  optional bool block_unencrypted_removable_media = 36;
+  // Baseline policy for all removable media.
+  // If unset, falls back to deprecated `block_usb_mount` + `remount_usb_mode`.
+  optional RemovableMediaPolicy removable_media_policy = 36;
+
+  // Optional override for encrypted volumes.
+  // If unset, encrypted volumes use `removable_media_policy`.
+  optional RemovableMediaPolicy encrypted_removable_media_policy = 37;
 
   // If set, if a mount of a USB device happens and the mount flags match, the
   // mount will be allowed. If the flags do not match, Santa will deny the mount
   // but then remount with the provided flags.
-  repeated string remount_usb_mode = 14;
+  // `remount_usb_mode` is deprecated. Use removable_media_policy instead.
+  repeated string remount_usb_mode = 14 [deprecated = true];
 
   // Overrides the File Access Authorization (FAA) policy to change the performed action.
   // Allowed values:
@@ -393,7 +409,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 37
+  // next ID: 38
 }
 
 // The Decision enum records what decision Santa made about an execution.
