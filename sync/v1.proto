@@ -937,6 +937,9 @@ message Rule {
   // in this case.
   string cel_expr = 9;
 
+  reserved 10, 11;
+  reserved "rule_id", "seatbelt_policy";
+
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
     json_name = "sha256",
