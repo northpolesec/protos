@@ -855,6 +855,9 @@ enum Policy {
   // See cel/v1.proto for more details.
   CEL = 6;
 
+  reserved 7;
+  reserved "SEATBELT";
+
   // These enum values are deprecated and remain here for backward compatibility.
   WHITELIST = 1;
   WHITELIST_COMPILER = 2;
@@ -933,6 +936,9 @@ message Rule {
   // This field is only used for rules with a Policy of CEL and is required
   // in this case.
   string cel_expr = 9;
+
+  reserved 10, 11;
+  reserved "rule_id", "seatbelt_policy";
 
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [

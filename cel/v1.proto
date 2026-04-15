@@ -38,8 +38,8 @@ enum ReturnValue {
   SILENT_BLOCKLIST = 4;
 
   // Provided by cel v2
-  reserved 5, 6;
-  reserved "REQUIRE_TOUCHID", "REQUIRE_TOUCHID_ONLY";
+  reserved 5, 6, 7;
+  reserved "REQUIRE_TOUCHID", "REQUIRE_TOUCHID_ONLY", "SEATBELT";
 }
 
 // The fields in this message provided to CEL programs.

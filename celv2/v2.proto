@@ -45,6 +45,10 @@ enum ReturnValue {
   // Identical to REQUIRE_TOUCHID but goes straight to TouchID authorization
   // without showing the usual Santa block dialog.
   REQUIRE_TOUCHID_ONLY = 6;
+
+  // Require this process to be run under `santactl sandbox` using a seatbelt
+  // policy that is also attached to this rule.
+  SEATBELT = 7;
 }
 
 // The fields in this message provided to CEL programs.
