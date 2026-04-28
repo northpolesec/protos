@@ -83,6 +83,22 @@ message EventUploadResponse {
   optional Error error = 1;
 }
 
+// Command to request Santa upload a binary to an analysis service.
+// The analysis service destination is configured via MDM.
+message BinaryUploadRequest {
+  string path = 1;
+}
+
+message BinaryUploadResponse {
+  enum Error {
+    ERROR_UNSPECIFIED = 0;
+    ERROR_INVALID_PATH = 1;
+    ERROR_INTERNAL = 2;
+    ERROR_ANALYSIS_SERVER_NOT_CONFIGURED = 3;
+  }
+  optional Error error = 1;
+}
+
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
   // Nonce
@@ -102,6 +118,7 @@ message SantaCommandRequest {
     PingRequest ping = 10;
     KillRequest kill = 11;
     EventUploadRequest event_upload = 12;
+    BinaryUploadRequest binary_upload = 13;
   }
 }
 
@@ -121,6 +138,7 @@ message SantaCommandResponse {
     PingResponse ping = 2;
     KillResponse kill = 3;
     EventUploadResponse event_upload = 4;
+    BinaryUploadResponse binary_upload = 5;
   }
 }
 
