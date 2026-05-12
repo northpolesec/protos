@@ -8,8 +8,11 @@ option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/cel
 
 // ReturnValue is the type that should be returned from the expression and
 // indicates to Santa the decision that should be applied to the execution.
-// These decisions map 1:1 with decisions from the santa.sync.v1.Policy enum
-// but with fewer options.
+// With the exception of AUDIT, these decisions map 1:1 with decisions from the
+// santa.sync.v1.Policy enum but with fewer options. AUDIT is a CEL-only return
+// value: it has no corresponding santa.sync.v1.Policy and is instead surfaced
+// on sync events via the `audit_return` flag (see syncv2.Event.audit_return),
+// while the execution itself is allowed as if ALLOWLIST had been returned.
 //
 // The expression can also return a boolean value, in which case true is
 // equivalent to returning ALLOWLIST and false is equivalent to BLOCKLIST.
@@ -49,6 +52,13 @@ enum ReturnValue {
   // Require this process to be run under `santactl sandbox` using a seatbelt
   // policy that is also attached to this rule.
   SEATBELT = 7;
+
+  // Allow the process to execute, but flag the resulting event as having been
+  // produced by an audit-only rule. Behaves identically to ALLOWLIST for the
+  // executing client, but the corresponding event is always uploaded to the
+  // sync server with the audit decision so audit matches can be distinguished
+  // from ordinary allowlist matches.
+  AUDIT = 8;
 }
 
 // The fields in this message provided to CEL programs.

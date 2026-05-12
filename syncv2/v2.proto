@@ -784,6 +784,14 @@ message Event {
   // The rule ID that matched this event (if any), as provided during rule
   // download. If there was no matching rule, this value will be zero.
   int64 rule_id = 35;
+
+  // True if the matching rule returned AUDIT from a CEL expression. The
+  // execution itself was allowed (as if the rule had returned ALLOWLIST), but
+  // the event is uploaded with this flag set so audit matches can be
+  // distinguished from regular allow decisions on the server. The `decision`
+  // field still reports the underlying allow reason (e.g. ALLOW_BINARY,
+  // ALLOW_CEL_FALLBACK).
+  bool audit_return = 36 [json_name = "audit_return"];
 }
 
 // Information about a given process. This can optionally be used to
