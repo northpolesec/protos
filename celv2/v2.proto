@@ -49,6 +49,13 @@ enum ReturnValue {
   // Require this process to be run under `santactl sandbox` using a seatbelt
   // policy that is also attached to this rule.
   SEATBELT = 7;
+
+  // Allow the process to execute, but flag the resulting event as having been
+  // produced by an audit-only rule. Behaves identically to ALLOWLIST for the
+  // executing client, but the corresponding event is always uploaded to the
+  // sync server with the audit decision so audit matches can be distinguished
+  // from ordinary allowlist matches.
+  AUDIT = 8;
 }
 
 // The fields in this message provided to CEL programs.
