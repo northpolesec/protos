@@ -476,6 +476,10 @@ enum Decision {
   // Provided by sync v2
   reserved "ALLOW_CEL_FALLBACK", "BLOCK_CEL_FALLBACK";
   reserved 16 to 17;
+
+  // The execution was blocked because the kernel's view of the binary
+  // disagreed with Santa's on-disk view at policy-evaluation time.
+  BLOCK_BINARY_MISMATCH = 18;
 }
 
 message Certificate {
