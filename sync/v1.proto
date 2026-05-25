@@ -149,9 +149,9 @@ message PreflightRequest {
   string rules_hash = 22;
 
   // Provided by sync v2
-  reserved 23, 24;
+  reserved 23 to 26;
 
-  // next ID: 25
+  // next ID: 27
 }
 
 enum SyncType {
@@ -813,9 +813,9 @@ message EventUploadRequest {
   string machine_id = 2 [json_name = "machine_id"];
 
   // Provided by sync v2
-  reserved 5;
+  reserved 5 to 7;
 
-  // next ID: 6
+  // next ID: 8
 }
 
 message EventUploadResponse {
@@ -978,7 +978,7 @@ message RuleDownloadResponse {
   string cursor = 2;
 
   // Provided by sync v2
-  reserved 3;
+  reserved 3, 4;
 }
 
 message PostflightRequest {
@@ -1001,9 +1001,9 @@ message PostflightRequest {
   string rules_hash = 5;
 
   // Provided by sync v2
-  reserved 6, 7, 8;
+  reserved 6 to 11;
 
-  // next ID: 9
+  // next ID: 12
 }
 
 message PostflightResponse {}
