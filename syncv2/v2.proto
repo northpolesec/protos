@@ -971,8 +971,9 @@ message NetworkFlowEvent {
   uint32 remote_port = 2;
   string local_address = 3;
   uint32 local_port = 4;
+  // IANA protocol number (e.g. 6 = TCP, 17 = UDP, 1 = ICMP, 58 = ICMPv6).
   uint32 protocol = 5;
-  uint32 socket_family = 6;
+  NetworkFlowSocketFamily socket_family = 6;
   NetworkFlowDirection direction = 7;
 
   // The DNS hostname the connection was correlated to, if any.
@@ -1329,6 +1330,16 @@ enum NetworkFlowDirection {
   NETWORK_FLOW_DIRECTION_INCOMING = 3;
 }
 
+// Socket address family for a network flow. Values match Darwin's AF_*
+// constants. Proto3 preserves unknown enum values on the wire, so any
+// family not yet named here (e.g. AF_NDRV = 27) would still round-trip
+// as the raw integer if NEFilterSocketFlow ever delivers it.
+enum NetworkFlowSocketFamily {
+  NETWORK_FLOW_SOCKET_FAMILY_UNSPECIFIED = 0;
+  AF_INET = 2;
+  AF_INET6 = 30;
+}
+
 message NetworkFlowRule {
   enum Action {
     ACTION_UNSPECIFIED = 0;
@@ -1365,7 +1376,9 @@ message NetworkFlowRule {
   }
 
   message PortRange {
+    // Inclusive lower bound.
     uint32 low = 1;
+    // Inclusive upper bound. If unset, the range matches only `low`.
     optional uint32 high = 2;
   }
 
@@ -1373,6 +1386,16 @@ message NetworkFlowRule {
     int64 rule_id = 1;
     Action action = 2;
 
+    // Rule precedence hint. The engine combines this with other signals
+    // (process specificity, remote specificity, etc.) per the v1 ranking
+    // policy; see the design spec for the full ordering algorithm.
+    //   - priority = true: highest precedence; treated as rank = INT64_MAX
+    //     by the v1 policy. Workshop affordance for "always win" rules.
+    //   - rank: explicit numeric precedence; higher values win at the
+    //     precedence tier. Setting `priority = false` is semantically
+    //     equivalent to leaving the oneof unset; producers should omit
+    //     rather than emit `priority = false`.
+    // If neither is set, the rule's effective rank is 0.
     oneof precedence_hint {
       bool priority = 3;
       int64 rank = 4;
@@ -1381,6 +1404,8 @@ message NetworkFlowRule {
     repeated Process processes = 5;
     repeated Remote remotes = 6;
     repeated PortRange ports = 7;
+    // Protocol matchers as IANA protocol numbers (same namespace as
+    // NetworkFlowEvent.protocol). Empty list = any protocol.
     repeated uint32 protocols = 8;
     NetworkFlowDirection direction = 9;
 
