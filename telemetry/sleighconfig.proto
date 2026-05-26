@@ -49,7 +49,6 @@ message SleighExportTelemetry {
 // Sleigh is started.
 message SleighConfig {
   // The host_id for this host as sent up to Workshop.
-  // the export folder.
   string host_id = 1;
 
   // The host_name for this host as sent up to Workshop.
