@@ -1344,13 +1344,14 @@ enum NetworkFlowDirection {
 }
 
 // Socket address family for a network flow. Values match Darwin's AF_*
-// constants. Proto3 preserves unknown enum values on the wire, so any
-// family not yet named here (e.g. AF_NDRV = 27) would still round-trip
-// as the raw integer if NEFilterSocketFlow ever delivers it.
+// constants (AF_INET = 2, AF_INET6 = 30). Proto3 preserves unknown enum
+// values on the wire, so any family not yet named here (e.g. AF_NDRV = 27)
+// would still round-trip as the raw integer if NEFilterSocketFlow ever
+// delivers it.
 enum NetworkFlowSocketFamily {
   NETWORK_FLOW_SOCKET_FAMILY_UNSPECIFIED = 0;
-  AF_INET = 2;
-  AF_INET6 = 30;
+  NETWORK_FLOW_SOCKET_FAMILY_INET = 2;
+  NETWORK_FLOW_SOCKET_FAMILY_INET6 = 30;
 }
 
 message NetworkFlowRule {
