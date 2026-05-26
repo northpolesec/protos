@@ -981,6 +981,9 @@ message NetworkFlowEvent {
 
   // Outcome.
   NetworkFlowDecision decision = 9;
+
+  // The rule ID that matched this event (if any), as provided during rule
+  // download. If there was no matching rule, this value will be zero.
   int64 rule_id = 10;
 
   // Other rules that also matched but were not chosen (for telemetry).
