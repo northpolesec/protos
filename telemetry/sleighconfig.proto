@@ -57,5 +57,5 @@ message SleighConfig {
 
   oneof command {
     SleighExportTelemetry export_telemetry = 3;
-  };
+  }
 }
