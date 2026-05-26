@@ -141,6 +141,10 @@ message PreflightRequest {
   uint32 cdhash_rule_count = 17 [json_name = "cdhash_rule_count"];
   // The number of file access rules in the database.
   uint32 file_access_rule_count = 24 [json_name = "file_access_rule_count"];
+  // The number of network flow rules in the database.
+  uint32 network_flow_rule_count = 25 [json_name = "network_flow_rule_count"];
+  // Hash of network flow rules.
+  string network_flow_rules_hash = 26 [json_name = "network_flow_rules_hash"];
 
   // The UUID of the machine that is sending this preflight.
   // This will always match the UUID included in the request URL.
@@ -164,7 +168,7 @@ message PreflightRequest {
   // Hash of FAA rules.
   string file_access_rules_hash = 23;
 
-  // next ID: 25
+  // next ID: 27
 }
 
 enum SyncType {
@@ -267,6 +271,16 @@ message ModeTransition {
 message NetworkExtension {
   // Whether or not to enable networking features.
   bool enable = 1;
+
+  // Default action applied to flows that no NetworkFlowRule matches.
+  NetworkFlowDefaultAction flow_default_action = 2;
+}
+
+// Action to apply to network flows that match no NetworkFlowRule.
+enum NetworkFlowDefaultAction {
+  NETWORK_FLOW_DEFAULT_ACTION_UNSPECIFIED = 0;
+  NETWORK_FLOW_DEFAULT_ACTION_ALLOW = 1;
+  NETWORK_FLOW_DEFAULT_ACTION_DENY = 2;
 }
 
 // If set, if a mount of a USB device happens and the mount flags match, the
@@ -935,6 +949,58 @@ message USBMountEvent {
   optional bool encrypted = 9 [json_name = "encrypted"];
 }
 
+// The NetworkFlowDecision enum records what decision Santa made about a network flow.
+enum NetworkFlowDecision {
+  NETWORK_FLOW_DECISION_UNSPECIFIED = 0;
+
+  // The network flow was allowed by a NetworkFlowRule.
+  NETWORK_FLOW_DECISION_ALLOW = 1;
+
+  // The network flow was blocked by a NetworkFlowRule.
+  NETWORK_FLOW_DECISION_BLOCK = 2;
+
+  // The network flow matched a NetworkFlowRule with action ACTION_AUDIT.
+  NETWORK_FLOW_DECISION_AUDIT = 3;
+}
+
+// A NetworkFlowEvent reports a per-flow policy decision made by santanetd —
+// either from a matching NetworkFlowRule (rule_id set) or from the configured
+// NetworkExtension.flow_default_action when no rule matched (rule_id == 0).
+message NetworkFlowEvent {
+  string remote_address = 1;
+  uint32 remote_port = 2;
+  string local_address = 3;
+  uint32 local_port = 4;
+  // IANA protocol number (e.g. 6 = TCP, 17 = UDP, 1 = ICMP, 58 = ICMPv6).
+  uint32 protocol = 5;
+  NetworkFlowSocketFamily socket_family = 6;
+  NetworkFlowDirection direction = 7;
+
+  // The DNS hostname the connection was correlated to, if any.
+  string hostname = 8;
+
+  // Outcome.
+  NetworkFlowDecision decision = 9;
+
+  // The rule ID that matched this event (if any), as provided during rule
+  // download. If there was no matching rule, this value will be zero.
+  int64 rule_id = 10;
+
+  // Other rules that also matched but were not chosen (for telemetry).
+  repeated int64 competing_rule_ids = 11;
+
+  // Wall-clock time of the flow decision (seconds since epoch, fractional).
+  double flow_time = 12;
+
+  // Information about the process chain that triggered this flow.
+  // The first process in the chain is the process that triggered the flow,
+  // each subsequent process is the parent of the previous process.
+  repeated Process process_chain = 13;
+
+  // The process that delegated the flow on behalf of another (e.g. mDNSResponder).
+  optional Process via_process = 14;
+}
+
 // Audit Event for when Santa makes a new rule in standalone mode.
 message StandaloneModeRuleCreation {
   Decision decision = 1 [json_name = "decision"]; // Indicates new rule type
@@ -1029,11 +1095,14 @@ message EventUploadRequest {
   // The set of USB mount events being uploaded.
   repeated USBMountEvent usb_mount_events = 6 [json_name = "usb_mount_events"];
 
+  // The set of network flow events being uploaded.
+  repeated NetworkFlowEvent network_flow_events = 7 [json_name = "network_flow_events"];
+
   // The UUID of the machine where the event(s) occurred. See the comment
   // above the same field in `PreflightRequest` for more details.
   string machine_id = 2 [json_name = "machine_id"];
 
-  // next ID: 7
+  // next ID: 8
 }
 
 message EventUploadResponse {
@@ -1256,6 +1325,107 @@ message FileAccessRule {
   }
 }
 
+// The direction of a network flow, relative to the host.
+enum NetworkFlowDirection {
+  NETWORK_FLOW_DIRECTION_UNSPECIFIED = 0;
+  NETWORK_FLOW_DIRECTION_ANY = 1;
+  NETWORK_FLOW_DIRECTION_OUTGOING = 2;
+  NETWORK_FLOW_DIRECTION_INCOMING = 3;
+}
+
+// Socket address family for a network flow. Values match Darwin's AF_*
+// constants. Proto3 preserves unknown enum values on the wire, so any
+// family not yet named here (e.g. AF_NDRV = 27) would still round-trip
+// as the raw integer if NEFilterSocketFlow ever delivers it.
+enum NetworkFlowSocketFamily {
+  NETWORK_FLOW_SOCKET_FAMILY_UNSPECIFIED = 0;
+  AF_INET = 2;
+  AF_INET6 = 30;
+}
+
+message NetworkFlowRule {
+  enum Action {
+    ACTION_UNSPECIFIED = 0;
+    ACTION_ALLOW = 1;
+    ACTION_DENY = 2;
+    ACTION_SILENT_DENY = 3;
+    ACTION_AUDIT = 4;
+  }
+
+  message Process {
+    oneof identity {
+      string cd_hash = 1;
+      string signing_id = 2;
+      string team_id = 3;
+    }
+  }
+
+  message Remote {
+    message Hostnames {
+      repeated string values = 1;
+    }
+    message Domains {
+      repeated string values = 1;
+    }
+    message Addresses {
+      repeated string values = 1;
+    }
+
+    oneof remote {
+      Hostnames hostnames = 1;
+      Domains domains = 2;
+      Addresses addresses = 3;
+    }
+  }
+
+  message PortRange {
+    // Inclusive lower bound.
+    uint32 low = 1;
+    // Inclusive upper bound. If unset, the range matches only `low`.
+    optional uint32 high = 2;
+  }
+
+  message Add {
+    int64 rule_id = 1;
+    Action action = 2;
+
+    // Rule precedence hint. The engine combines this with other signals
+    // (process specificity, remote specificity, etc.) per the v1 ranking
+    // policy; see the design spec for the full ordering algorithm.
+    //   - priority = true: highest precedence; treated as rank = INT64_MAX
+    //     by the v1 policy. Workshop affordance for "always win" rules.
+    //   - rank: explicit numeric precedence; higher values win at the
+    //     precedence tier. Setting `priority = false` is semantically
+    //     equivalent to leaving the oneof unset; producers should omit
+    //     rather than emit `priority = false`.
+    // If neither is set, the rule's effective rank is 0.
+    oneof precedence_hint {
+      bool priority = 3;
+      int64 rank = 4;
+    }
+
+    repeated Process processes = 5;
+    repeated Remote remotes = 6;
+    repeated PortRange ports = 7;
+    // Protocol matchers as IANA protocol numbers (same namespace as
+    // NetworkFlowEvent.protocol). Empty list = any protocol.
+    repeated uint32 protocols = 8;
+    NetworkFlowDirection direction = 9;
+
+    string custom_msg = 10;
+    string custom_url = 11;
+  }
+
+  message Remove {
+    int64 rule_id = 1;
+  }
+
+  oneof action {
+    Add add = 1;
+    Remove remove = 2;
+  }
+}
+
 message RuleDownloadRequest {
   // When Santa downloads rules from the server, the server can return a
   // "cursor" that is sent back in the next request. This can be used to
@@ -1282,6 +1452,9 @@ message RuleDownloadResponse {
 
   // The set of FAA rules in this response.
   repeated FileAccessRule file_access_rules = 3 [json_name = "file_access_rules"];
+
+  // The set of network flow rules in this response.
+  repeated NetworkFlowRule network_flow_rules = 4 [json_name = "network_flow_rules"];
 }
 
 message PostflightRequest {
@@ -1313,7 +1486,17 @@ message PostflightRequest {
   // Hash of FAA rules.
   string file_access_rules_hash = 6;
 
-  // next ID: 9
+  // The total number of network flow rules that were received by the client
+  // across all RuleDownload requests.
+  uint32 network_flow_rules_received = 9 [json_name = "network_flow_rules_received"];
+
+  // The number of valid network flow rules that were successfully imported.
+  uint32 network_flow_rules_processed = 10 [json_name = "network_flow_rules_processed"];
+
+  // Hash of network flow rules.
+  string network_flow_rules_hash = 11 [json_name = "network_flow_rules_hash"];
+
+  // next ID: 12
 }
 
 message PostflightResponse {}
