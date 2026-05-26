@@ -6,6 +6,7 @@ syntax = "proto3";
 // not supported for external users.
 package santa.sync.v2;
 
+import "commands/v1.proto";
 import "google/api/annotations.proto";
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/syncv2";
@@ -57,6 +58,15 @@ service SantaSync {
   rpc PublishMetrics(PublishMetricsRequest) returns (PublishMetricsResponse) {
     option (google.api.http) = {
       post: "/metrics/{machine_id}"
+      body: "*"
+    };
+  }
+
+  // Commands posts the results of any commands the agent ran since its last
+  // sync and pulls any newly-queued commands for this host.
+  rpc Commands(CommandsRequest) returns (CommandsResponse) {
+    option (google.api.http) = {
+      post: "/commands/{machine_id}"
       body: "*"
     };
   }
@@ -1545,3 +1555,23 @@ message PublishMetricsRequest {
 }
 
 message PublishMetricsResponse {}
+
+// CommandsRequest is the body of the POST /commands/{machine_id} call. A thin
+// sync-level envelope around a batch of santa.commands.v1.CommandResult values.
+// The agent posts every result it produced since its last sync (may be empty)
+// and the server replies with any newly queued commands.
+message CommandsRequest {
+  // The UUID of the machine making the request. Matches the URL placeholder.
+  string machine_id = 1;
+
+  // Results from commands executed since the agent's last successful /commands
+  // call.
+  repeated santa.commands.v1.CommandResult results = 2;
+}
+
+// CommandsResponse carries any commands newly queued for this host. A thin
+// sync-level envelope around a batch of santa.commands.v1.QueuedCommand
+// values, may be empty when the host has nothing to do.
+message CommandsResponse {
+  repeated santa.commands.v1.QueuedCommand commands = 1;
+}

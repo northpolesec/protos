@@ -129,3 +129,57 @@ message PingRequest {}
 
 // An empty message just to respond
 message PingResponse {}
+
+// QueuedCommand is one command instance assigned to the host for execution. The
+// agent runs the typed request from the `command` oneof and echoes `command_id`
+// back in every CommandResult it posts for this command.
+message QueuedCommand {
+  // Opaque identifier the agent echoes back unchanged in CommandResult.
+  // Required.
+  int64 command_id = 1;
+
+  // The typed request to execute.
+  oneof command {
+    KillRequest kill = 2;
+    EventUploadRequest event_upload = 3;
+  }
+}
+
+// CommandResult is the agent's report about one QueuedCommand. The flow is
+// two-phase: the agent posts DELIVERED first (ack-only, no payload), then
+// COMPLETE with the typed response once execution finishes. Fast commands may
+// short-circuit straight to COMPLETE in a single post. REJECTED / FAILED are
+// terminal failure variants (no payload).
+message CommandResult {
+  // Echoed back from QueuedCommand.command_id. Required.
+  int64 command_id = 1;
+
+  // What the agent decided about this command. Required.
+  enum HostStatus {
+    HOST_STATUS_UNSPECIFIED = 0;
+    // Intermediate ack: the agent received the command and will execute it. The
+    // `result` oneof MUST NOT be set; the typed payload arrives later as a
+    // separate COMPLETE post.
+    HOST_STATUS_DELIVERED = 1;
+    // The agent received the command but refused to run it (e.g. the command
+    // type is disabled in the agent's configuration). No `result`.
+    HOST_STATUS_REJECTED = 2;
+    // Catch-all for unexpected agent-side failures dispatching the command
+    // before it ran (deserialization, internal errors, etc.). No `result`.
+    HOST_STATUS_FAILED = 3;
+    // The agent ran the command. The matching `result` oneof variant carries
+    // the typed per-command response. Required for this status.
+    HOST_STATUS_COMPLETE = 4;
+  }
+  HostStatus host_status = 2;
+
+  // Optional free-text error context.
+  string error_message = 3;
+
+  // The agent's typed response, present iff host_status = COMPLETE. The variant
+  // must match the QueuedCommand variant the agent received.
+  oneof result {
+    KillResponse kill = 4;
+    EventUploadResponse event_upload = 5;
+  }
+}
