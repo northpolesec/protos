@@ -83,6 +83,56 @@ message EventUploadResponse {
   optional Error error = 1;
 }
 
+// SignedPost mirrors santa.sync.v2.SignedPost shape. Duplicated here to avoid
+// a commands -> sync package dependency. If telemetry's SignedPost ever moves
+// to a shared protos/common location, fold this in.
+message SignedPost {
+  string url = 1;
+  map<string, string> form_values = 2 [json_name = "form_values"];
+}
+
+// Command to request Santa upload a binary to a workshop-configured bucket via
+// the provided presigned POST URL.
+//
+// Field semantics:
+//   - `path` is required: santa opens that file on disk, hashes it, POSTs it.
+//   - `sha256` is optional: when set, santa verifies the hash matches before
+//     uploading (mismatch -> DISPOSITION_HASH_MISMATCH). When empty, santa
+//     hashes the file and reports the resulting sha256 back in
+//     BinaryUploadResponse.sha256_computed.
+//   - `signed_post` carries the presigned POST URL + form values workshop
+//     minted. The bucket object key is already baked into signed_post; santa
+//     does not pick the key. Santa can read it from form_values["key"] if it
+//     needs to log it.
+message BinaryUploadRequest {
+  optional string sha256 = 1;
+  string path = 2;
+  SignedPost signed_post = 3 [json_name = "signed_post"];
+}
+
+message BinaryUploadResponse {
+  enum Disposition {
+    DISPOSITION_UNSPECIFIED = 0;
+    DISPOSITION_COMPLETED = 1; // 2xx from bucket
+    DISPOSITION_NOT_FOUND = 2; // file at `path` doesn't exist
+    DISPOSITION_HASH_MISMATCH = 3; // file at `path` doesn't hash to `sha256`
+    DISPOSITION_REFUSED = 4; // santa-local kill switch (MDM, etc.)
+    DISPOSITION_HTTP_ERROR = 5; // non-2xx from bucket; `message` carries detail
+    DISPOSITION_INTERNAL_ERROR = 6; // open/hash/buffer/etc. failure on santa
+  }
+
+  optional Disposition disposition = 1;
+  // For HTTP_ERROR: HTTP status + body snippet.
+  // For INTERNAL_ERROR: errno or exception string.
+  // For COMPLETED: empty or a brief OK summary.
+  optional string message = 2;
+  // The sha256 santa computed for the file it uploaded. Always populated for
+  // COMPLETED; populated for HASH_MISMATCH so workshop can see what santa got.
+  optional string sha256_computed = 3 [json_name = "sha256_computed"];
+  optional int64 bytes_uploaded = 4 [json_name = "bytes_uploaded"];
+  optional int64 upload_duration_ms = 5 [json_name = "upload_duration_ms"];
+}
+
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
   // Nonce
@@ -102,6 +152,7 @@ message SantaCommandRequest {
     PingRequest ping = 10;
     KillRequest kill = 11;
     EventUploadRequest event_upload = 12;
+    BinaryUploadRequest binary_upload = 13;
   }
 }
 
@@ -121,6 +172,7 @@ message SantaCommandResponse {
     PingResponse ping = 2;
     KillResponse kill = 3;
     EventUploadResponse event_upload = 4;
+    BinaryUploadResponse binary_upload = 5;
   }
 }
 
