@@ -129,7 +129,7 @@ message BinaryUploadResponse {
   // The sha256 santa computed for the file it uploaded. Always populated for
   // COMPLETED; populated for HASH_MISMATCH so workshop can see what santa got.
   optional string sha256_computed = 3 [json_name = "sha256_computed"];
-  optional nt64 bytes_uploaded = 4 [json_name = "bytes_uploaded"];
+  optional int64 bytes_uploaded = 4 [json_name = "bytes_uploaded"];
   optional int64 upload_duration_ms = 5 [json_name = "upload_duration_ms"];
 }
 
