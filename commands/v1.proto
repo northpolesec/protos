@@ -105,7 +105,7 @@ message SignedPost {
 //     does not pick the key. Santa can read it from form_values["key"] if it
 //     needs to log it.
 message BinaryUploadRequest {
-  string sha256 = 1;
+  optional string sha256 = 1;
   string path = 2;
   SignedPost signed_post = 3 [json_name = "signed_post"];
 }
@@ -125,10 +125,10 @@ message BinaryUploadResponse {
   // For HTTP_ERROR: HTTP status + body snippet.
   // For INTERNAL_ERROR: errno or exception string.
   // For COMPLETED: empty or a brief OK summary.
-  string message = 2;
+  optional string message = 2;
   // The sha256 santa computed for the file it uploaded. Always populated for
   // COMPLETED; populated for HASH_MISMATCH so workshop can see what santa got.
-  string sha256_computed = 3 [json_name = "sha256_computed"];
+  optional string sha256_computed = 3 [json_name = "sha256_computed"];
   int64 bytes_uploaded = 4 [json_name = "bytes_uploaded"];
   int64 upload_duration_ms = 5 [json_name = "upload_duration_ms"];
 }
