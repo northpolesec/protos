@@ -113,12 +113,12 @@ message BinaryUploadRequest {
 message BinaryUploadResponse {
   enum Disposition {
     DISPOSITION_UNSPECIFIED = 0;
-    DISPOSITION_COMPLETED = 1;       // 2xx from bucket
-    DISPOSITION_NOT_FOUND = 2;       // file at `path` doesn't exist
-    DISPOSITION_HASH_MISMATCH = 3;   // file at `path` doesn't hash to `sha256`
-    DISPOSITION_REFUSED = 4;         // santa-local kill switch (MDM, etc.)
-    DISPOSITION_HTTP_ERROR = 5;      // non-2xx from bucket; `message` carries detail
-    DISPOSITION_INTERNAL_ERROR = 6;  // open/hash/buffer/etc. failure on santa
+    DISPOSITION_COMPLETED = 1; // 2xx from bucket
+    DISPOSITION_NOT_FOUND = 2; // file at `path` doesn't exist
+    DISPOSITION_HASH_MISMATCH = 3; // file at `path` doesn't hash to `sha256`
+    DISPOSITION_REFUSED = 4; // santa-local kill switch (MDM, etc.)
+    DISPOSITION_HTTP_ERROR = 5; // non-2xx from bucket; `message` carries detail
+    DISPOSITION_INTERNAL_ERROR = 6; // open/hash/buffer/etc. failure on santa
   }
 
   optional Disposition disposition = 1;
