@@ -45,9 +45,23 @@ message SleighExportTelemetry {
   repeated string filter_expressions = 5;
 }
 
+// BinaryMetadata is computed by santa (via SNTFileInfo + MOLCodesignChecker) and
+// carried in SleighBinaryUpload for sleigh's CEL upload filter to evaluate. In
+// filter expressions the variable is `binary` (e.g. `binary.is_platform_binary`).
+message BinaryMetadata {
+  string path = 1;
+  string signing_id = 2;
+  string team_id = 3;
+  string cdhash = 4;
+  bool is_platform_binary = 5;
+  int64 file_size = 6;
+  string macho_type = 7;
+}
+
 // SleighBinaryUpload streams a single mach-o binary to a workshop-minted
-// presigned POST. The CEL upload filter and the metadata it needs are evaluated
-// in santad before launch, so sleigh receives only binaries that should upload.
+// presigned POST. sleigh evaluates the CEL filter (against `metadata`) and the
+// mach-o gate itself; a binary that matches a filter expression is dropped and
+// not uploaded.
 message SleighBinaryUpload {
   // The mach-o file to upload, passed as an already-open file descriptor.
   int32 input_fd = 1;
@@ -60,6 +74,15 @@ message SleighBinaryUpload {
   // verifies its computed hash against this value and aborts the upload before
   // the object commits on a mismatch.
   optional string expected_sha256 = 3;
+
+  // Binary metadata computed by santa for the CEL filter to evaluate against.
+  BinaryMetadata metadata = 4;
+
+  // CEL expressions evaluated against `metadata`; if an expression returns true
+  // the binary is dropped (not uploaded). Sourced by santa from the
+  // BinaryUploadFilterExpressions config (MDM + sync state), so it is identical
+  // for every invocation.
+  repeated string filter_expressions = 5;
 }
 
 // SleighConfig contains the configuration data to be passed to Sleigh when
