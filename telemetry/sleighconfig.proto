@@ -45,6 +45,23 @@ message SleighExportTelemetry {
   repeated string filter_expressions = 5;
 }
 
+// SleighBinaryUpload streams a single mach-o binary to a workshop-minted
+// presigned POST. The CEL upload filter and the metadata it needs are evaluated
+// in santad before launch, so sleigh receives only binaries that should upload.
+message SleighBinaryUpload {
+  // The mach-o file to upload, passed as an already-open file descriptor.
+  int32 input_fd = 1;
+
+  // Presigned POST minted by workshop. The object key is baked into
+  // form_values["key"]; sleigh uses the form values verbatim and never renames.
+  SignedPost signed_post = 2;
+
+  // Optional expected hash (from BinaryUploadRequest.sha256). When set, sleigh
+  // verifies its computed hash against this value and aborts the upload before
+  // the object commits on a mismatch.
+  optional string expected_sha256 = 3;
+}
+
 // SleighConfig contains the configuration data to be passed to Sleigh when
 // Sleigh is started.
 message SleighConfig {
@@ -56,5 +73,6 @@ message SleighConfig {
 
   oneof command {
     SleighExportTelemetry export_telemetry = 3;
+    SleighBinaryUpload binary_upload = 4;
   }
 }
