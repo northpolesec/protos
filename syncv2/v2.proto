@@ -284,11 +284,6 @@ message NetworkExtension {
 
   // Default action applied to flows that no NetworkFlowRule matches.
   NetworkFlowDefaultAction flow_default_action = 2;
-
-  // Upstream DNS forward timeout used by santanetd's DNS proxy, in seconds.
-  // The client clamps this to [1, 15]s; an unset/0 value uses the client
-  // default (5s).
-  optional double dns_upstream_timeout_seconds = 3;
 }
 
 // Action to apply to network flows that match no NetworkFlowRule.
