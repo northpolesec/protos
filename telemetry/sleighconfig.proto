@@ -94,31 +94,53 @@ message SleighBinaryUpload {
 // lockfiles and install metadata. host_id / host_name come from the
 // SleighConfig wrapper and are stamped on every emitted row.
 message SleighInventoryScan {
-  // Discovery profile. One of:
-  //   "baseline" — bounded known package/tool roots (the default fleet scan).
-  //   "project"  — configured developer/project roots.
-  //   "deep"     — incident-response exposure scan; requires explicit roots
-  //                and may include user home directories.
-  string profile = 1;
+  // Discovery profile.
+  enum Profile {
+    // Unset; sleigh treats this as PROFILE_BASELINE.
+    PROFILE_UNKNOWN = 0;
+    // Bounded known package/tool roots (the default fleet scan).
+    PROFILE_BASELINE = 1;
+    // Configured developer/project roots.
+    PROFILE_PROJECT = 2;
+    // Incident-response exposure scan; requires explicit roots and may
+    // include user home directories.
+    PROFILE_DEEP = 3;
+  }
 
-  // Filesystem roots to scan. Required for profile=deep; optional for
-  // baseline and project (in which case profile-curated defaults are used).
-  // Unrelated to running the binary as root.
+  // Package ecosystem identifiers, matching sleigh's emitted ecosystem
+  // strings.
+  enum Ecosystem {
+    ECOSYSTEM_UNKNOWN = 0;
+    ECOSYSTEM_NPM = 1;
+    ECOSYSTEM_PYPI = 2;
+    ECOSYSTEM_GO = 3;
+    ECOSYSTEM_RUBYGEMS = 4;
+    ECOSYSTEM_PACKAGIST = 5;
+    ECOSYSTEM_MCP = 6;
+    ECOSYSTEM_EDITOR_EXTENSION = 7;
+    ECOSYSTEM_BROWSER_EXTENSION = 8;
+  }
+
+  // Discovery profile. Unset (PROFILE_UNKNOWN) is treated as
+  // PROFILE_BASELINE, the default fleet scan.
+  Profile profile = 1;
+
+  // Filesystem roots to scan. Required for PROFILE_DEEP; optional for
+  // PROFILE_BASELINE and PROFILE_PROJECT (in which case profile-curated
+  // defaults are used). Unrelated to running the binary as root.
   repeated string roots = 2;
 
   // Additional directory names or suffix paths to exclude during walking,
   // on top of the built-in walker excludes.
   repeated string excludes = 3;
 
-  // Restrict scanning to these ecosystem identifiers. When empty all
-  // supported ecosystems run. Recognized values are sleigh's emitted
-  // ecosystem strings (npm, pypi, go, rubygems, packagist, mcp,
-  // editor-extension, browser-extension).
-  repeated string ecosystems = 4;
+  // Restrict scanning to these ecosystems. When empty all supported
+  // ecosystems run.
+  repeated Ecosystem ecosystems = 4;
 
   // macOS only: when true, baseline/project per-user roots are expanded
   // across every real /Users/<name>/ home (useful when sleigh runs as a
-  // root LaunchDaemon). Cannot be combined with profile=deep or with
+  // root LaunchDaemon). Cannot be combined with PROFILE_DEEP or with
   // operator-supplied roots. No effect on Linux.
   bool all_users = 5;
 
