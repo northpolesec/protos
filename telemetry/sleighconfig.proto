@@ -19,6 +19,9 @@ package santa.telemetry.v1;
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
 option objc_class_prefix = "SNTPB";
 
+import "commands/v1.proto";
+import "common/signals.proto";
+
 // SignedPost maps to the same message in syncv2. It's a separate message to
 // allow the messages to be changed independently.
 message SignedPost {
@@ -43,6 +46,13 @@ message SleighExportTelemetry {
   // If an expression returns true the event is dropped. Expressions can also
   // redact fields instead of dropping.
   repeated string filter_expressions = 5;
+
+  // Detection signals evaluated against every converted event. Signals are
+  // non-destructive (they never drop or redact); each one that matches at least
+  // one event is summarized in the SleighResponse signal report. Sourced by
+  // santa from the synced telemetry_signals config, identical for every
+  // invocation.
+  repeated santa.common.v1.Signal signals = 6;
 }
 
 // BinaryMetadata is computed by santa (via SNTFileInfo + MOLCodesignChecker) and
@@ -97,5 +107,40 @@ message SleighConfig {
   oneof command {
     SleighExportTelemetry export_telemetry = 3;
     SleighBinaryUpload binary_upload = 4;
+  }
+}
+
+// SignalReport summarizes how a single detection signal matched over the course
+// of an export. One entry is emitted per signal that fired at least once.
+message SignalReport {
+  // The Signal.name that fired.
+  string name = 1;
+
+  santa.common.v1.Severity severity = 2;
+
+  // The Signal.description, echoed for convenience so alerting does not need to
+  // re-join against the synced config.
+  string description = 3;
+
+  // Total number of events that matched this signal across the export.
+  uint64 match_count = 4;
+
+  // Distinct converted event types the signal matched on (e.g. "execution"),
+  // sorted.
+  repeated string event_types = 5;
+}
+
+// SleighExportTelemetryResponse is the result of an export_telemetry command.
+message SleighExportTelemetryResponse {
+  // One entry per detection signal that fired at least once, sorted by name.
+  repeated SignalReport signal_reports = 1;
+}
+
+// SleighResponse is written (serialized) to stdout by sleigh and read by santad.
+// The populated field mirrors the SleighConfig.command that was run.
+message SleighResponse {
+  oneof response {
+    SleighExportTelemetryResponse export_telemetry = 1;
+    santa.commands.v1.BinaryUploadResponse binary_upload = 2;
   }
 }
