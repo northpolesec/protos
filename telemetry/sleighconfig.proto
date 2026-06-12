@@ -214,6 +214,11 @@ message SignalReport {
   // Distinct converted event types the signal matched on (e.g. "execution"),
   // sorted.
   repeated string event_types = 5;
+
+  // The source events that triggered this signal. Many signals will trigger on
+  // a single event but this field is repeated to allow for signals that join
+  // across related events.
+  repeated SantaMessage events = 6;
 }
 
 // SleighExportTelemetryResponse is the result of an export_telemetry command.
