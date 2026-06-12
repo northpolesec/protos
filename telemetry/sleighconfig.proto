@@ -18,6 +18,7 @@ package santa.telemetry.v1;
 
 import "commands/v1.proto";
 import "common/signals.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
 option objc_class_prefix = "SNTPB";
@@ -95,6 +96,90 @@ message SleighBinaryUpload {
   repeated string filter_expressions = 5;
 }
 
+// SleighInventoryScan runs a read-only package-inventory discovery sweep on
+// the host and uploads per-ecosystem Parquet files inside a zip to a
+// workshop-minted presigned POST. No package managers are executed and no
+// resolution-time network requests are made; sleigh only reads on-disk
+// lockfiles and install metadata. host_id / host_name come from the
+// SleighConfig wrapper and are stamped on every emitted row.
+message SleighInventoryScan {
+  // Discovery profile.
+  enum Profile {
+    // Unset; sleigh treats this as PROFILE_BASELINE.
+    PROFILE_UNKNOWN = 0;
+    // Bounded known package/tool roots (the default fleet scan).
+    PROFILE_BASELINE = 1;
+    // Configured developer/project roots.
+    PROFILE_PROJECT = 2;
+    // Incident-response exposure scan; requires explicit roots and may
+    // include user home directories.
+    PROFILE_DEEP = 3;
+  }
+
+  // Package ecosystem identifiers, matching sleigh's emitted ecosystem
+  // strings.
+  enum Ecosystem {
+    ECOSYSTEM_UNKNOWN = 0;
+    ECOSYSTEM_NPM = 1;
+    ECOSYSTEM_PYPI = 2;
+    ECOSYSTEM_GO = 3;
+    ECOSYSTEM_RUBYGEMS = 4;
+    ECOSYSTEM_PACKAGIST = 5;
+    ECOSYSTEM_MCP = 6;
+    ECOSYSTEM_EDITOR_EXTENSION = 7;
+    ECOSYSTEM_BROWSER_EXTENSION = 8;
+  }
+
+  // Discovery profile. Unset (PROFILE_UNKNOWN) is treated as
+  // PROFILE_BASELINE, the default fleet scan.
+  Profile profile = 1;
+
+  // Filesystem roots to scan. Required for PROFILE_DEEP; optional for
+  // PROFILE_BASELINE and PROFILE_PROJECT (in which case profile-curated
+  // defaults are used). Unrelated to running the binary as root.
+  repeated string roots = 2;
+
+  // Additional directory names or suffix paths to exclude during walking,
+  // on top of the built-in walker excludes.
+  repeated string excludes = 3;
+
+  // Restrict scanning to these ecosystems. When empty all supported
+  // ecosystems run.
+  repeated Ecosystem ecosystems = 4;
+
+  // macOS only: when true, baseline/project per-user roots are expanded
+  // across every real /Users/<name>/ home (useful when sleigh runs as a
+  // root LaunchDaemon). Cannot be combined with PROFILE_DEEP or with
+  // operator-supplied roots. No effect on Linux.
+  bool all_users = 5;
+
+  // Per-file read cap in bytes. 0 falls back to sleigh's built-in default.
+  int64 max_file_size = 6;
+
+  // Wall-clock budget for the whole scan. Zero / unset means unbounded.
+  google.protobuf.Duration max_duration = 7;
+
+  // Concurrent file parsers. 0 falls back to sleigh's built-in default.
+  int32 concurrency = 8;
+
+  // Path to a JSON exposure catalog file or directory of *.json catalogs
+  // (merged non-recursively). Matches emit record_type=finding alongside
+  // package records.
+  string exposure_catalog_path = 9;
+
+  // Per-catalog-file read cap in bytes. 0 falls back to sleigh's
+  // built-in default.
+  int64 max_catalog_size = 10;
+
+  // Suppress package records while still emitting findings and the
+  // scan_summary. Requires exposure_catalog_path to be set.
+  bool findings_only = 11;
+
+  // Presigned POST minted by workshop. The object key is built from
+  // form_values["key"] suffixed by the run's generated filename.
+  SignedPost signed_post = 12;
+}
+
 // SleighConfig contains the configuration data to be passed to Sleigh when
 // Sleigh is started.
 message SleighConfig {
@@ -107,6 +192,7 @@ message SleighConfig {
   oneof command {
     SleighExportTelemetry export_telemetry = 3;
     SleighBinaryUpload binary_upload = 4;
+    SleighInventoryScan inventory_scan = 5;
   }
 }
 
