@@ -40,8 +40,11 @@ message Signal {
   // Stable identifier for the signal (e.g. "CRED-001"), echoed in the report.
   string name = 1;
 
-  Severity severity = 2;
+  // Human-readable description of what the signal detects.
+  string description = 2;
+
+  Severity severity = 3;
 
   // CEL boolean expression over `event`. A true result is a match.
-  string expression = 3;
+  string expression = 4;
 }
