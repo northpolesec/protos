@@ -40,11 +40,11 @@ message Signal {
   // Stable identifier for the signal (e.g. "SM-001"), echoed in the report.
   string name = 1;
 
-  // CEL boolean expression over `event`. A true result is a match.
-  string expression = 2;
+  // Human-readable description of what the signal detects.
+  string description = 2;
 
   Severity severity = 3;
 
-  // Human-readable description of what the signal detects.
-  string description = 4;
+  // CEL boolean expression over `event`. A true result is a match.
+  string expression = 4;
 }
