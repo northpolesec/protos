@@ -7,7 +7,9 @@ syntax = "proto3";
 package santa.sync.v2;
 
 import "commands/v1.proto";
+import "common/signals.proto";
 import "google/api/annotations.proto";
+import "telemetry/sleighconfig.proto";
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/syncv2";
 
@@ -468,6 +470,10 @@ message PreflightResponse {
   // A set of CEL expressions to apply to telemetry before upload.
   repeated string telemetry_filter_expressions = 35;
 
+  // Non-destructive detection signals to evaluate against telemetry during
+  // export. Santa passes these through to sleigh's SleighExportTelemetry.signals.
+  repeated santa.common.v1.Signal telemetry_signals = 38;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -507,7 +513,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 38
+  // next ID: 39
 }
 
 // The Decision enum records what decision Santa made about an execution.
