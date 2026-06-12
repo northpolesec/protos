@@ -19,6 +19,7 @@ package santa.telemetry.v1;
 import "commands/v1.proto";
 import "common/signals.proto";
 import "google/protobuf/duration.proto";
+import "telemetry/v1.proto";
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
 option objc_class_prefix = "SNTPB";
