@@ -16,11 +16,11 @@ syntax = "proto3";
 
 package santa.telemetry.v1;
 
-option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
-option objc_class_prefix = "SNTPB";
-
 import "commands/v1.proto";
 import "common/signals.proto";
+
+option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry";
+option objc_class_prefix = "SNTPB";
 
 // SignedPost maps to the same message in syncv2. It's a separate message to
 // allow the messages to be changed independently.

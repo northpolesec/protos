@@ -513,7 +513,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 38
+  // next ID: 39
 }
 
 // The Decision enum records what decision Santa made about an execution.
