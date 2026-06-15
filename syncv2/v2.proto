@@ -277,6 +277,40 @@ message ModeTransition {
   }
 }
 
+// On-demand temporary admin mode settings.
+message OnDemandAdminMode {
+  // Maximum number of minutes a user may be elevated to administrator.
+  uint32 max_minutes = 1;
+
+  // The default number of minutes granted when a duration is not explicitly
+  // requested. If not specified or 0, "max_minutes" is the default.
+  optional uint32 default_duration_minutes = 2;
+
+  // Whether the user must locally authenticate (Touch ID / password) to
+  // elevate. Defaults to true when unset.
+  optional bool require_authentication = 3;
+
+  // Whether the user must supply a free-text reason to elevate. Defaults to
+  // true when unset.
+  optional bool require_reason = 4;
+
+  // Whether an active elevation is revoked when the screen locks. Defaults to
+  // true when unset.
+  optional bool revoke_on_screen_lock = 5;
+}
+
+// This specifies the valid temporary admin mode settings for a machine.
+message AdminModeTransition {
+  oneof transition {
+    // When set and true, the machine will no longer be able to enter on-demand
+    // temporary admin mode, and any active session will immediately be revoked.
+    bool revoke = 1;
+
+    // When set, contains the allowed on-demand temporary admin mode settings.
+    OnDemandAdminMode on_demand_admin_mode = 2;
+  }
+}
+
 // The specifies the settings related to Santa's networking features
 message NetworkExtension {
   // Whether or not to enable networking features.
@@ -435,6 +469,9 @@ message PreflightResponse {
 
   // Settings related to on-demand monitor mode.
   optional ModeTransition mode_transition = 25;
+
+  // Settings related to on-demand temporary admin mode.
+  optional AdminModeTransition temporary_admin_policy = 38;
 
   // The URL to open when the user clicks the button on a block notification.
   // This URL will be used for all rules unless overridden by a rule-specific
@@ -1076,6 +1113,119 @@ message TemporaryMonitorMode {
   }
 }
 
+// Audit event emitted when a user is elevated to administrator temporarily.
+message TemporaryAdminModeEnter {
+  // Maximum number of seconds the elevation will last.
+  optional uint64 seconds = 1;
+
+  // Reasons why a temporary admin session can be entered.
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+
+    // Requested by a user with a valid on-demand policy.
+    REASON_ON_DEMAND = 1;
+
+    // User had an active session and changed the duration.
+    REASON_ON_DEMAND_REFRESH = 2;
+
+    // Santa automatically re-applied the elevation after a process restart.
+    REASON_RESTART = 3;
+  }
+
+  // The reason for entering the temporary admin session.
+  Reason reason = 2;
+
+  // The username of the elevated user.
+  string username = 3;
+
+  // The free-text reason the user supplied when requesting elevation.
+  string user_reason = 4;
+}
+
+// Audit event emitted when a temporary admin elevation ends.
+message TemporaryAdminModeLeave {
+  // Reasons why a temporary admin session can be left.
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+
+    // The temporary duration expired.
+    REASON_EXPIRY = 1;
+
+    // The user manually cancelled the session.
+    REASON_CANCELLED = 2;
+
+    // The sync server revoked the machine's eligibility.
+    REASON_REVOKED = 3;
+
+    // The machine's SyncBaseURL configuration changed, revoking eligibility.
+    REASON_SYNC_SERVER_CHANGED = 4;
+
+    // The machine rebooted and the elevation was actively removed.
+    REASON_REBOOT = 5;
+
+    // The screen locked and the policy revokes on screen lock.
+    REASON_SCREEN_LOCKED = 6;
+
+    // The elevated user's session ended (logout / fast-user-switch away).
+    REASON_SESSION_ENDED = 7;
+  }
+
+  // The reason for leaving the temporary admin session.
+  Reason reason = 1;
+
+  // The username of the demoted user.
+  string username = 2;
+}
+
+// Audit event emitted when a temporary admin elevation is denied or fails.
+message TemporaryAdminModeDenied {
+  // Reasons why a temporary admin request can be denied.
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+
+    // No on-demand policy is in effect for this machine.
+    REASON_NO_POLICY = 1;
+
+    // The machine is otherwise ineligible (e.g. no sync server).
+    REASON_NOT_ELIGIBLE = 2;
+
+    // Local authentication failed or timed out.
+    REASON_AUTH_FAILED = 3;
+
+    // A reason was required but not supplied.
+    REASON_REASON_REQUIRED = 4;
+
+    // The user is already an administrator (no session is recorded).
+    REASON_ALREADY_ADMIN = 5;
+
+    // A session is already active for a different user.
+    REASON_SESSION_ALREADY_ACTIVE = 6;
+
+    // The admin-group membership change failed to commit/verify.
+    REASON_MEMBERSHIP_CHANGE_FAILED = 7;
+  }
+
+  // The reason the request was denied.
+  Reason reason = 1;
+
+  // The username of the user whose request was denied.
+  string username = 2;
+
+  // The free-text reason the user supplied, if any.
+  string user_reason = 3;
+}
+
+message TemporaryAdminMode {
+  // A unique identifier to tie together different admin transition events.
+  string session_id = 1 [json_name = "session_id"];
+
+  oneof transition {
+    TemporaryAdminModeEnter enter = 2;
+    TemporaryAdminModeLeave leave = 3;
+    TemporaryAdminModeDenied denied = 4;
+  }
+}
+
 // AuditEvents are events sent by Santa to communicate context to the sync
 // service.
 message AuditEvent {
@@ -1086,6 +1236,7 @@ message AuditEvent {
   oneof event {
     StandaloneModeRuleCreation standalone_mode_rule_creation = 2 [json_name = "standalone_mode_rule_creation"];
     TemporaryMonitorMode temporary_monitor_mode = 3 [json_name = "temporary_monitor_mode"];
+    TemporaryAdminMode temporary_admin_mode = 4 [json_name = "temporary_admin_mode"];
   }
 }
 
