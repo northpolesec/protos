@@ -22,6 +22,9 @@ proto_library(
     name = "sleighconfig_proto",
     srcs = ["sleighconfig.proto"],
     visibility = ["//visibility:public"],
+    deps = [
+        "@protobuf//:duration_proto",
+    ],
 )
 
 cc_proto_library(
