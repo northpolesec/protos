@@ -48,13 +48,23 @@ message SleighExportTelemetry {
   // If an expression returns true the event is dropped. Expressions can also
   // redact fields instead of dropping.
   repeated string filter_expressions = 5;
+}
+
+// SleighSignalScan evaluates non-destructive detection signals against converted
+// telemetry events. Unlike SleighExportTelemetry it uploads nothing; it only
+// reports which signals matched. Santa triggers it on demand (separately from
+// the export pass) when it wants signals evaluated over a set of telemetry
+// files.
+message SleighSignalScan {
+  // The telemetry files to evaluate, passed as a set of already open file
+  // descriptors.
+  repeated int32 input_fds = 1;
 
   // Detection signals evaluated against every converted event. Signals are
   // non-destructive (they never drop or redact); each one that matches at least
   // one event is summarized in the SleighResponse signal report. Sourced by
-  // santa from the synced telemetry_signals config, identical for every
-  // invocation.
-  repeated santa.common.v1.Signal signals = 6;
+  // santa from the synced telemetry_signals config.
+  repeated santa.common.v1.Signal signals = 2;
 }
 
 // BinaryMetadata is computed by santa (via SNTFileInfo + MOLCodesignChecker) and
@@ -194,11 +204,12 @@ message SleighConfig {
     SleighExportTelemetry export_telemetry = 3;
     SleighBinaryUpload binary_upload = 4;
     SleighInventoryScan inventory_scan = 5;
+    SleighSignalScan signal_scan = 6;
   }
 }
 
 // SignalReport summarizes how a single detection signal matched over the course
-// of an export. One entry is emitted per signal that fired at least once.
+// of a signal scan. One entry is emitted per signal that fired at least once.
 message SignalReport {
   // The Signal.name that fired.
   string name = 1;
@@ -209,7 +220,7 @@ message SignalReport {
   // re-join against the synced config.
   string description = 3;
 
-  // Total number of events that matched this signal across the export.
+  // Total number of events that matched this signal across the scan.
   uint64 match_count = 4;
 
   // Distinct converted event types the signal matched on (e.g. "execution"),
@@ -219,11 +230,11 @@ message SignalReport {
   // The source events that triggered this signal. Many signals will trigger on
   // a single event but this field is repeated to allow for signals that join
   // across related events.
-  repeated SantaMessage events = 6;
+  repeated string event_ids = 6;
 }
 
-// SleighExportTelemetryResponse is the result of an export_telemetry command.
-message SleighExportTelemetryResponse {
+// SleighSignalScanResponse is the result of a signal_scan command.
+message SleighSignalScanResponse {
   // One entry per detection signal that fired at least once, sorted by name.
   repeated SignalReport signal_reports = 1;
 }
@@ -232,7 +243,7 @@ message SleighExportTelemetryResponse {
 // The populated field mirrors the SleighConfig.command that was run.
 message SleighResponse {
   oneof response {
-    SleighExportTelemetryResponse export_telemetry = 1;
+    SleighSignalScanResponse signal_scan = 1;
     santa.commands.v1.BinaryUploadResponse binary_upload = 2;
   }
 }
