@@ -469,7 +469,7 @@ message PreflightResponse {
   optional ModeTransition mode_transition = 25;
 
   // Settings related to on-demand temporary admin mode.
-  optional AdminModeTransition temporary_admin_policy = 38;
+  optional AdminModeTransition temporary_admin_policy = 39;
 
   // The URL to open when the user clicks the button on a block notification.
   // This URL will be used for all rules unless overridden by a rule-specific
@@ -542,7 +542,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 38
+  // next ID: 40
 }
 
 // The Decision enum records what decision Santa made about an execution.
