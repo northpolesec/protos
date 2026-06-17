@@ -279,6 +279,12 @@ message ModeTransition {
 
 // On-demand temporary admin mode settings.
 message OnDemandAdminMode {
+  // Authentication (Touch ID / password) is always required to elevate, and an
+  // active elevation is always revoked on screen lock. These are not
+  // server-configurable.
+  reserved 3, 5;
+  reserved "require_authentication", "revoke_on_screen_lock";
+
   // Maximum number of minutes a user may be elevated to administrator.
   uint32 max_minutes = 1;
 
@@ -286,17 +292,9 @@ message OnDemandAdminMode {
   // requested. If not specified or 0, "max_minutes" is the default.
   optional uint32 default_duration_minutes = 2;
 
-  // Whether the user must locally authenticate (Touch ID / password) to
-  // elevate. Defaults to true when unset.
-  optional bool require_authentication = 3;
-
-  // Whether the user must supply a free-text reason to elevate. Defaults to
-  // true when unset.
-  optional bool require_reason = 4;
-
-  // Whether an active elevation is revoked when the screen locks. Defaults to
-  // true when unset.
-  optional bool revoke_on_screen_lock = 5;
+  // Whether the user must supply a free-text justification to elevate. Defaults
+  // to true when unset.
+  optional bool require_justification = 4;
 }
 
 // This specifies the valid temporary admin mode settings for a machine.
@@ -1138,8 +1136,8 @@ message TemporaryAdminModeEnter {
   // The username of the elevated user.
   string username = 3;
 
-  // The free-text reason the user supplied when requesting elevation.
-  string user_reason = 4;
+  // The free-text justification the user supplied when requesting elevation.
+  string user_justification = 4;
 }
 
 // Audit event emitted when a temporary admin elevation ends.
@@ -1192,8 +1190,8 @@ message TemporaryAdminModeDenied {
     // Local authentication failed or timed out.
     REASON_AUTH_FAILED = 3;
 
-    // A reason was required but not supplied.
-    REASON_REASON_REQUIRED = 4;
+    // A justification was required but not supplied.
+    REASON_JUSTIFICATION_REQUIRED = 4;
 
     // The user is already an administrator (no session is recorded).
     REASON_ALREADY_ADMIN = 5;
@@ -1210,9 +1208,6 @@ message TemporaryAdminModeDenied {
 
   // The username of the user whose request was denied.
   string username = 2;
-
-  // The free-text reason the user supplied, if any.
-  string user_reason = 3;
 }
 
 message TemporaryAdminMode {
