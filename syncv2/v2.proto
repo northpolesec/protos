@@ -278,14 +278,10 @@ message ModeTransition {
   }
 }
 
-// On-demand temporary admin mode settings.
+// On-demand temporary admin mode settings. Authentication (Touch ID / password)
+// is always required to elevate and an active elevation is always revoked on
+// screen lock; those are invariants, not server-configurable.
 message OnDemandAdminMode {
-  // Authentication (Touch ID / password) is always required to elevate, and an
-  // active elevation is always revoked on screen lock. These are not
-  // server-configurable.
-  reserved 3, 5;
-  reserved "require_authentication", "revoke_on_screen_lock";
-
   // Maximum number of minutes a user may be elevated to administrator.
   uint32 max_minutes = 1;
 
@@ -295,7 +291,7 @@ message OnDemandAdminMode {
 
   // Whether the user must supply a free-text justification to elevate. Defaults
   // to true when unset.
-  optional bool require_justification = 4;
+  optional bool require_justification = 3;
 }
 
 // This specifies the valid temporary admin mode settings for a machine.
