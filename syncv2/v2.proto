@@ -289,9 +289,10 @@ message OnDemandAdminMode {
   // requested. If not specified or 0, "max_minutes" is the default.
   optional uint32 default_duration_minutes = 2;
 
-  // Whether the user must supply a free-text justification to elevate. Defaults
-  // to true when unset.
-  optional bool require_justification = 3;
+  // If true, the user must supply a free-text justification to elevate. Defaults
+  // to false (no justification required) when unset; a sync server opts in by
+  // setting this true.
+  bool require_justification = 3;
 }
 
 // This specifies the valid temporary admin mode settings for a machine.
