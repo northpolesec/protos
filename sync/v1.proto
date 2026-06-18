@@ -848,7 +848,9 @@ enum Policy {
 
   // The target should be blocked and GUI notifications should not be shown to
   // the user. This should be used sparingly as the behavior of applications
-  // being silently blocked can be very confusing for users.
+  // being silently blocked can be very confusing for users. Combines
+  // SILENT_GUI_BLOCKLIST and SILENT_TTY_BLOCKLIST: neither GUI nor TTY
+  // notifications are shown.
   SILENT_BLOCKLIST = 4;
 
   // An existing rule for this target should be removed, allowing Santa to
@@ -865,6 +867,14 @@ enum Policy {
 
   reserved 7;
   reserved "SEATBELT";
+
+  // The target should be blocked and GUI notifications should not be shown to
+  // the user, but TTY notifications should still be shown.
+  SILENT_GUI_BLOCKLIST = 8;
+
+  // The target should be blocked and TTY notifications should not be shown to
+  // the user, but GUI notifications should still be shown.
+  SILENT_TTY_BLOCKLIST = 9;
 
   // These enum values are deprecated and remain here for backward compatibility.
   WHITELIST = 1;
