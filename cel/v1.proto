@@ -40,8 +40,8 @@ enum ReturnValue {
   SILENT_BLOCKLIST = 4;
 
   // Provided by cel v2
-  reserved 5, 6, 7;
-  reserved "REQUIRE_TOUCHID", "REQUIRE_TOUCHID_ONLY", "SEATBELT";
+  reserved 5, 6, 7, 8;
+  reserved "REQUIRE_TOUCHID", "REQUIRE_TOUCHID_ONLY", "SEATBELT", "AUDIT";
 
   // Block the process from executing and do not show GUI notifications to the
   // user, but still show TTY notifications.
