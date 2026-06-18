@@ -37,7 +37,9 @@ enum ReturnValue {
 
   // Block the process from executing and do not show GUI notifications to the
   // user. This should be used sparingly as the behavior of applications being
-  // silently blocked can be very confusing for users.
+  // silently blocked can be very confusing for users. Combines
+  // SILENT_GUI_BLOCKLIST and SILENT_TTY_BLOCKLIST: neither GUI nor TTY
+  // notifications are shown.
   SILENT_BLOCKLIST = 4;
 
   // Hold the process until the user has authorized it using biometrics (or, if
@@ -59,6 +61,14 @@ enum ReturnValue {
   // sync server with the audit decision so audit matches can be distinguished
   // from ordinary allowlist matches.
   AUDIT = 8;
+
+  // Block the process from executing and do not show GUI notifications to the
+  // user, but still show TTY notifications.
+  SILENT_GUI_BLOCKLIST = 9;
+
+  // Block the process from executing and do not show TTY notifications to the
+  // user, but still show GUI notifications.
+  SILENT_TTY_BLOCKLIST = 10;
 }
 
 // The fields in this message provided to CEL programs.
