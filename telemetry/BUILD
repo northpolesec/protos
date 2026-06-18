@@ -23,6 +23,9 @@ proto_library(
     srcs = ["sleighconfig.proto"],
     visibility = ["//visibility:public"],
     deps = [
+        ":v1_proto",
+        "//commands:v1_proto",
+        "//common:signals_proto",
         "@protobuf//:duration_proto",
     ],
 )
