@@ -8,6 +8,7 @@ proto_library(
     visibility = ["//visibility:public"],
     deps = [
         "//commands:v1_proto",
+        "//common:signals_proto",
         "@googleapis//google/api:annotations_proto",
     ],
 )
