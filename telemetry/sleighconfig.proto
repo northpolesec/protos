@@ -220,17 +220,18 @@ message SignalReport {
   // re-join against the synced config.
   string description = 3;
 
-  // Total number of events that matched this signal across the scan.
-  uint64 match_count = 4;
+  // One entry per time this signal fired during the scan. The number of matches
+  // is the total match count.
+  repeated Match matches = 4;
 
-  // Distinct converted event types the signal matched on (e.g. "execution"),
-  // sorted.
-  repeated string event_types = 5;
-
-  // The source events that triggered this signal. Many signals will trigger on
-  // a single event but this field is repeated to allow for signals that join
-  // across related events.
-  repeated string event_ids = 6;
+  // A single firing of the signal.
+  message Match {
+    // The source event(s) that triggered this match. A signal currently fires
+    // on a single event, but this is repeated to allow signals that join across
+    // related events in the future. Each ID is the event type and the event ID
+    // separated by a colon (e.g. "execution:<id>").
+    repeated string event_ids = 1;
+  }
 }
 
 // SleighSignalScanResponse is the result of a signal_scan command.
