@@ -1640,9 +1640,8 @@ message NetworkFlowRule {
   }
 }
 
-// TelemetrySignalRule adds or removes a single detection signal, mirroring the
-// add/remove semantics of NetworkFlowRule. The client applies these
-// incrementally across RuleDownload responses.
+// TelemetrySignalRule adds or removes a single detection signal. The client
+// applies these incrementally across RuleDownload responses.
 message TelemetrySignalRule {
   message Add {
     santa.common.v1.Signal signal = 1;
