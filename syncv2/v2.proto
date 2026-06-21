@@ -511,11 +511,6 @@ message PreflightResponse {
   // A set of CEL expressions to apply to telemetry before upload.
   repeated string telemetry_filter_expressions = 35;
 
-  // Non-destructive detection signals to evaluate against telemetry. Santa
-  // passes these through to sleigh's SleighSignalScan.signals, which it triggers
-  // on demand.
-  repeated santa.common.v1.Signal telemetry_signals = 38;
-
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -1674,6 +1669,11 @@ message RuleDownloadResponse {
 
   // The set of network flow rules in this response.
   repeated NetworkFlowRule network_flow_rules = 4 [json_name = "network_flow_rules"];
+
+  // Non-destructive detection signals to evaluate against telemetry. Santa
+  // passes these through to sleigh's SleighSignalScan.signals, which it triggers
+  // on demand.
+  repeated santa.common.v1.Signal telemetry_signals = 5 [json_name = "telemetry_signals"];
 }
 
 message PostflightRequest {
@@ -1715,7 +1715,17 @@ message PostflightRequest {
   // Hash of network flow rules.
   string network_flow_rules_hash = 11 [json_name = "network_flow_rules_hash"];
 
-  // next ID: 12
+  // The total number of telemetry signals that were received by the client
+  // across all RuleDownload requests.
+  uint32 telemetry_signals_received = 12 [json_name = "telemetry_signals_received"];
+
+  // The number of valid telemetry signals that were successfully imported.
+  uint32 telemetry_signals_processed = 13 [json_name = "telemetry_signals_processed"];
+
+  // Hash of telemetry signals.
+  string telemetry_signals_hash = 14 [json_name = "telemetry_signals_hash"];
+
+  // next ID: 15
 }
 
 message PostflightResponse {}
