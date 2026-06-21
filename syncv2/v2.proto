@@ -1640,6 +1640,25 @@ message NetworkFlowRule {
   }
 }
 
+// TelemetrySignalRule adds or removes a single detection signal, mirroring the
+// add/remove semantics of NetworkFlowRule. The client applies these
+// incrementally across RuleDownload responses.
+message TelemetrySignalRule {
+  message Add {
+    santa.common.v1.Signal signal = 1;
+  }
+
+  message Remove {
+    // The Signal.name to remove.
+    string name = 1;
+  }
+
+  oneof action {
+    Add add = 1;
+    Remove remove = 2;
+  }
+}
+
 message RuleDownloadRequest {
   // When Santa downloads rules from the server, the server can return a
   // "cursor" that is sent back in the next request. This can be used to
@@ -1670,10 +1689,10 @@ message RuleDownloadResponse {
   // The set of network flow rules in this response.
   repeated NetworkFlowRule network_flow_rules = 4 [json_name = "network_flow_rules"];
 
-  // Non-destructive detection signals to evaluate against telemetry. Santa
-  // passes these through to sleigh's SleighSignalScan.signals, which it triggers
-  // on demand.
-  repeated santa.common.v1.Signal telemetry_signals = 5 [json_name = "telemetry_signals"];
+  // Non-destructive detection signal rules to add or remove. Santa passes the
+  // resulting signal set through to sleigh's SleighSignalScan.signals, which it
+  // triggers on demand.
+  repeated TelemetrySignalRule telemetry_signal_rules = 5 [json_name = "telemetry_signal_rules"];
 }
 
 message PostflightRequest {
@@ -1715,15 +1734,15 @@ message PostflightRequest {
   // Hash of network flow rules.
   string network_flow_rules_hash = 11 [json_name = "network_flow_rules_hash"];
 
-  // The total number of telemetry signals that were received by the client
+  // The total number of telemetry signal rules that were received by the client
   // across all RuleDownload requests.
-  uint32 telemetry_signals_received = 12 [json_name = "telemetry_signals_received"];
+  uint32 telemetry_signal_rules_received = 12 [json_name = "telemetry_signal_rules_received"];
 
-  // The number of valid telemetry signals that were successfully imported.
-  uint32 telemetry_signals_processed = 13 [json_name = "telemetry_signals_processed"];
+  // The number of valid telemetry signal rules that were successfully imported.
+  uint32 telemetry_signal_rules_processed = 13 [json_name = "telemetry_signal_rules_processed"];
 
-  // Hash of telemetry signals.
-  string telemetry_signals_hash = 14 [json_name = "telemetry_signals_hash"];
+  // Hash of telemetry signal rules.
+  string telemetry_signal_rules_hash = 14 [json_name = "telemetry_signal_rules_hash"];
 
   // next ID: 15
 }
