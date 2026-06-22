@@ -1600,8 +1600,11 @@ message NetworkFlowRule {
   }
 
   message Add {
-    int64 rule_id = 1;
-    Action action = 2;
+    // Name is the primary key for the rule.
+    string name = 1;
+    // The rule id is analogous to a version.
+    int64 rule_id = 2;
+    Action action = 3;
 
     // Rule precedence hint. The engine combines this with other signals
     // (process specificity, remote specificity, etc.) per the v1 ranking
@@ -1614,24 +1617,24 @@ message NetworkFlowRule {
     //     rather than emit `priority = false`.
     // If neither is set, the rule's effective rank is 0.
     oneof precedence_hint {
-      bool priority = 3;
-      int64 rank = 4;
+      bool priority = 4;
+      int64 rank = 5;
     }
 
-    repeated Process processes = 5;
-    repeated Remote remotes = 6;
-    repeated PortRange ports = 7;
+    repeated Process processes = 6;
+    repeated Remote remotes = 7;
+    repeated PortRange ports = 8;
     // Protocol matchers as IANA protocol numbers (same namespace as
     // NetworkFlowEvent.protocol). Empty list = any protocol.
-    repeated uint32 protocols = 8;
-    NetworkFlowDirection direction = 9;
+    repeated uint32 protocols = 9;
+    NetworkFlowDirection direction = 10;
 
-    string custom_msg = 10;
-    string custom_url = 11;
+    string custom_msg = 11;
+    string custom_url = 12;
   }
 
   message Remove {
-    int64 rule_id = 1;
+    string name = 1;
   }
 
   oneof action {
