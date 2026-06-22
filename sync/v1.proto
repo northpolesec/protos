@@ -988,7 +988,7 @@ message RuleDownloadResponse {
   string cursor = 2;
 
   // Provided by sync v2
-  reserved 3, 4;
+  reserved 3 to 5;
 }
 
 message PostflightRequest {
@@ -1011,9 +1011,9 @@ message PostflightRequest {
   string rules_hash = 5;
 
   // Provided by sync v2
-  reserved 6 to 11;
+  reserved 6 to 14;
 
-  // next ID: 12
+  // next ID: 15
 }
 
 message PostflightResponse {}
