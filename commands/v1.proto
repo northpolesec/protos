@@ -235,3 +235,8 @@ message CommandResult {
     EventUploadResponse event_upload = 5;
   }
 }
+
+message SyncRequest {
+  // The max amount of random jitter before performing a sync. Set to `0` for an immediate sync.
+  optional uint32 max_jitter = 1;
+}
