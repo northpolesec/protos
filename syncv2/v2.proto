@@ -1016,6 +1016,30 @@ enum NetworkFlowDecision {
   NETWORK_FLOW_DECISION_AUDIT = 3;
 }
 
+// NetworkFlowTier classifies how a NetworkFlowRule's remote matcher matched a
+// flow, ordered from most to least specific. The engine uses this tier as one
+// of the signals in the v1 ranking policy: a more specific tier wins over a
+// less specific one before other tie-breakers (process specificity, rank)
+// apply.
+enum NetworkFlowTier {
+  NETWORK_FLOW_TIER_UNSPECIFIED = 0;
+
+  // Matched a single exact IP address (Remote.Addresses).
+  NETWORK_FLOW_TIER_EXACT_IP = 1;
+
+  // Matched a CIDR block (Remote.Addresses).
+  NETWORK_FLOW_TIER_CIDR = 2;
+
+  // Matched an exact hostname (Remote.Hostnames).
+  NETWORK_FLOW_TIER_HOSTNAME = 3;
+
+  // Matched a domain suffix (Remote.Domains).
+  NETWORK_FLOW_TIER_DOMAIN = 4;
+
+  // Matched any remote (no remote matcher constrained the flow).
+  NETWORK_FLOW_TIER_ANY_REMOTE = 5;
+}
+
 // A NetworkFlowEvent reports a per-flow policy decision made by santanetd —
 // either from a matching NetworkFlowRule (rule_id set) or from the configured
 // NetworkExtension.flow_default_action when no rule matched (rule_id == 0).
@@ -1035,9 +1059,14 @@ message NetworkFlowEvent {
   // Outcome.
   NetworkFlowDecision decision = 9;
 
+  // The winning tier.
+  NetworkFlowTier decision_tier = 16;
+
   // The rule ID that matched this event (if any), as provided during rule
   // download. If there was no matching rule, this value will be zero.
   int64 rule_id = 10;
+  // The name of the matching rule, if any.
+  string rule_name = 17;
 
   // Other rules that also matched but were not chosen (for telemetry).
   repeated int64 competing_rule_ids = 11;
