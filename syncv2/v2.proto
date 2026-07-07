@@ -258,9 +258,16 @@ message SignedPost {
 }
 
 message ExportConfiguration {
-  // If additional configurations are added, wrap this and the new
-  // configurations in a oneof.
-  SignedPost signed_post = 1;
+  oneof configuration {
+    // When set, contains the configuration Santa needs to export data to the
+    // configured destination.
+    SignedPost signed_post = 1;
+
+    // When set and true, the client must stop exporting and discard any
+    // previously received export configuration. Sent when telemetry export is
+    // disabled so absence of a config can no longer be misread as "unchanged".
+    bool revoke = 2;
+  }
 }
 
 // On-demand monitor mode settings
