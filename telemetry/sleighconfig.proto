@@ -216,13 +216,9 @@ message SignalReport {
 
   santa.common.v1.Severity severity = 2;
 
-  // The Signal.description, echoed for convenience so alerting does not need to
-  // re-join against the synced config.
-  string description = 3;
-
   // One entry per time this signal fired during the scan. The number of matches
   // is the total match count.
-  repeated Match matches = 4;
+  repeated Match matches = 3;
 
   // A single firing of the signal.
   message Match {
