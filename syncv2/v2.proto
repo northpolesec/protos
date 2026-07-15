@@ -124,6 +124,10 @@ message PreflightRequest {
   // The version of Santa making this request, e.g. 2025.1.80
   string santa_version = 6 [json_name = "santa_version"];
 
+  // The version of santanetd running on this host, e.g. 2025.1.80. Empty if
+  // santanetd is not loaded. santanetd updates independently of Santa.
+  string santanetd_version = 27 [json_name = "santanetd_version"];
+
   // The primary user of this machine, as configured by either the `MachineOwner`
   // or (`MachineOwnerPlist` and `MachineOwnerKey`) configuration options.
   string primary_user = 7 [json_name = "primary_user"];
@@ -189,7 +193,7 @@ message PreflightRequest {
   // Hash of FAA rules.
   string file_access_rules_hash = 23;
 
-  // next ID: 27
+  // next ID: 28
 }
 
 enum SyncType {
