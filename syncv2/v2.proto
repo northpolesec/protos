@@ -193,7 +193,7 @@ message PreflightRequest {
   // Hash of FAA rules.
   string file_access_rules_hash = 23;
 
-  // next ID: 27
+  // next ID: 28
 }
 
 enum SyncType {
