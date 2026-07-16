@@ -65,6 +65,12 @@ message SleighSignalScan {
   // one event is summarized in the SleighResponse signal report. Sourced by
   // santa from the synced telemetry_signals config.
   repeated santa.common.v1.Signal signals = 2;
+
+  // Sleigh's persistent scan-state database, passed as an already-open
+  // read-write file descriptor. Santa opens it as root (the file lives under
+  // root-owned /var/db/santa) and hands the fd to sleigh, which runs with
+  // dropped privileges but keeps the inherited descriptor.
+  int32 state_db_fd = 3;
 }
 
 // BinaryMetadata is computed by santa (via SNTFileInfo + MOLCodesignChecker) and
@@ -208,32 +214,11 @@ message SleighConfig {
   }
 }
 
-// SignalReport summarizes how a single detection signal matched over the course
-// of a signal scan. One entry is emitted per signal that fired at least once.
-message SignalReport {
-  // The Signal.name that fired.
-  string name = 1;
-
-  santa.common.v1.Severity severity = 2;
-
-  // One entry per time this signal fired during the scan. The number of matches
-  // is the total match count.
-  repeated Match matches = 3;
-
-  // A single firing of the signal.
-  message Match {
-    // The source event(s) that triggered this match. A signal currently fires
-    // on a single event, but this is repeated to allow signals that join across
-    // related events in the future. Each ID is the event type and the event ID
-    // separated by a colon (e.g. "execution:<id>").
-    repeated string event_ids = 1;
-  }
-}
-
 // SleighSignalScanResponse is the result of a signal_scan command.
 message SleighSignalScanResponse {
   // One entry per detection signal that fired at least once, sorted by name.
-  repeated SignalReport signal_reports = 1;
+  // SignalReport lives in santa.common.v1 so this and the sync upload share it.
+  repeated santa.common.v1.SignalReport signal_reports = 1;
 }
 
 // SleighResponse is written (serialized) to stdout by sleigh and read by santad.

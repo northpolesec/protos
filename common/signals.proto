@@ -46,3 +46,54 @@ message Signal {
   // CEL boolean expression over `event`. A true result is a match.
   string expression = 3;
 }
+
+// SignalReport summarizes how a single detection signal matched over the course
+// of a signal scan. One entry is emitted per signal that fired at least once.
+// Shared by sleigh's scan response (santa.telemetry.v1) and the sync upload
+// (santa.sync.v2) so the two stay identical.
+message SignalReport {
+  // The Signal.name that fired.
+  string name = 1;
+
+  Severity severity = 2;
+
+  // One entry per time this signal fired during the scan. The number of matches
+  // is the total match count.
+  repeated Match matches = 3;
+
+  // A single firing of the signal.
+  message Match {
+    // The source event(s) that triggered this match. A signal currently fires
+    // on a single event, but this is repeated to allow signals that join across
+    // related events in the future. Each ID is the event type and the event ID
+    // separated by a colon (e.g. "execution:<id>").
+    repeated string event_ids = 1;
+
+    // The ancestry of the process the matched event pertains to, reconstructed
+    // from the process tree sleigh builds from fork/exec/exit telemetry. Element
+    // 0 is the process itself, element 1 its parent, and so on to the root.
+    repeated SignalProcessNode process_tree = 2;
+  }
+}
+
+// SignalProcessNode is one process in a match's process tree. Identity (pid,
+// pidversion, path) is always present; the code signature, platform flag,
+// responsible id, and args are known only for processes observed executing —
+// they are empty for processes seen only via fork/exit or synthesized as a
+// parent stub. Envs are populated only on element 0 (the matched process).
+message SignalProcessNode {
+  int32 pid = 1;
+  int32 pidversion = 2;
+  string path = 3;
+  bool exited = 4;
+  bool is_platform_binary = 5;
+  int32 responsible_pid = 6;
+  int32 responsible_pidversion = 7;
+  // Code signature of the executable: team id, the formatted signing id
+  // (platform:/TEAMID: prefixed), and the hex-encoded cdhash.
+  string team_id = 8;
+  string signing_id = 9;
+  string cdhash = 10;
+  repeated string args = 11;
+  repeated string envs = 12;
+}
