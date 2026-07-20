@@ -73,6 +73,14 @@ message SignalReport {
     // from the process tree sleigh builds from fork/exec/exit telemetry. Element
     // 0 is the process itself, element 1 its parent, and so on to the root.
     repeated SignalProcessNode process_tree = 2;
+
+    // Full details for responsible processes referenced by a process_tree node's
+    // responsible_pid/responsible_pidversion that are not themselves in
+    // process_tree (e.g. the app that launched a helper via LaunchServices). To
+    // resolve a node's responsible process, join its responsible_pid/pidversion
+    // against process_tree first, then here. Kept separate from process_tree so a
+    // node's role (ancestor vs. responsible) is never ambiguous.
+    repeated SignalProcessNode responsible_processes = 3;
   }
 }
 

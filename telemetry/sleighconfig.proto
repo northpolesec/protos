@@ -71,6 +71,11 @@ message SleighSignalScan {
   // root-owned /var/db/santa) and hands the fd to sleigh, which runs with
   // dropped privileges but keeps the inherited descriptor.
   int32 state_db_fd = 3;
+
+  // A set of CEL expressions to use to filter events as they are processed.
+  // If an expression returns true a matched process will not upload envs/args.
+  // Expressions can also redact fields instead of dropping.
+  repeated string filter_expressions = 5;
 }
 
 // BinaryMetadata is computed by santa (via SNTFileInfo + MOLCodesignChecker) and
