@@ -22,6 +22,13 @@ message RunningProcess {
   int32 pid = 1;
   int32 pidversion = 2;
   string boot_session_uuid = 3 [json_name = "boot_session_uuid"];
+
+  // Process start time, paired with `pid` to defeat PID reuse when validating
+  // a kill request. Complements `pidversion` for pinning a specific process
+  // instance where a 32-bit generation counter is not sufficient. Units are
+  // opaque and agent-defined; the reporting agent and the killing agent must
+  // agree. 0 means unset, in which case start-time validation is skipped.
+  int64 process_start_time = 4 [json_name = "process_start_time"];
 }
 
 message KillRequest {
