@@ -1816,21 +1816,22 @@ message PublishMetricsRequest {
 message PublishMetricsResponse {}
 
 // CommandsRequest is the body of the POST /commands/{machine_id} call. A thin
-// sync-level envelope around a batch of santa.commands.v1.CommandResult values.
-// The agent posts every result it produced since its last sync (may be empty)
-// and the server replies with any newly queued commands.
+// sync-level envelope around a single santa.commands.v1.CommandResult. Commands
+// are dispatched serially, so the agent reports the result of at most one
+// command per call and the server replies with at most one newly queued
+// command.
 message CommandsRequest {
   // The UUID of the machine making the request. Matches the URL placeholder.
   string machine_id = 1;
 
-  // Results from commands executed since the agent's last successful /commands
-  // call.
-  repeated santa.commands.v1.CommandResult results = 2;
+  // Result of the command the agent executed since its last successful
+  // /commands call. Unset when the agent has nothing to report.
+  santa.commands.v1.CommandResult result = 2;
 }
 
-// CommandsResponse carries any commands newly queued for this host. A thin
-// sync-level envelope around a batch of santa.commands.v1.QueuedCommand
-// values, may be empty when the host has nothing to do.
+// CommandsResponse carries the command newly queued for this host. A thin
+// sync-level envelope around a single santa.commands.v1.QueuedCommand. Unset
+// when the host has nothing to do.
 message CommandsResponse {
-  repeated santa.commands.v1.QueuedCommand commands = 1;
+  santa.commands.v1.QueuedCommand command = 1;
 }
