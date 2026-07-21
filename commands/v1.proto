@@ -16,6 +16,8 @@ syntax = "proto3";
 
 package santa.commands.v1;
 
+import "common/inventory.proto";
+
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/commands";
 
 message RunningProcess {
@@ -140,6 +142,32 @@ message BinaryUploadResponse {
   optional int64 upload_duration_ms = 5 [json_name = "upload_duration_ms"];
 }
 
+// Command to request Santa run a read-only package-inventory scan (via sleigh)
+// and upload the results to the workshop-minted presigned POST. Santa forwards
+// `scan` and `signed_post` into the SleighInventoryScan it hands to sleigh.
+message InventoryScanRequest {
+  // Scan tuning parameters (profile, roots, ecosystems, limits, ...). Shared
+  // with the SleighConfig command sleigh runs (SleighInventoryScan).
+  santa.common.v1.InventoryScan scan = 1;
+
+  // Presigned POST minted by workshop for the results zip. Santa forwards this
+  // to sleigh verbatim; the object key is baked into form_values["key"].
+  SignedPost signed_post = 2 [json_name = "signed_post"];
+}
+
+// Results are uploaded directly to the presigned POST (like binary upload), so
+// this only reports command-level success/failure.
+message InventoryScanResponse {
+  enum Error {
+    ERROR_UNSPECIFIED = 0;
+    // Santa/sleigh failed to run the scan (spawn, parse, internal error).
+    ERROR_INTERNAL = 1;
+    // The scan ran but uploading the results to the presigned POST failed.
+    ERROR_UPLOAD_FAILED = 2;
+  }
+  optional Error error = 1;
+}
+
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
   // Nonce
@@ -160,6 +188,7 @@ message SantaCommandRequest {
     KillRequest kill = 11;
     EventUploadRequest event_upload = 12;
     BinaryUploadRequest binary_upload = 13;
+    InventoryScanRequest inventory_scan = 14;
   }
 }
 
@@ -180,6 +209,7 @@ message SantaCommandResponse {
     KillResponse kill = 3;
     EventUploadResponse event_upload = 4;
     BinaryUploadResponse binary_upload = 5;
+    InventoryScanResponse inventory_scan = 6;
   }
 }
 
