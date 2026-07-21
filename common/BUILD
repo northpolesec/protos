@@ -14,3 +14,16 @@ cc_proto_library(
     deps = [":signals_proto"],
     visibility = ["//visibility:public"],
 )
+
+proto_library(
+    name = "inventory_proto",
+    srcs = ["inventory.proto"],
+    visibility = ["//visibility:public"],
+    deps = ["@protobuf//:duration_proto"],
+)
+
+cc_proto_library(
+    name = "inventory_cc_proto",
+    deps = [":inventory_proto"],
+    visibility = ["//visibility:public"],
+)
