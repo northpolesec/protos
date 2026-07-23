@@ -1478,6 +1478,11 @@ message Rule {
   // with the sandbox if desired.
   string seatbelt_policy = 11;
 
+  // For BLOCK_* rules, this will override the text shown on the "Open" button in
+  // the UI. Overrides the EventDetailText configuration value.
+  // See: https://santa.dev/deployment/configuration#eventdetailtext
+  string event_detail_button_label = 12;
+
   // This field is deprecated and has been replaced with `identifier`.
   string deprecated_sha256 = 1000 [
     json_name = "sha256",
@@ -1498,6 +1503,12 @@ message CELFallbackRule {
   // by the EventDetailURL configuration value can be used here.
   // See: https://santa.dev/deployment/configuration#eventdetailurl
   string custom_url = 3;
+
+  // For expressions that lead to a modal notification, this field can be used
+  // to override the text shown on the "Open" button. Overrides the
+  // EventDetailText configuration value.
+  // See: https://santa.dev/deployment/configuration#eventdetailtext
+  string event_detail_button_label = 4;
 }
 
 message FileAccessRule {
@@ -1650,6 +1661,10 @@ message NetworkFlowRule {
 
     string custom_msg = 11;
     string custom_url = 12;
+    // Overrides the text shown on the "Open" button in the block notification
+    // UI, i.e. the EventDetailText configuration value.
+    // See: https://santa.dev/deployment/configuration#eventdetailtext
+    string event_detail_button_label = 13;
   }
 
   message Remove {
