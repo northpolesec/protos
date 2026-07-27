@@ -57,6 +57,8 @@ message InventoryScan {
     ECOSYSTEM_MCP = 6;
     ECOSYSTEM_EDITOR_EXTENSION = 7;
     ECOSYSTEM_BROWSER_EXTENSION = 8;
+    ECOSYSTEM_HOMEBREW = 9;
+    ECOSYSTEM_AGENT_SKILL = 10;
   }
 
   // Discovery profile. Unset (PROFILE_UNKNOWN) is treated as
