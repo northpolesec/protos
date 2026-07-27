@@ -231,6 +231,8 @@ message QueuedCommand {
   oneof command {
     KillRequest kill = 2;
     EventUploadRequest event_upload = 3;
+    BinaryUploadRequest binary_upload = 4;
+    InventoryScanRequest inventory_scan = 5;
   }
 }
 
@@ -270,6 +272,8 @@ message CommandResult {
   oneof result {
     KillResponse kill = 4;
     EventUploadResponse event_upload = 5;
+    BinaryUploadResponse binary_upload = 6;
+    InventoryScanResponse inventory_scan = 7;
   }
 }
 
