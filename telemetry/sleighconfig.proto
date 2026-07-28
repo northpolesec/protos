@@ -126,7 +126,7 @@ message SleighBinaryUpload {
 // SleighConfig wrapper and are stamped on every emitted row.
 message SleighInventoryScan {
   // Scan tuning parameters (profile, roots, ecosystems, limits, ...). Shared
-  // with the workshop-issued host command (santa.commands.v1.InventoryScanRequest).
+  // with the workshop-issued host command (santa.commands.v1.PackageInventoryRequest).
   santa.common.v1.InventoryScan scan = 1;
 
   // Presigned POST minted by workshop. The object key is built from

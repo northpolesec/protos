@@ -145,7 +145,7 @@ message BinaryUploadResponse {
 // Command to request Santa run a read-only package-inventory scan (via sleigh)
 // and upload the results to the workshop-minted presigned POST. Santa forwards
 // `scan` and `signed_post` into the SleighInventoryScan it hands to sleigh.
-message InventoryScanRequest {
+message PackageInventoryRequest {
   // Scan tuning parameters (profile, roots, ecosystems, limits, ...). Shared
   // with the SleighConfig command sleigh runs (SleighInventoryScan).
   santa.common.v1.InventoryScan scan = 1;
@@ -157,7 +157,7 @@ message InventoryScanRequest {
 
 // Results are uploaded directly to the presigned POST (like binary upload), so
 // this only reports command-level success/failure.
-message InventoryScanResponse {
+message PackageInventoryResponse {
   enum Error {
     ERROR_UNSPECIFIED = 0;
     // Santa/sleigh failed to run the scan (spawn, parse, internal error).
@@ -188,8 +188,9 @@ message SantaCommandRequest {
     KillRequest kill = 11;
     EventUploadRequest event_upload = 12;
     BinaryUploadRequest binary_upload = 13;
-    InventoryScanRequest inventory_scan = 14;
   }
+  // 14 was InventoryScanRequest; package inventory is delivered via QueuedCommand.
+  reserved 14;
 }
 
 message SantaCommandResponse {
@@ -209,8 +210,9 @@ message SantaCommandResponse {
     KillResponse kill = 3;
     EventUploadResponse event_upload = 4;
     BinaryUploadResponse binary_upload = 5;
-    InventoryScanResponse inventory_scan = 6;
   }
+  // 6 was InventoryScanResponse; package inventory is delivered via QueuedCommand.
+  reserved 6;
 }
 
 // An empty message just to send request a ping
@@ -231,6 +233,7 @@ message QueuedCommand {
   oneof command {
     KillRequest kill = 2;
     EventUploadRequest event_upload = 3;
+    PackageInventoryRequest package_inventory = 4;
   }
 }
 
@@ -270,6 +273,7 @@ message CommandResult {
   oneof result {
     KillResponse kill = 4;
     EventUploadResponse event_upload = 5;
+    PackageInventoryResponse package_inventory = 6;
   }
 }
 

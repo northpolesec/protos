@@ -28,7 +28,7 @@ option objc_class_prefix = "SNTPB";
 //
 // Shared between the SleighConfig command sleigh actually runs
 // (santa.telemetry.v1.SleighInventoryScan) and the workshop-issued host command
-// (santa.commands.v1.InventoryScanRequest) so the tunable surface stays
+// (santa.commands.v1.PackageInventoryRequest) so the tunable surface stays
 // identical. Transport details (the presigned upload target, host_id /
 // host_name) live on those wrappers, not here.
 message InventoryScan {
