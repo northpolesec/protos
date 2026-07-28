@@ -16,14 +16,14 @@ cc_proto_library(
 )
 
 proto_library(
-    name = "inventory_proto",
-    srcs = ["inventory.proto"],
+    name = "packageinventory_proto",
+    srcs = ["packageinventory.proto"],
     visibility = ["//visibility:public"],
     deps = ["@protobuf//:duration_proto"],
 )
 
 cc_proto_library(
-    name = "inventory_cc_proto",
-    deps = [":inventory_proto"],
+    name = "packageinventory_cc_proto",
+    deps = [":packageinventory_proto"],
     visibility = ["//visibility:public"],
 )

@@ -17,7 +17,7 @@ syntax = "proto3";
 package santa.telemetry.v1;
 
 import "commands/v1.proto";
-import "common/inventory.proto";
+import "common/packageinventory.proto";
 import "common/signals.proto";
 import "telemetry/v1.proto";
 
@@ -118,16 +118,17 @@ message SleighBinaryUpload {
   repeated string filter_expressions = 5;
 }
 
-// SleighInventoryScan runs a read-only package-inventory discovery sweep on
-// the host and uploads per-ecosystem Parquet files inside a zip to a
+// SleighPackageInventoryScan runs a read-only package-inventory discovery sweep
+// on the host and uploads per-ecosystem Parquet files inside a zip to a
 // workshop-minted presigned POST. No package managers are executed and no
 // resolution-time network requests are made; sleigh only reads on-disk
 // lockfiles and install metadata. host_id / host_name come from the
 // SleighConfig wrapper and are stamped on every emitted row.
-message SleighInventoryScan {
+message SleighPackageInventoryScan {
   // Scan tuning parameters (profile, roots, ecosystems, limits, ...). Shared
-  // with the workshop-issued host command (santa.commands.v1.InventoryScanRequest).
-  santa.common.v1.InventoryScan scan = 1;
+  // with the workshop-issued host command
+  // (santa.commands.v1.PackageInventoryRequest).
+  santa.common.v1.PackageInventoryScan scan = 1;
 
   // Presigned POST minted by workshop. The object key is built from
   // form_values["key"] suffixed by the run's generated filename.
@@ -146,7 +147,7 @@ message SleighConfig {
   oneof command {
     SleighExportTelemetry export_telemetry = 3;
     SleighBinaryUpload binary_upload = 4;
-    SleighInventoryScan inventory_scan = 5;
+    SleighPackageInventoryScan package_inventory_scan = 5;
     SleighSignalScan signal_scan = 6;
   }
 }

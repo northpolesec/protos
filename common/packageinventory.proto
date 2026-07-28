@@ -21,17 +21,17 @@ import "google/protobuf/duration.proto";
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/common";
 option objc_class_prefix = "SNTPB";
 
-// InventoryScan carries the tuning parameters for a read-only package-inventory
-// discovery sweep. No package managers are executed and no resolution-time
-// network requests are made; sleigh only reads on-disk lockfiles and install
-// metadata.
+// PackageInventoryScan carries the tuning parameters for a read-only
+// package-inventory discovery sweep. No package managers are executed and no
+// resolution-time network requests are made; sleigh only reads on-disk
+// lockfiles and install metadata.
 //
 // Shared between the SleighConfig command sleigh actually runs
-// (santa.telemetry.v1.SleighInventoryScan) and the workshop-issued host command
-// (santa.commands.v1.InventoryScanRequest) so the tunable surface stays
-// identical. Transport details (the presigned upload target, host_id /
+// (santa.telemetry.v1.SleighPackageInventoryScan) and the workshop-issued host
+// command (santa.commands.v1.PackageInventoryRequest) so the tunable surface
+// stays identical. Transport details (the presigned upload target, host_id /
 // host_name) live on those wrappers, not here.
-message InventoryScan {
+message PackageInventoryScan {
   // Discovery profile.
   enum Profile {
     // Unset; sleigh treats this as PROFILE_BASELINE.
@@ -84,25 +84,6 @@ message InventoryScan {
   // operator-supplied roots. No effect on Linux.
   bool all_users = 5;
 
-  // Per-file read cap in bytes. 0 falls back to sleigh's built-in default.
-  int64 max_file_size = 6;
-
   // Wall-clock budget for the whole scan. Zero / unset means unbounded.
-  google.protobuf.Duration max_duration = 7;
-
-  // Concurrent file parsers. 0 falls back to sleigh's built-in default.
-  int32 concurrency = 8;
-
-  // Path to a JSON exposure catalog file or directory of *.json catalogs
-  // (merged non-recursively). Matches emit record_type=finding alongside
-  // package records.
-  string exposure_catalog_path = 9;
-
-  // Per-catalog-file read cap in bytes. 0 falls back to sleigh's
-  // built-in default.
-  int64 max_catalog_size = 10;
-
-  // Suppress package records while still emitting findings and the
-  // scan_summary. Requires exposure_catalog_path to be set.
-  bool findings_only = 11;
+  google.protobuf.Duration max_duration = 6;
 }
