@@ -6,7 +6,7 @@ proto_library(
     name = "v1_proto",
     srcs = ["v1.proto"],
     visibility = ["//visibility:public"],
-    deps = ["//common:inventory_proto"],
+    deps = ["//common:packageinventory_proto"],
 )
 
 cc_proto_library(

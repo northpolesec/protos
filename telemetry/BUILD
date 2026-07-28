@@ -25,7 +25,7 @@ proto_library(
     deps = [
         ":v1_proto",
         "//commands:v1_proto",
-        "//common:inventory_proto",
+        "//common:packageinventory_proto",
         "//common:signals_proto",
     ],
 )
