@@ -149,9 +149,9 @@ message PreflightRequest {
   string rules_hash = 22;
 
   // Provided by sync v2
-  reserved 23 to 26;
+  reserved 23 to 27;
 
-  // next ID: 27
+  // next ID: 28
 }
 
 enum SyncType {
@@ -343,6 +343,11 @@ message PreflightResponse {
   // configured destination.
   optional ExportConfiguration export_configuration = 16;
 
+  // Holes in the field number space that this message shares with
+  // santa.sync.v2.PreflightResponse. Never used by either version.
+  reserved 17;
+  reserved 38;
+
   // Provided by sync v2
   reserved 18 to 20;
 
@@ -367,8 +372,10 @@ message PreflightResponse {
 
   // Provided by sync v2
   reserved 28 to 30;
+  reserved 31;
   reserved 32;
   reserved 34 to 35;
+  reserved 39;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -409,7 +416,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 38
+  // next ID: 40
 }
 
 // The Decision enum records what decision Santa made about an execution.

@@ -561,6 +561,11 @@ message PreflightResponse {
     deprecated = true
   ];
 
+  // Holes in the field number space that this message shares with
+  // santa.sync.v1.PreflightResponse. Never used by either version.
+  reserved 17;
+  reserved 38;
+
   // next ID: 40
 }
 

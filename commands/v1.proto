@@ -177,11 +177,20 @@ message SantaCommandRequest {
   // timestamp in second to prevent replays
   int64 issued_at = 2;
 
-  // HMAC of the uuid concatenated with the command values.
-  // This should be HMAC(uuid + issued_at + command bytes)
+  // HMAC-SHA256 authenticating this request, keyed with the push_hmac_key from
+  // santa.sync.v2.PreflightResponse.
   //
-  // To calculate this copy the value, set it to nil in the message and then
-  // marshal the message and compare.
+  // The signed bytes are the concatenation, in exactly this order, of:
+  //   1. the UTF-8 bytes of uuid,
+  //   2. issued_at as a 64-bit big-endian two's-complement integer,
+  //   3. the serialized bytes of the command submessage set in the oneof
+  //      (the submessage itself, without the enclosing tag or length prefix).
+  // Do not HMAC the serialized SantaCommandRequest: protobuf serialization is
+  // not canonical, so two conforming runtimes can produce different bytes for
+  // the same logical command.
+  //
+  // Receivers must compare the computed value against this field using a
+  // constant-time comparison.
   bytes hmac = 3;
 
   oneof command {
