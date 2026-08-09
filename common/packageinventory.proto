@@ -59,6 +59,7 @@ message PackageInventoryScan {
     ECOSYSTEM_BROWSER_EXTENSION = 8;
     ECOSYSTEM_HOMEBREW = 9;
     ECOSYSTEM_AGENT_SKILL = 10;
+    ECOSYSTEM_NIX = 11;
   }
 
   // Discovery profile. Unset (PROFILE_UNKNOWN) is treated as
