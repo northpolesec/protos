@@ -314,6 +314,27 @@ message OnDemandAdminMode {
   // to false (no justification required) when unset; a sync server opts in by
   // setting this true.
   bool require_justification = 3;
+
+  // The accounts allowed to hold standing local administrator rights.
+  //
+  // The PRESENCE of this message is what turns admin-group enforcement on. A
+  // repeated field could not express this: proto3 gives repeated fields no
+  // presence, so "the server sent an empty list" and "the server is too old to
+  // know this field" would be indistinguishable, and the second would demote
+  // every administrator in the fleet.
+  //
+  //   absent             -> the server does not implement this; do not enforce
+  //   present, empty     -> enforce; no account may hold standing admin
+  //   present, non-empty -> enforce; exactly these accounts may
+  //
+  // Usernames are posix short names, compared case-insensitively. Wildcards are
+  // not supported. An entry containing ':' is reserved for a future
+  // "scheme:value" form (e.g. "uid:503") and is ignored by clients that do not
+  // understand it.
+  message AllowedAdmins {
+    repeated string usernames = 1;
+  }
+  AllowedAdmins allowed_admins = 4;
 }
 
 // This specifies the valid temporary admin mode settings for a machine.
