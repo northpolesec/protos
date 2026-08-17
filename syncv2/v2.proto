@@ -1624,11 +1624,22 @@ message FileAccessRule {
     // here takes precedence over `processes`; if several entries match, the
     // first in list order wins.
     //
-    // Clients that predate this field ignore it entirely, so an entry here
-    // falls back to how the rule treats an unlisted process: denied (and
-    // notified) for RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES. To have an
-    // ACTION_ALLOW entry work on those clients too, also list the process in
-    // `processes`.
+    // Clients that predate this field ignore it entirely, so on those clients
+    // a process listed only here gets whatever the rule does with an unlisted
+    // process, which depends on `rule_type`:
+    //   - *_ALLOWED_* rule types deny it, so an ACTION_ALLOW entry is lost and
+    //     the process is denied and notified.
+    //   - *_DENIED_* rule types allow it, so an ACTION_DENY entry is lost and
+    //     the process is allowed.
+    // The proto cannot enforce this; it is on the server to decide policy. To
+    // keep behaviour equivalent on older clients, also list the process in
+    // `processes` whenever the entry's action matches what `rule_type` implies
+    // for a listed process (ACTION_ALLOW under *_ALLOWED_*, ACTION_DENY under
+    // *_DENIED_*). An entry whose action opposes `rule_type` - notably the
+    // silently-denied process under RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES that
+    // this field exists for - has no representation in `processes` at all, so a
+    // server that cares must either accept the fallback above or withhold the
+    // rule from clients that do not support this field.
     repeated ProcessWithOptions processes_with_options = 14;
   }
   message Remove {
