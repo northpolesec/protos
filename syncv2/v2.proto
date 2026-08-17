@@ -1554,6 +1554,38 @@ message FileAccessRule {
       string team_id = 5;
     }
   }
+  // A process matcher carrying per-process overrides of the rule's settings.
+  // Unlike `Add.processes`, the outcome for a match here does not depend on
+  // `Add.rule_type`: each entry states its own action. This makes it possible
+  // to e.g. silently deny a process under a
+  // RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES rule, which cannot be expressed by
+  // `Add.processes` because membership there means "allowed".
+  message ProcessWithOptions {
+    enum Action {
+      ACTION_UNSPECIFIED = 0;
+      ACTION_ALLOW = 1;
+      ACTION_DENY = 2;
+    }
+
+    // The process this entry matches. Required.
+    Process process = 1;
+
+    // What happens when `process` accesses one of the rule's paths. Required;
+    // an entry with ACTION_UNSPECIFIED makes the rule invalid.
+    Action action = 2;
+
+    // Overrides of the corresponding `Add` fields, for this process only.
+    // Unset means "inherit the value from the rule". As with the rule-level
+    // field, `block_violations = false` means the violation is logged but not
+    // blocked, i.e. audit-only for this process.
+    optional bool block_violations = 3;
+    optional bool enable_silent_mode = 4;
+    optional bool enable_silent_tty_mode = 5;
+    optional string block_message = 6;
+    optional string event_detail_url = 7;
+    optional string event_detail_text = 8;
+    optional bool allow_read_access = 9;
+  }
   message Path {
     enum PathType {
       PATH_TYPE_UNSPECIFIED = 0;
@@ -1580,10 +1612,24 @@ message FileAccessRule {
     string block_message = 9;
     string event_detail_url = 10;
     string event_detail_text = 11;
-    repeated Process processes = 12;
+    // This field is deprecated, use `processes_with_options` instead, which can
+    // express the same matches plus a per-process action and overrides.
+    // Still honoured, and still required to convey allowed processes to clients
+    // that predate `processes_with_options`.
+    repeated Process processes = 12 [deprecated = true];
     // A server-side identifier that will be echoed for events that match this
     // rule.
     int64 rule_id = 13;
+    // Per-process rules with their own action and overrides. A process matched
+    // here takes precedence over `processes`; if several entries match, the
+    // first in list order wins.
+    //
+    // Clients that predate this field ignore it entirely, so an entry here
+    // falls back to how the rule treats an unlisted process: denied (and
+    // notified) for RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES. To have an
+    // ACTION_ALLOW entry work on those clients too, also list the process in
+    // `processes`.
+    repeated ProcessWithOptions processes_with_options = 14;
   }
   message Remove {
     string name = 1;
