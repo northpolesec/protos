@@ -543,6 +543,10 @@ message PreflightResponse {
   // A set of CEL expressions to apply to telemetry before upload.
   repeated string telemetry_filter_expressions = 35;
 
+  // The server's current time, seconds since the UNIX epoch, UTC. Clients use
+  // this to correct a local clock that has drifted or been tampered with.
+  optional int64 server_time = 40 [json_name = "server_time"];
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -587,7 +591,7 @@ message PreflightResponse {
   reserved 17;
   reserved 38;
 
-  // next ID: 40
+  // next ID: 41
 }
 
 // The Decision enum records what decision Santa made about an execution.
@@ -1301,6 +1305,26 @@ message TemporaryAdminMode {
   }
 }
 
+// Reports processes the client terminated because a time based rule crossed a
+// schedule transition: a temporary grant expired or a scheduled block took
+// effect.
+message TimedRuleKill {
+  // Identifier of the rule whose transition fired.
+  string identifier = 1 [json_name = "identifier"];
+
+  // Rule type of that rule.
+  RuleType rule_type = 2 [json_name = "rule_type"];
+
+  // Server-assigned rule id, matching Rule.rule_id.
+  int64 rule_id = 3 [json_name = "rule_id"];
+
+  // The transition instant, seconds since the UNIX epoch, UTC.
+  int64 transition = 4 [json_name = "transition"];
+
+  // Per-process outcomes.
+  repeated santa.commands.v1.KillResponse.Process processes = 5 [json_name = "processes"];
+}
+
 // AuditEvents are events sent by Santa to communicate context to the sync
 // service.
 message AuditEvent {
@@ -1312,6 +1336,7 @@ message AuditEvent {
     StandaloneModeRuleCreation standalone_mode_rule_creation = 2 [json_name = "standalone_mode_rule_creation"];
     TemporaryMonitorMode temporary_monitor_mode = 3 [json_name = "temporary_monitor_mode"];
     TemporaryAdminMode temporary_admin_mode = 4 [json_name = "temporary_admin_mode"];
+    TimedRuleKill timed_rule_kill = 5 [json_name = "timed_rule_kill"];
   }
 }
 
