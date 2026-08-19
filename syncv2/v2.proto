@@ -1580,8 +1580,7 @@ message FileAccessRule {
     // The process this entry matches. Required.
     Process process = 1;
 
-    // What happens when `process` accesses one of the rule's paths. Required;
-    // an entry with ACTION_UNSPECIFIED makes the rule invalid.
+    // What happens when `process` accesses one of the rule's paths.
     Action action = 2;
 
     // Overrides of the corresponding `Add` fields, for this process only.
@@ -1635,8 +1634,8 @@ message FileAccessRule {
     // Clients that predate this field ignore it entirely, so an entry here
     // falls back to how the rule treats an unlisted process: denied (and
     // notified) for RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES. To have an
-    // ACTION_ALLOW entry work on those clients too, also list the process in
-    // `processes`.
+    // ACTION_ALLOW_READ_ONLY entry work on those clients too, also list
+    // the process in `processes`.
     repeated ProcessWithOptions processes_with_options = 14;
   }
   message Remove {
