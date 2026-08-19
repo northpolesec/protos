@@ -1588,12 +1588,11 @@ message FileAccessRule {
     // Unset means "inherit the value from the rule". As with the rule-level
     // field, `block_violations = false` means the violation is logged but not
     // blocked, i.e. audit-only for this process.
-    optional bool block_violations = 3;
-    optional bool enable_silent_mode = 4;
-    optional bool enable_silent_tty_mode = 5;
-    optional string block_message = 6;
-    optional string event_detail_url = 7;
-    optional string event_detail_text = 8;
+    optional bool enable_silent_mode = 3;
+    optional bool enable_silent_tty_mode = 4;
+    optional string block_message = 5;
+    optional string event_detail_url = 6;
+    optional string event_detail_text = 7;
   }
   message Path {
     enum PathType {
