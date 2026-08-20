@@ -94,14 +94,16 @@ message Schedule {
     optional int64 not_after = 2;
   }
 
-  // A weekly repeat, stated in local wall-clock time in `timezone`.
+  // A weekly repeat, stated in local wall-clock time. The timezone that
+  // resolves it is the schedule's, passed as in_schedule()'s optional second
+  // argument; when the argument is absent, the host's configured timezone is
+  // used.
   message Weekly {
     // Days the window starts on. Sunday = 0, matching both Go's time.Weekday
     // and CEL's getDayOfWeek().
     repeated int32 weekdays = 1;
     string start_tod = 2; // "HH:MM"
     string end_tod = 3; // "HH:MM"; <= start_tod means the next day
-    string timezone = 4; // IANA name; required
   }
 
   // One window family. New kinds are added here, and only here. A client that
