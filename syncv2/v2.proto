@@ -1571,10 +1571,10 @@ message FileAccessRule {
       ACTION_UNSPECIFIED = 0;
       // Allow access.
       ACTION_ALLOW = 1;
-      // Allow access, but audit, equivalent to `block_violations = false= in the outer rule.
+      // Allow access, but audit, equivalent to `block_violations = false` in the outer rule.
       ACTION_AUDIT = 2;
       // Block access.
-      ACTION_DENY = 5;
+      ACTION_DENY = 3;
     }
     Action action = 2;
 
