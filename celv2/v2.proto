@@ -21,8 +21,12 @@ option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/cel
 // or by using the value names, as if they were keywords.
 //
 enum ReturnValue {
-  // This value exists due to protobuf best practices but should not be returned
-  // by any program and will be treated as an evaluation error if it is.
+  // UNSPECIFIED means the program makes no decision. Fallback rule programs
+  // return it to fall through to the next fallback rule. Ordinary rules may
+  // return it on clients that support rule fall-through, where it means:
+  // continue to the next rule in precedence order. Clients without that
+  // support reject ordinary-rule expressions referencing this value at
+  // compile time, which is the intended fail-safe.
   UNSPECIFIED = 0;
 
   // Allow the process to execute.
@@ -69,6 +73,54 @@ enum ReturnValue {
   // Block the process from executing and do not show TTY notifications to the
   // user, but still show GUI notifications.
   SILENT_TTY_BLOCKLIST = 10;
+}
+
+// A schedule of time windows, evaluated by the in_schedule() CEL function.
+//
+// The client parses this message out of the rule's expression at ingest, which
+// is what lets it compute transition times for warnings and process
+// termination without executing the program. Servers MUST emit it as a
+// protojson string literal so that it remains statically readable.
+//
+// Parsing is strict and all-or-nothing: a schedule containing an unknown
+// window kind, an empty windows list, or a window with no kind set fails to
+// parse, and the rule carrying it is rejected at ingest. Partial enforcement
+// of a schedule would change its meaning.
+message Schedule {
+  // A single absolute window. Seconds since the UNIX epoch, UTC.
+  // Unset means unbounded on that side.
+  message OneShot {
+    optional int64 not_before = 1;
+    optional int64 not_after = 2;
+  }
+
+  // A weekly repeat, stated in local wall-clock time. The timezone that
+  // resolves it is the schedule's, passed as in_schedule()'s optional second
+  // argument; when the argument is absent, the host's configured timezone is
+  // used.
+  message Weekly {
+    // Days the window starts on. Sunday = 0, matching both Go's time.Weekday
+    // and CEL's getDayOfWeek().
+    repeated int32 weekdays = 1;
+    string start_tod = 2; // "HH:MM"
+    string end_tod = 3; // "HH:MM"; <= start_tod means the next day
+  }
+
+  // One window family. New kinds are added here, and only here. A client that
+  // does not know a kind fails the parse, which fails the rule safely.
+  message Window {
+    oneof kind {
+      OneShot one_shot = 1;
+      Weekly weekly = 2;
+    }
+  }
+
+  // The schedule is the union of its windows: an instant is in the schedule
+  // when it is inside any window. Overlapping or adjacent windows are merged
+  // by the evaluator before transition times are computed. At least one window
+  // is required. A schedule holds at most 64 windows; clients reject larger
+  // schedules at parse time.
+  repeated Window windows = 1;
 }
 
 // The fields in this message provided to CEL programs.
