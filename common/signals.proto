@@ -45,6 +45,11 @@ message Signal {
 
   // CEL boolean expression over `event`. A true result is a match.
   string expression = 3;
+
+  // When true, a match reports the whole process tree around the matched
+  // process - siblings included - instead of just its ancestry. See
+  // SignalReport.Match.process_tree.
+  bool full_process_tree = 4;
 }
 
 // SignalReport summarizes how a single detection signal matched over the course
@@ -69,9 +74,16 @@ message SignalReport {
     // separated by a colon (e.g. "execution:<id>").
     repeated string event_ids = 1;
 
-    // The ancestry of the process the matched event pertains to, reconstructed
-    // from the process tree sleigh builds from fork/exec/exit telemetry. Element
-    // 0 is the process itself, element 1 its parent, and so on to the root.
+    // The process tree for the process the matched event pertains to,
+    // reconstructed from the tree sleigh builds from fork/exec/exit telemetry.
+    // Element 0 is always the matched process itself; the matched ancestry
+    // slice is found by following parent_pid/parent_pidversion up from it.
+    //
+    // By default only that ancestry is included (element 1 is the parent,
+    // element 2 its parent, and so on to the root). When the fired signal set
+    // full_process_tree, the remaining elements are the whole tree rooted at
+    // the ancestry's root - siblings, cousins and descendants included - in no
+    // particular order.
     repeated SignalProcessNode process_tree = 2;
 
     // Full details for responsible processes referenced by a process_tree node's
@@ -104,4 +116,8 @@ message SignalProcessNode {
   string cdhash = 10;
   repeated string args = 11;
   repeated string envs = 12;
+  // The parent process, used to rebuild the tree from process_tree and to find
+  // the matched ancestry slice within a full tree. Zero on the root node.
+  int32 parent_pid = 13;
+  int32 parent_pidversion = 14;
 }
