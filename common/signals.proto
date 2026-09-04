@@ -120,4 +120,6 @@ message SignalProcessNode {
   // the matched ancestry slice within a full tree. Zero on the root node.
   int32 parent_pid = 13;
   int32 parent_pidversion = 14;
+  uint64 start_boottime = 15;
+  uint64 parent_start_boottime = 16;
 }
