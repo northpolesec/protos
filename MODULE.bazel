@@ -1,4 +1,4 @@
 module(name = "protos")
 
-bazel_dep(name = "googleapis", version = "0.0.0-20250703-f9d6fe4a")
-bazel_dep(name = "protobuf", version = "31.1")
+bazel_dep(name = "googleapis", version = "0.0.0-20260825-d10ac924")
+bazel_dep(name = "protobuf", version = "36.1.bcr.1")
