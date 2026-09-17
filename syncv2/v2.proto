@@ -101,6 +101,31 @@ enum ClientMode {
   STANDALONE = 3;
 }
 
+// Policy applied when Santa cannot confirm that the file it evaluated is the
+// image the kernel loaded (the ExecutableIntegrityPolicy configuration key).
+// Only settable via sync v2; v1 fleets configure it via configuration profile.
+enum ExecutableIntegrityPolicy {
+  // The server is not setting this policy; the client's existing
+  // configuration governs.
+  EXECUTABLE_INTEGRITY_POLICY_UNSPECIFIED = 0;
+
+  // Deny a confirmed swap; an unreadable exec target follows FailClosed.
+  BLOCK_CHANGED = 1;
+
+  // Deny a confirmed swap and any exec target that could not be read, in any
+  // client mode.
+  BLOCK_UNVERIFIED = 2;
+
+  // A confirmed swap does not block; the event is marked identity_unverified.
+  // An unreadable exec target still follows FailClosed. Marked events are
+  // force-uploaded regardless of the host's normal upload settings.
+  REPORT = 3;
+
+  // Same disposition as REPORT; differs only in storage: marked events defer
+  // to the host's normal upload settings instead of being force-uploaded.
+  IGNORE = 4;
+}
+
 message PreflightRequest {
   // The host's serial number.
   string serial_number = 1 [json_name = "serial_num"];
@@ -543,6 +568,10 @@ message PreflightResponse {
   // A set of CEL expressions to apply to telemetry before upload.
   repeated string telemetry_filter_expressions = 35;
 
+  // Policy applied when Santa cannot confirm the executable backing an
+  // execution. Unset/UNSPECIFIED leaves the client's existing setting alone.
+  optional ExecutableIntegrityPolicy executable_integrity_policy = 40 [json_name = "executable_integrity_policy"];
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -587,7 +616,7 @@ message PreflightResponse {
   reserved 17;
   reserved 38;
 
-  // next ID: 40
+  // next ID: 41
 }
 
 // The Decision enum records what decision Santa made about an execution.
@@ -658,7 +687,8 @@ enum Decision {
   BLOCK_CEL_FALLBACK = 17;
 
   // The execution was blocked because the kernel's view of the binary
-  // disagreed with Santa's on-disk view at policy-evaluation time.
+  // disagreed with Santa's on-disk view at policy-evaluation time, or because
+  // ExecutableIntegrityPolicy BLOCK_UNVERIFIED denied an unreadable target.
   BLOCK_BINARY_MISMATCH = 18;
 
   // The execution was allowed because the binary is considered a platform
@@ -900,6 +930,12 @@ message Event {
   // field still reports the underlying allow reason (e.g. ALLOW_BINARY,
   // ALLOW_CEL_FALLBACK).
   bool audit_return = 36 [json_name = "audit_return"];
+
+  // True when Santa could not confirm that the file it evaluated for this
+  // event is the image the kernel loaded. The decision field still reports the
+  // real outcome of the evaluation; content-derived fields on this event,
+  // including the file hash, describe what Santa read and are report-only.
+  bool identity_unverified = 37 [json_name = "identity_unverified"];
 }
 
 // Information about a given process. This can optionally be used to
