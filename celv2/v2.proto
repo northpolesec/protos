@@ -69,6 +69,27 @@ enum ReturnValue {
   // Block the process from executing and do not show TTY notifications to the
   // user, but still show GUI notifications.
   SILENT_TTY_BLOCKLIST = 10;
+
+  // Hold the process until the user has touched a FIDO2 hardware security key
+  // attached to the machine, allowing or denying the execution as appropriate.
+  // Touch ID does not satisfy this policy.
+  //
+  // This establishes that a person was present, not which person: the client
+  // checks user presence and does not verify which key was touched.
+  REQUIRE_SECURITY_KEY = 11;
+
+  // Identical to REQUIRE_SECURITY_KEY but goes straight to the security key
+  // prompt without showing the usual Santa block dialog.
+  REQUIRE_SECURITY_KEY_ONLY = 12;
+
+  // Hold the process until the user has demonstrated physical presence with
+  // either Touch ID or a FIDO2 hardware security key, allowing or denying the
+  // execution as appropriate.
+  REQUIRE_PRESENCE = 13;
+
+  // Identical to REQUIRE_PRESENCE but goes straight to authorization without
+  // showing the usual Santa block dialog.
+  REQUIRE_PRESENCE_ONLY = 14;
 }
 
 // The fields in this message provided to CEL programs.
