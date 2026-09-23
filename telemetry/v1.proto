@@ -366,6 +366,12 @@ message Execution {
   // session rather than the configured client mode. The `mode` field still
   // reports the effective mode the decision was made under (MODE_MONITOR).
   optional bool temporary_monitor_mode = 20;
+
+  // True when Santa could not confirm that the file it evaluated for this
+  // event is the image the kernel loaded. The decision field still reports the
+  // real outcome of the evaluation; content-derived fields on this event,
+  // including the file hash, describe what Santa read and are report-only.
+  optional bool identity_unverified = 21;
 }
 
 // Information about a fork event
