@@ -726,6 +726,10 @@ message Event {
   // real outcome of the evaluation; content-derived fields on this event,
   // including the file hash, describe what Santa read and are report-only.
   bool identity_unverified = 37 [json_name = "identity_unverified"];
+
+  // Provided by sync v2
+  reserved 38;
+  reserved "annotations";
 }
 
 // Information about a given process. This can optionally be used to
