@@ -151,6 +151,20 @@ message FileDescriptor {
   optional uint64 pipe_id = 3;
 }
 
+// Annotations attached to a process by Santa's process tree
+message Annotations {
+  enum Originator {
+    UNSPECIFIED = 0;
+    LOGIN = 1;
+    CRON = 2;
+  }
+
+  optional Originator originator = 1;
+
+  // Names of the annotations added by CEL rules via add_annotation(), sorted.
+  repeated string cel = 2;
+}
+
 // Process information
 message ProcessInfo {
   // Process ID of the process
@@ -200,8 +214,8 @@ message ProcessInfo {
   // Time the process was started
   optional google.protobuf.Timestamp start_time = 17;
 
-  // Process annotations - not currently used.
-  reserved 18;
+  // Process annotations
+  optional Annotations annotations = 18;
 }
 
 // Light variant of ProcessInfo message to help minimize on-disk/on-wire sizes
@@ -232,8 +246,8 @@ message ProcessInfoLight {
   // File information for the executable backing this process
   optional FileInfoLight executable = 10;
 
-  // Process annotations - not currently used.
-  reserved 11;
+  // Process annotations
+  optional Annotations annotations = 11;
 }
 
 // Certificate information
