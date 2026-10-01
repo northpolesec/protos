@@ -1584,6 +1584,21 @@ message FileAccessRule {
     RULE_TYPE_PROCESSES_WITH_ALLOWED_PATHS = 3;
     RULE_TYPE_PROCESSES_WITH_DENIED_PATHS = 4;
   }
+  // How a rule treats renaming or cloning a directory that contains one of
+  // its paths, at any depth.
+  enum ParentDirectoryProtection {
+    // The client applies its default.
+    PARENT_DIRECTORY_PROTECTION_UNSPECIFIED = 0;
+    // The operation is not evaluated against the rule.
+    PARENT_DIRECTORY_PROTECTION_DISABLED = 1;
+    // The operation is evaluated against the rule, and a violation is
+    // reported but not blocked.
+    PARENT_DIRECTORY_PROTECTION_AUDIT = 2;
+    // The operation is evaluated against the rule as if it accessed the
+    // rule's paths directly, so `block_violations` decides whether a
+    // violation is blocked.
+    PARENT_DIRECTORY_PROTECTION_ENFORCE = 3;
+  }
   message Process {
     oneof identifier {
       string binary_path = 1;
@@ -1668,6 +1683,9 @@ message FileAccessRule {
     // falls back to how the rule treats an unlisted process: denied (and
     // notified) for RULE_TYPE_PATHS_WITH_ALLOWED_PROCESSES.
     repeated ProcessWithOptions processes_with_options = 14;
+    // How this rule treats renaming or cloning a directory that contains one
+    // of its paths.
+    ParentDirectoryProtection parent_directory_protection = 15;
   }
   message Remove {
     string name = 1;
