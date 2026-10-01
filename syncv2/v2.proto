@@ -1118,13 +1118,13 @@ enum NetworkFlowTier {
   // Matched a CIDR block (Remote.Addresses).
   NETWORK_FLOW_TIER_CIDR = 2;
 
-  // Matched an exact hostname (Remote.Hostnames).
+  // Matched an exact hostname (Remote.Hostnames or DNSQuestions.exact_names).
   NETWORK_FLOW_TIER_HOSTNAME = 3;
 
-  // Matched a domain suffix (Remote.Domains).
+  // Matched a domain suffix (Remote.Domains or DNSQuestions.suffixes).
   NETWORK_FLOW_TIER_DOMAIN = 4;
 
-  // Matched any remote (no remote matcher constrained the flow).
+  // Matched any remote (no remote matcher constrained the flow, or DNSQuestions.any_name).
   NETWORK_FLOW_TIER_ANY_REMOTE = 5;
 }
 
@@ -1174,7 +1174,18 @@ message NetworkFlowEvent {
   // The process that delegated the flow on behalf of another (e.g. mDNSResponder).
   optional Process via_process = 14;
 
-  // next ID: 18
+  // Set only for a decision on a DNS question. Then rule_id is always set (a
+  // question no rule matches is forwarded and not reported), hostname is the
+  // question name, remote_address and remote_port are the resolver, local
+  // fields are unset, protocol is 17 or 6, direction is OUTGOING, and
+  // decision_tier is HOSTNAME (exact name), DOMAIN (suffix), or ANY_REMOTE
+  // (any name).
+  message DNSQuestion {
+    uint32 qtype = 1; // 1 = A, 28 = AAAA, 65 = HTTPS
+  }
+  optional DNSQuestion dns_question = 18;
+
+  // next ID: 19
 }
 
 // Audit Event for when Santa makes a new rule in standalone mode.
@@ -1754,11 +1765,31 @@ message NetworkFlowRule {
     message Addresses {
       repeated string values = 1;
     }
+    // Matches DNS question names before resolution, independently of socket
+    // hostname/domain matching. Applies to all question types (QTYPEs).
+    message DNSQuestions {
+      // Exact hostnames. Names are ASCII-case-insensitive; a trailing root dot
+      // is ignored when normalizing authored names.
+      repeated string exact_names = 1;
+      // Matches each domain itself and its subdomains, at DNS label boundaries.
+      repeated string suffixes = 2;
+      // Explicit catch-all. When true, both name lists must be empty. Otherwise,
+      // at least one name is required; an empty message is not a catch-all.
+      bool any_name = 3;
+    }
 
     oneof remote {
       Hostnames hostnames = 1;
       Domains domains = 2;
       Addresses addresses = 3;
+      // A DNS rule has exactly one Remote, this arm. It must not set
+      // processes, ports, or protocols, and direction must be ANY. Servers
+      // and clients reject a rule that violates any of these.
+      //
+      // All four actions apply. ALLOW and AUDIT forward the question. DENY
+      // and SILENT_DENY answer it with Add.dns_response. No match forwards
+      // the question; the connection default action does not apply.
+      DNSQuestions dns_questions = 4;
     }
   }
 
@@ -1767,6 +1798,20 @@ message NetworkFlowRule {
     uint32 low = 1;
     // Inclusive upper bound. If unset, the range matches only `low`.
     optional uint32 high = 2;
+  }
+
+  // The reply for a denying DNS rule. Valid only on a dns_questions rule with
+  // ACTION_DENY or ACTION_SILENT_DENY. Unset means NXDOMAIN. Servers must not
+  // send a kind the host cannot produce. Clients reject an unknown kind.
+  message DNSResponse {
+    enum Kind {
+      KIND_UNSPECIFIED = 0; // NXDOMAIN
+      KIND_NXDOMAIN = 1; // RCODE 3: the name does not exist
+      KIND_NODATA = 2; // RCODE 0, no answers: no records of this type
+      // Reserved: KIND_OVERRIDE = 3, with `repeated string addresses = 2` and
+      // `uint32 ttl_seconds = 3` in this message.
+    }
+    Kind kind = 1;
   }
 
   message Add {
@@ -1805,6 +1850,9 @@ message NetworkFlowRule {
     // UI, i.e. the EventDetailText configuration value.
     // See: https://santa.dev/deployment/configuration#eventdetailtext
     string event_detail_button_label = 13;
+    // Reply for a denying DNS rule. See DNSResponse.
+    DNSResponse dns_response = 14;
+    // next ID: 15
   }
 
   message Remove {
