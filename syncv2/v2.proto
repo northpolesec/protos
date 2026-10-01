@@ -939,6 +939,11 @@ message Event {
 
   // Names of the annotations attached to the executing process, sorted.
   repeated string annotations = 38 [json_name = "annotations"];
+
+  // If the executed file is part of a bundle, this field will be set to the
+  // LSApplicationCategoryType of the bundle, e.g.
+  // "public.app-category.developer-tools".
+  string file_bundle_category = 39 [json_name = "file_bundle_category"];
 }
 
 // Information about a given process. This can optionally be used to
