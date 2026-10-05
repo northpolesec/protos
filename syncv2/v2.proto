@@ -107,8 +107,8 @@ enum ClientMode {
 // ExecutableIntegrityPolicy configuration key). Only settable via sync v2; v1
 // fleets configure it via configuration profile.
 enum ExecutableIntegrityPolicy {
-  // The server is not setting this policy; the client's existing
-  // configuration governs.
+  // The server is not setting this policy; the client's configuration profile
+  // value or default governs.
   EXECUTABLE_INTEGRITY_POLICY_UNSPECIFIED = 0;
 
   // Deny an execution whose target changed during launch or could not be
