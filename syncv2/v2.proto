@@ -219,7 +219,12 @@ message PreflightRequest {
   // Hash of FAA rules.
   string file_access_rules_hash = 23;
 
-  // next ID: 28
+  // The ExecutableIntegrityPolicy in effect at the time of this sync: the
+  // synced, configuration profile, or default value, with ENFORCE reported as
+  // REPORT in MONITOR mode. UNSPECIFIED from clients that predate this field.
+  ExecutableIntegrityPolicy executable_integrity_policy = 28 [json_name = "executable_integrity_policy"];
+
+  // next ID: 29
 }
 
 enum SyncType {

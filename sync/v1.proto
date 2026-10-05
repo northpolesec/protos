@@ -149,9 +149,9 @@ message PreflightRequest {
   string rules_hash = 22;
 
   // Provided by sync v2
-  reserved 23 to 27;
+  reserved 23 to 28;
 
-  // next ID: 28
+  // next ID: 29
 }
 
 enum SyncType {
