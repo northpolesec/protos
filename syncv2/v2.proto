@@ -102,28 +102,29 @@ enum ClientMode {
 }
 
 // Policy applied when Santa cannot confirm that the file it evaluated is the
-// image the kernel loaded (the ExecutableIntegrityPolicy configuration key).
-// Only settable via sync v2; v1 fleets configure it via configuration profile.
+// image the kernel loaded: the file changed during launch and its signing
+// identity no longer matches, or Santa could not read it (the
+// ExecutableIntegrityPolicy configuration key). Only settable via sync v2; v1
+// fleets configure it via configuration profile.
 enum ExecutableIntegrityPolicy {
   // The server is not setting this policy; the client's existing
   // configuration governs.
   EXECUTABLE_INTEGRITY_POLICY_UNSPECIFIED = 0;
 
-  // Deny a confirmed swap; an unreadable exec target follows FailClosed.
-  BLOCK_CHANGED = 1;
+  // Deny an execution whose target changed during launch or could not be
+  // read, in LOCKDOWN and STANDALONE modes. In MONITOR mode the client treats
+  // this as REPORT. The client default.
+  ENFORCE = 1;
 
-  // Deny a confirmed swap and any exec target that could not be read, in any
-  // client mode.
-  BLOCK_UNVERIFIED = 2;
+  // Evaluate rules against the on-disk file, which may not be what executed.
+  // A target that could not be read follows FailClosed. Events are marked
+  // identity_unverified and force-uploaded regardless of the host's normal
+  // upload settings.
+  REPORT = 2;
 
-  // A confirmed swap does not block; the event is marked identity_unverified.
-  // An unreadable exec target still follows FailClosed. Marked events are
-  // force-uploaded regardless of the host's normal upload settings.
-  REPORT = 3;
-
-  // Same disposition as REPORT; differs only in storage: marked events defer
-  // to the host's normal upload settings instead of being force-uploaded.
-  IGNORE = 4;
+  // Same as REPORT, except that marked events follow the host's normal upload
+  // settings instead of being force-uploaded.
+  IGNORE = 3;
 }
 
 message PreflightRequest {
@@ -569,7 +570,8 @@ message PreflightResponse {
   repeated string telemetry_filter_expressions = 35;
 
   // Policy applied when Santa cannot confirm the executable backing an
-  // execution. Unset/UNSPECIFIED leaves the client's existing setting alone.
+  // execution. Unset leaves the client's synced value alone. UNSPECIFIED
+  // clears it, so the client's configuration profile value or default governs.
   optional ExecutableIntegrityPolicy executable_integrity_policy = 40 [json_name = "executable_integrity_policy"];
 
   // These fields are deprecated forms of other fields and exist here solely for
@@ -688,7 +690,7 @@ enum Decision {
 
   // The execution was blocked because the kernel's view of the binary
   // disagreed with Santa's on-disk view at policy-evaluation time, or because
-  // ExecutableIntegrityPolicy BLOCK_UNVERIFIED denied an unreadable target.
+  // ExecutableIntegrityPolicy ENFORCE denied an unreadable target.
   BLOCK_BINARY_MISMATCH = 18;
 
   // The execution was allowed because the binary is considered a platform
