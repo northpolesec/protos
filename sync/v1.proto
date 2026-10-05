@@ -149,9 +149,9 @@ message PreflightRequest {
   string rules_hash = 22;
 
   // Provided by sync v2
-  reserved 23 to 27;
+  reserved 23 to 28;
 
-  // next ID: 28
+  // next ID: 29
 }
 
 enum SyncType {
@@ -487,7 +487,7 @@ enum Decision {
 
   // The execution was blocked because the kernel's view of the binary
   // disagreed with Santa's on-disk view at policy-evaluation time, or because
-  // ExecutableIntegrityPolicy BLOCK_UNVERIFIED denied an unreadable target.
+  // ExecutableIntegrityPolicy ENFORCE denied an unreadable target.
   BLOCK_BINARY_MISMATCH = 18;
 
   // The execution was allowed because the binary is considered a platform
