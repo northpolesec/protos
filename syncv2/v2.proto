@@ -1124,7 +1124,7 @@ enum NetworkFlowTier {
   // Matched a domain suffix (Remote.Domains or DNSQuestions.suffixes).
   NETWORK_FLOW_TIER_DOMAIN = 4;
 
-  // Matched any remote (no remote matcher constrained the flow, or DNSQuestions.any_name).
+  // Matched any remote (no remote matcher constrained the flow).
   NETWORK_FLOW_TIER_ANY_REMOTE = 5;
 }
 
@@ -1178,8 +1178,7 @@ message NetworkFlowEvent {
   // question no rule matches is forwarded and not reported), hostname is the
   // question name, remote_address and remote_port are the resolver, local
   // fields are unset, protocol is 17 or 6, direction is OUTGOING, and
-  // decision_tier is HOSTNAME (exact name), DOMAIN (suffix), or ANY_REMOTE
-  // (any name).
+  // decision_tier is HOSTNAME (exact name) or DOMAIN (suffix).
   message DNSQuestion {
     uint32 qtype = 1; // 1 = A, 28 = AAAA, 65 = HTTPS
   }
@@ -1773,9 +1772,7 @@ message NetworkFlowRule {
       repeated string exact_names = 1;
       // Matches each domain itself and its subdomains, at DNS label boundaries.
       repeated string suffixes = 2;
-      // Explicit catch-all. When true, both name lists must be empty. Otherwise,
-      // at least one name is required; an empty message is not a catch-all.
-      bool any_name = 3;
+      // There is no catch-all: a rule lists at least one name.
     }
 
     oneof remote {
