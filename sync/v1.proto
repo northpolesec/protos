@@ -377,6 +377,7 @@ message PreflightResponse {
   reserved 34 to 35;
   reserved 39;
   reserved 40;
+  reserved 41 to 42;
 
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
@@ -417,7 +418,7 @@ message PreflightResponse {
     deprecated = true
   ];
 
-  // next ID: 41
+  // next ID: 43
 }
 
 // The Decision enum records what decision Santa made about an execution.
