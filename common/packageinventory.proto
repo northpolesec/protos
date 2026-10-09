@@ -60,6 +60,7 @@ message PackageInventoryScan {
     ECOSYSTEM_HOMEBREW = 9;
     ECOSYSTEM_AGENT_SKILL = 10;
     ECOSYSTEM_NIX = 11;
+    ECOSYSTEM_AI_ACCOUNT = 12;
   }
 
   // Discovery profile. Unset (PROFILE_UNKNOWN) is treated as
