@@ -579,6 +579,18 @@ message PreflightResponse {
   // clears it, so the client's configuration profile value or default governs.
   optional ExecutableIntegrityPolicy executable_integrity_policy = 40 [json_name = "executable_integrity_policy"];
 
+  // The message to display when a removable media mount is blocked, including
+  // encrypted volumes. Unset leaves the client's synced message alone; an
+  // empty string clears it, so the client's configuration profile message or
+  // default applies.
+  optional string banned_removable_media_block_message = 41;
+
+  // The message to display when a removable media mount is remounted with
+  // restricted flags, including encrypted volumes. Unset leaves the client's
+  // synced message alone; an empty string clears it, so the client's
+  // configuration profile message or default applies.
+  optional string remount_removable_media_block_message = 42;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -623,7 +635,7 @@ message PreflightResponse {
   reserved 17;
   reserved 38;
 
-  // next ID: 41
+  // next ID: 43
 }
 
 // The Decision enum records what decision Santa made about an execution.
