@@ -1304,6 +1304,28 @@ message NetworkActivity {
     // next ID: 19
   }
 
+  // A DNS question the DNS proxy handled during the window. Set only under
+  // Process.dns_questions; Process.flows keeps meaning connections.
+  message DNSQuestion {
+    optional string id = 1; // a new UUID per question
+    optional string name = 2; // question name, lowercase
+    optional uint32 qtype = 3; // 1 = A, 28 = AAAA, 65 = HTTPS
+    optional string resolver_address = 4; // where the question was sent
+    optional uint32 resolver_port = 5;
+    optional int32 protocol = 6; // 17 = UDP, 6 = TCP
+    optional Flow.Decision decision = 7;
+    optional Flow.Tier decision_tier = 8;
+    optional int64 rule_id = 9;
+    optional string rule_name = 10;
+    optional uint32 rcode = 11; // unset: no answer reached the client
+    repeated string answers = 12; // A/AAAA addresses in the answer
+    optional uint64 bytes_outbound = 13; // question size
+    optional uint64 bytes_inbound = 14; // answer size, 0 when no answer
+    optional google.protobuf.Timestamp start_time = 15; // question received
+    optional google.protobuf.Timestamp close_time = 16; // answer sent, local reply sent, or the proxy gave up
+    // next ID: 17
+  }
+
   // Network activity for a single process
   message Process {
     // Information about the process performing network activity
@@ -1311,6 +1333,11 @@ message NetworkActivity {
 
     // Active flows for this process during the window
     repeated Flow flows = 2;
+
+    // DNS questions the DNS proxy handled for this process during the window
+    repeated DNSQuestion dns_questions = 3;
+
+    // next ID: 4
   }
 
   // All processes with network activity during this window
