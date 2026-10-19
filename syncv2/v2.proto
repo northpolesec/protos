@@ -591,6 +591,10 @@ message PreflightResponse {
   // configuration profile message or default applies.
   optional string remount_removable_media_block_message = 42;
 
+  // If true, Santa skips re-hashing an executable whose code signature the
+  // kernel does not enforce before reusing a cached allow for it.
+  optional bool disable_executable_integrity_recheck = 43;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
@@ -635,7 +639,7 @@ message PreflightResponse {
   reserved 17;
   reserved 38;
 
-  // next ID: 43
+  // next ID: 44
 }
 
 // The Decision enum records what decision Santa made about an execution.
