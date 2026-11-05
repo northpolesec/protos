@@ -91,5 +91,5 @@ message PackageInventoryScan {
 
   // Opaque ID the issuer assigns so it can find this scan's rows. When set,
   // sleigh writes it to every row's RunID instead of generating one.
-  string run_id = 7;
+  optional string run_id = 7;
 }
