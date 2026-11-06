@@ -88,4 +88,8 @@ message PackageInventoryScan {
 
   // Wall-clock budget for the whole scan. Zero / unset means unbounded.
   google.protobuf.Duration max_duration = 6;
+
+  // Opaque ID the issuer assigns so it can find this scan's rows. When set,
+  // sleigh writes it to every row's RunID instead of generating one.
+  optional string run_id = 7;
 }
