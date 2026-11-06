@@ -752,6 +752,32 @@ message Entitlement {
   optional string value = 2;
 }
 
+// A library an executable declares as a dependency.
+message LinkedLibrary {
+  // How the executable references the library.
+  enum LoadKind {
+    LOAD_KIND_UNSPECIFIED = 0;
+    // LC_LOAD_DYLIB
+    LOAD_KIND_LOAD = 1;
+    // LC_LOAD_WEAK_DYLIB
+    LOAD_KIND_WEAK = 2;
+    // LC_REEXPORT_DYLIB
+    LOAD_KIND_REEXPORT = 3;
+    // LC_LAZY_LOAD_DYLIB
+    LOAD_KIND_LAZY = 4;
+    // LC_LOAD_UPWARD_DYLIB
+    LOAD_KIND_UPWARD = 5;
+    // An ELF DT_NEEDED entry
+    LOAD_KIND_ELF_NEEDED = 6;
+  }
+
+  // The install name (Mach-O) or soname (ELF) as written in the executable,
+  // e.g. "/usr/lib/libSystem.B.dylib" or "@rpath/Sparkle.framework/Sparkle".
+  string install_name = 1 [json_name = "install_name"];
+
+  LoadKind kind = 2 [json_name = "kind"];
+}
+
 // Information about entitlements
 message EntitlementInfo {
   // Whether or not the set of reported entitlements is complete or has been
@@ -967,6 +993,16 @@ message Event {
   // LSApplicationCategoryType of the bundle, e.g.
   // "public.app-category.developer-tools".
   string file_bundle_category = 39 [json_name = "file_bundle_category"];
+
+  // Libraries the executable declares as dependencies, in load command order.
+  // On macOS these are read from the Mach-O load commands (LC_LOAD_DYLIB and
+  // related) of the slice the kernel loaded. Install names are reported as
+  // written, so they may contain @rpath, @loader_path or @executable_path.
+  repeated LinkedLibrary linked_libraries = 40 [json_name = "linked_libraries"];
+
+  // True when linked_libraries is incomplete: the list was capped or the load
+  // commands could not be fully parsed.
+  bool linked_libraries_truncated = 41 [json_name = "linked_libraries_truncated"];
 }
 
 // Information about a given process. This can optionally be used to
