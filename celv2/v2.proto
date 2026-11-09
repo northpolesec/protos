@@ -128,6 +128,13 @@ message ExecutionContext {
   // full resolved path.
   // Using this field will prevent the result from being cached.
   string path = 8;
+
+  // The responsible process of the process being executed, as macOS tracks it
+  // for attribution across XPC and launchd boundaries (e.g. the app that asked
+  // a helper to launch). Often the process itself or one of its ancestors.
+  // All fields are empty if the responsible process is unknown.
+  // Using this field will prevent the result from being cached.
+  Ancestor responsible_process = 9;
 }
 
 // The fields in this message are provided to the CEL program and are static,
