@@ -19,3 +19,19 @@ import the sync proto in Go code add the following to your imports:
 buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync
 ```
 
+## Telemetry
+
+`telemetry/v1.proto` is the schema of Santa's protobuf telemetry. With the
+`EventLogType` `protobuf`, the spool files are a `LogBatch` of `Any`-wrapped
+`SantaMessage`. With `protobufstream`, Santa writes length-delimited
+`SantaMessage`.
+
+Each Santa release N tags this repository `santa/N` at the schema it was built
+with.
+
+The telemetry schema is also on BSR. To import it in Go code, add the following
+to your imports:
+
+```text
+buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry
+```
