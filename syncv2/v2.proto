@@ -1763,10 +1763,17 @@ message NetworkFlowRule {
   }
 
   message Process {
+    // A client that does not support an identity drops the whole rule. It
+    // never widens the rule to match any process.
     oneof identity {
       string cd_hash = 1;
       string signing_id = 2;
       string team_id = 3;
+      // The SHA-256 of the executable file's contents, as 64 hex characters.
+      string sha256 = 4;
+      // The absolute path of the executable file, with symbolic links
+      // resolved. Matches only that exact path.
+      string path = 5;
     }
   }
 
