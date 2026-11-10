@@ -21,13 +21,10 @@ buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync
 
 ## Telemetry
 
-`telemetry/v1.proto` is the schema of Santa's protobuf telemetry. With the
-`EventLogType` `protobuf`, the spool files are a `LogBatch` of `Any`-wrapped
-`SantaMessage`. With `protobufstream`, Santa writes length-delimited
-`SantaMessage`.
-
-Each Santa release N tags this repository `santa/N` at the schema it was built
-with.
+`telemetry/v1.proto` is the schema of the protobuf telemetry that Santa for
+macOS writes. See the
+[Santa telemetry docs](https://northpole.dev/features/telemetry) for the file
+formats.
 
 The telemetry schema is also on BSR. To import it in Go code, add the following
 to your imports:
