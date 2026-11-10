@@ -595,6 +595,13 @@ message PreflightResponse {
   // kernel does not enforce before reusing a cached allow for it.
   optional bool disable_executable_integrity_recheck = 43;
 
+  // The message to display when an execution is blocked. This message will be
+  // used for all rules unless overridden by a rule-specific custom_msg.
+  // Supports basic HTML. Unset leaves the client's synced message alone; an
+  // empty string clears it, so the client's configuration profile message
+  // (BannedBlockMessage) or default applies.
+  optional string banned_block_message = 44;
+
   // These fields are deprecated forms of other fields and exist here solely for
   // backwards compatibility.
   optional bool deprecated_enabled_transitive_whitelisting = 1000 [
