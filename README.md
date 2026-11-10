@@ -19,3 +19,16 @@ import the sync proto in Go code add the following to your imports:
 buf.build/gen/go/northpolesec/protos/protocolbuffers/go/sync
 ```
 
+## Telemetry
+
+`telemetry/v1.proto` is the schema of the protobuf telemetry that Santa for
+macOS writes. See the
+[Santa telemetry docs](https://northpole.dev/features/telemetry) for the file
+formats.
+
+The telemetry schema is also on BSR. To import it in Go code, add the following
+to your imports:
+
+```text
+buf.build/gen/go/northpolesec/protos/protocolbuffers/go/telemetry
+```
