@@ -134,7 +134,7 @@ message ExecutionContext {
   // a helper to launch). Often the process itself or one of its ancestors.
   // All fields are empty if the responsible process is unknown.
   // Using this field will prevent the result from being cached.
-  Ancestor responsible_process = 9;
+  Process responsible_process = 9;
 }
 
 // The fields in this message are provided to the CEL program and are static,
@@ -173,6 +173,25 @@ message ExecutableFile {
 }
 
 message Ancestor {
+  // The path of the executable for this process.
+  string path = 1;
+
+  // This process's signing ID, if the process is validly signed.
+  string signing_id = 2;
+
+  // This process's team ID, if the process is validly signed.
+  string team_id = 3;
+
+  // This process's CDHash, if this process is validly signed.
+  string cdhash = 4;
+
+  // The command-line arguments for this process.
+  repeated string args = 5;
+}
+
+// A process, such as the responsible process of an exec. It has the same
+// fields and field numbers as Ancestor.
+message Process {
   // The path of the executable for this process.
   string path = 1;
 
