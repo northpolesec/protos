@@ -191,6 +191,8 @@ message Ancestor {
 
 // A process, such as the responsible process of an exec. It has the same
 // fields and field numbers as Ancestor.
+// ponytail: Ancestor is kept as-is for `ancestors`, so existing CEL policies
+// keep their type. `ancestors` can move to Process later with no wire change.
 message Process {
   // The path of the executable for this process.
   string path = 1;
