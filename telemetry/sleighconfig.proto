@@ -17,6 +17,7 @@ syntax = "proto3";
 package santa.telemetry.v1;
 
 import "commands/v1.proto";
+import "common/aiaccountinventory.proto";
 import "common/packageinventory.proto";
 import "common/signals.proto";
 import "telemetry/v1.proto";
@@ -135,6 +136,21 @@ message SleighPackageInventoryScan {
   SignedPost signed_post = 2;
 }
 
+// SleighAIAccountInventoryScan runs a read-only sweep of every user home for
+// the accounts AI assistants (Claude Code, Codex) are signed in with, and
+// uploads the results as Parquet inside a zip to a workshop-minted presigned
+// POST. Secrets are never reported. host_id / host_name come from the
+// SleighConfig wrapper and are stamped on every emitted row.
+message SleighAIAccountInventoryScan {
+  // Scan tuning parameters. Shared with the workshop-issued host command
+  // (santa.commands.v1.AIAccountInventoryRequest).
+  santa.common.v1.AIAccountInventoryScan scan = 1;
+
+  // Presigned POST minted by workshop. The object key is built from
+  // form_values["key"] suffixed by the run's generated filename.
+  SignedPost signed_post = 2;
+}
+
 // SleighConfig contains the configuration data to be passed to Sleigh when
 // Sleigh is started.
 message SleighConfig {
@@ -149,6 +165,7 @@ message SleighConfig {
     SleighBinaryUpload binary_upload = 4;
     SleighPackageInventoryScan package_inventory_scan = 5;
     SleighSignalScan signal_scan = 6;
+    SleighAIAccountInventoryScan ai_account_inventory_scan = 7;
   }
 }
 

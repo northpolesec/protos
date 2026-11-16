@@ -28,3 +28,16 @@ cc_proto_library(
     deps = [":packageinventory_proto"],
     visibility = ["//visibility:public"],
 )
+
+proto_library(
+    name = "aiaccountinventory_proto",
+    srcs = ["aiaccountinventory.proto"],
+    visibility = ["//visibility:public"],
+    deps = ["@protobuf//:duration_proto"],
+)
+
+cc_proto_library(
+    name = "aiaccountinventory_cc_proto",
+    deps = [":aiaccountinventory_proto"],
+    visibility = ["//visibility:public"],
+)

@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package santa.commands.v1;
 
+import "common/aiaccountinventory.proto";
 import "common/packageinventory.proto";
 
 option go_package = "buf.build/gen/go/northpolesec/protos/protocolbuffers/go/commands";
@@ -169,6 +170,33 @@ message PackageInventoryResponse {
   optional Error error = 1;
 }
 
+// Command to request Santa run a read-only AI account inventory scan (via
+// sleigh) and upload the results to the workshop-minted presigned POST. Santa
+// forwards `scan` and `signed_post` into the SleighAIAccountInventoryScan it
+// hands to sleigh.
+message AIAccountInventoryRequest {
+  // Scan tuning parameters. Shared with the SleighConfig command sleigh runs
+  // (SleighAIAccountInventoryScan).
+  santa.common.v1.AIAccountInventoryScan scan = 1;
+
+  // Presigned POST minted by workshop for the results zip. Santa forwards this
+  // to sleigh verbatim; the object key is baked into form_values["key"].
+  SignedPost signed_post = 2 [json_name = "signed_post"];
+}
+
+// Results are uploaded directly to the presigned POST (like binary upload), so
+// this only reports command-level success/failure.
+message AIAccountInventoryResponse {
+  enum Error {
+    ERROR_UNSPECIFIED = 0;
+    // Santa/sleigh failed to run the scan (spawn, parse, internal error).
+    ERROR_INTERNAL = 1;
+    // The scan ran but uploading the results to the presigned POST failed.
+    ERROR_UPLOAD_FAILED = 2;
+  }
+  optional Error error = 1;
+}
+
 // Command message sent to santa.host.<deviceid>.commands
 message SantaCommandRequest {
   // Nonce
@@ -241,6 +269,7 @@ message QueuedCommand {
     EventUploadRequest event_upload = 3;
     BinaryUploadRequest binary_upload = 4;
     PackageInventoryRequest package_inventory = 5;
+    AIAccountInventoryRequest ai_account_inventory = 6;
   }
 }
 
@@ -282,6 +311,7 @@ message CommandResult {
     EventUploadResponse event_upload = 5;
     BinaryUploadResponse binary_upload = 6;
     PackageInventoryResponse package_inventory = 7;
+    AIAccountInventoryResponse ai_account_inventory = 8;
   }
 }
 
