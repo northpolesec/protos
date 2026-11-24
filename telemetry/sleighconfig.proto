@@ -37,12 +37,31 @@ message SignedPost {
   map<string, string> form_values = 2;
 }
 
+// SigningKey is a long lived HMAC key sleigh uses to sign its own short lived
+// POST policy, for hosts that are not handed a SignedPost.
+message SigningKey {
+  // Destination bucket, e.g. "s3://bucket" or "gs://bucket". The scheme picks
+  // the signing flavor: AWS4-HMAC-SHA256 for s3, GOOG4-HMAC-SHA256 for gs.
+  string bucket_url = 1;
+
+  // Bucket region. Required for s3, ignored for gs.
+  string region = 2;
+
+  // HMAC access key id and secret (an AWS access key or a GCS HMAC key).
+  string access_key_id = 3;
+  string secret_access_key = 4;
+
+  // Object name prefix. The generated filename is appended to it.
+  string key_prefix = 5;
+}
+
 message SleighExportTelemetry {
   // The files to be exported, passed as a set of already open file descriptors.
   repeated int32 input_fds = 3;
 
   oneof export_config {
     SignedPost signed_post = 4;
+    SigningKey signing_key = 6;
   }
 
   // A set of CEL expressions to use to filter events as they are processed.
